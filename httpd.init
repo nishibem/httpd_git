@@ -17,6 +17,9 @@ if [ -f /etc/sysconfig/httpd ]; then
         . /etc/sysconfig/httpd
 fi
 
+# Start httpd in the C locale by default.
+HTTPD_LANG=${HTTPD_LANG-"C"}
+
 # This will prevent initlog from swallowing up a pass-phrase prompt if
 # mod_ssl needs a pass-phrase from the user.
 INITLOG_ARGS=""
@@ -39,7 +42,7 @@ check13 () {
 	GONE="(ServerType|BindAddress|Port|AddModule|ClearModuleList|"
 	GONE="${GONE}AgentLog|RefererLog|RefererIgnore|FancyIndexing|"
 	GONE="${GONE}AccessConfig|ResourceConfig)"
-	if grep -Eiq "^[[:space:]]*($GONE)" $CONFFILE; then
+	if LANG=C grep -Eiq "^[[:space:]]*($GONE)" $CONFFILE; then
 		echo
 		echo 1>&2 " Apache 1.3 configuration directives found"
 		echo 1>&2 " please read @docdir@/migration.html"
@@ -56,7 +59,7 @@ check13 () {
 start() {
         echo -n $"Starting $prog: "
         check13 || exit 1
-        daemon $httpd $OPTIONS
+        LANG=$HTTPD_LANG daemon $httpd $OPTIONS
         RETVAL=$?
         echo
         [ $RETVAL = 0 ] && touch ${lockfile}

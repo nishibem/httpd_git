@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.50
-Release: 3.ent
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -50,6 +50,7 @@ Patch30: httpd-2.0.48-davmisc.patch
 Patch32: httpd-2.0.48-vhost.patch
 Patch35: httpd-2.0.49-eocbucket.patch
 Patch37: httpd-2.0.46-autoindex.patch
+Patch38: httpd-2.0.50-userdir.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -162,6 +163,7 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch32 -p1 -b .vhost
 %patch35 -p1 -b .eocbucket
 %patch37 -p1 -b .autoindex
+%patch38 -p1 -b .userdir
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -578,6 +580,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Tue Aug 17 2004 Joe Orton <jorton@redhat.com> 2.0.50-4
+- start httpd in the C locale by default (#128002)
+- fix CustomLog comments in default httpd.conf (#43223)
+- ensure correct mod_suexec vs mod_userdir hook ordering 
+  (Joshua Slive, upstream #18156)
+
 * Tue Jun 29 2004 Joe Orton <jorton@redhat.com> 2.0.50-3
 - update -proxy11 patch
 - explain where suexec went if SuexecUserGroup is used but
