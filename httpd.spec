@@ -2,64 +2,53 @@
 %define suexec_caller apache
 %define mmn 20020628
 
+%ifarch ia64
+# disable debuginfo on IA64
+%define debug_package %{nil}
+%endif
+
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 11.9
+Release: 21
 URL: http://httpd.apache.org/
+Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
-Source5: README.confd
 Source6: powered_by.gif
 Source10: httpd.conf
 Source11: ssl.conf
-Source12: migration.html
-Source13: migration.css
 Source14: mod_ssl-Makefile.crt
-Source14: mod_ssl-Makefile.crl
+Source15: mod_ssl-Makefile.crl
+# Documentation
+Source30: migration.xml
+Source31: migration.css
+Source32: html.xsl
+Source33: README.confd
 # build/scripts patches
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
 Patch3: httpd-2.0.36-sslink.patch
 # Bug fixes
 Patch20: httpd-2.0.40-davsegv.patch
-Patch21: httpd-2.0.40-leaks.patch
-Patch22: httpd-2.0.40-nphcgi.patch
-Patch23: httpd-2.0.40-proxy.patch
-Patch24: httpd-2.0.40-range.patch
-Patch26: httpd-2.0.40-pipelog.patch
-Patch27: httpd-2.0.40-rwmap.patch
-Patch28: httpd-2.0.40-stream.patch
-Patch29: httpd-2.0.40-subreq.patch
-Patch30: httpd-2.0.40-sslexcl.patch
-Patch31: httpd-2.0.40-include.patch
-Patch32: httpd-2.0.46-graceful.patch
-Patch33: httpd-2.0.40-rand.patch
+Patch21: httpd-2.0.40-glibc23.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
 Patch42: httpd-2.0.40-xfsz.patch
 Patch43: httpd-2.0.40-pod.patch
-Patch44: httpd-2.0.40-prctl.patch
+Patch44: httpd-2.0.40-noshmht.patch
+Patch45: httpd-2.0.40-leaks.patch
 # Security fixes
 Patch60: httpd-2.0.40-CAN-2002-0840.patch
 Patch61: httpd-2.0.40-CAN-2002-0843.patch
-Patch62: httpd-2.0.40-CAN-2003-0132.patch
-Patch63: httpd-2.0.40-CAN-2003-0020.patch
-Patch64: httpd-2.0.40-fdleak.patch
-Patch65: httpd-2.0.40-CAN-2003-0083.patch
-Patch66: httpd-2.0.40-CAN-2003-0245.patch
-Patch68: httpd-2.0.40-CAN-2003-0192.patch
-Patch69: httpd-2.0.40-CAN-2003-0253.patch
-Patch70: httpd-2.0.40-CAN-2003-0254.patch
-Patch71: httpd-2.0.40-VU379828.patch
-Patch72: httpd-2.0.40-CAN-2003-0542.patch
+Patch62: httpd-2.0.40-CAN-2003-0020.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
-BuildPrereq: db4-devel, expat-devel, findutils, perl
+BuildPrereq: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
@@ -113,79 +102,109 @@ Security (TLS) protocols.
 %prep
 %setup -q
 %patch1 -p0 -b .apctl
-%patch2 -p1 -b .apxs
+%patch2 -p0 -b .apxs
 %patch3 -p0 -b .sslink
 
 %patch20 -p1 -b .davsegv
-%patch21 -p0 -b .leaks
-%patch22 -p1 -b .nphcgi
-%patch23 -p1 -b .proxy
-%patch24 -p1 -b .range
-%patch26 -p1 -b .pipelog
-%patch27 -p1 -b .rwmap
-%patch28 -p1 -b .stream
-%patch29 -p1 -b .subreq
-%patch30 -p1 -b .sslexcl
-%patch31 -p1 -b .include
-%patch32 -p1 -b .graceful
-%patch33 -p1 -b .rand
+%patch21 -p1 -b .glibc23
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
 %patch42 -p0 -b .xfsz
 %patch43 -p0 -b .pod
-%patch44 -p1 -b .prctl
+%patch44 -p0 -b .noshmht
+%patch45 -p0 -b .leaks
 
-%patch60 -p1 -b .can0840
+# no -b to prevent droplets in install root.
+%patch60 -p1
 %patch61 -p1 -b .can0843
-%patch62 -p1 -b .can0132
-%patch63 -p1 -b .can0020
-%patch64 -p1 -b .fdleak
-%patch65 -p1 -b .can0083
-%patch66 -p1 -b .can0245
-%patch68 -p1 -b .can0192
-%patch69 -p1 -b .can0253
-%patch70 -p1 -b .can0254
-%patch71 -p1 -b .vu379828
-%patch72 -p1 -b .can0542
+%patch62 -p1 -b .can0020
 
-# copy across the migration guide and sed it's location into apachectl
-cp $RPM_SOURCE_DIR/migration.{html,css} .
+# Safety check: prevent build if defined MMN does not equal upstream MMN.
+vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include \`pwd\`/include/ap_mmn.h | grep -v '#'`
+if test "x${vmmn}" != "x%{mmn}"; then
+   : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}.
+   : Update the mmn macro and rebuild.
+   exit 1
+fi
+
+# update location of migration guide in apachectl
+%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
+	support/apachectl.in
 
 # regenerate configure scripts
 ./buildconf
 
-%build
-# Fix version in apachectl
-%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
-	support/apachectl.in
+# Before configure; fix location of build dir in generated apxs
+%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
+	support/apxs.in
 
-CFLAGS="$RPM_OPT_FLAGS" \
-AP_LIBS="-lssl -lcrypto" \
-./configure \
+%build
+# build the migration guide
+xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks $RPM_SOURCE_DIR/migration.xml
+cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
+
+if pkg-config openssl ; then
+	# configure -C barfs with trailing spaces in CFLAGS
+	CFLAGS="$RPM_OPT_FLAGS `pkg-config --cflags openssl | sed 's/ *$//'`"
+	AP_LIBS="$AP_LIBS `pkg-config --libs openssl`"
+else
+	CFLAGS="$RPM_OPT_FLAGS"
+	AP_LIBS="-lssl -lcrypto"
+fi
+export CFLAGS
+export AP_LIBS
+
+function mpmbuild()
+{
+mpm=$1; shift
+mkdir $mpm; pushd $mpm
+cat > config.cache <<EOF
+ac_cv_func_pthread_mutexattr_setpshared=no
+ac_cv_func_sem_open=no
+EOF
+../configure -C \
  	--prefix=%{_sysconfdir}/httpd \
  	--exec-prefix=%{_prefix} \
  	--bindir=%{_bindir} \
  	--sbindir=%{_sbindir} \
  	--mandir=%{_mandir} \
+	--libdir=%{_libdir} \
 	--sysconfdir=%{_sysconfdir}/httpd/conf \
 	--includedir=%{_includedir}/httpd \
 	--libexecdir=%{_libdir}/httpd/modules \
 	--datadir=%{contentdir} \
-	--with-mpm=prefork \
-	--enable-mods-shared=all \
+	--with-mpm=$mpm \
 	--enable-suexec --with-suexec \
 	--with-suexec-caller=%{suexec_caller} \
 	--with-suexec-docroot=%{contentdir} \
 	--with-suexec-logfile=%{_localstatedir}/log/httpd/suexec.log \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-uidmin=500 --with-suexec-gidmin=500 \
-        --with-devrandom=/dev/urandom \
+	$*
+
+make %{?_smp_mflags}
+popd
+}
+
+# Only bother enabling optional modules for main build.
+mpmbuild prefork --enable-mods-shared=all \
 	--enable-ssl --with-ssl \
-	--enable-deflate \
+	--enable-deflate --enable-cgid \
 	--enable-proxy --enable-proxy-connect \
 	--enable-proxy-http --enable-proxy-ftp
-make %{?_smp_mflags}
+
+# To prevent most modules being built statically into httpd.worker, 
+# easiest way seems to be enable them shared.
+mpmbuild worker --enable-mods-shared=all
+
+# Verify that the same modules were built into the two httpd binaries
+./prefork/httpd -l | grep -v prefork > prefork.mods
+./worker/httpd -l | grep -v worker > worker.mods
+if ! diff -u prefork.mods worker.mods; then
+  : Different modules built into httpd binaries, will not proceed
+  exit 1
+fi
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -196,10 +215,11 @@ sed -e "1s/logresolve 8/logresolve 1/" \
   < docs/man/logresolve.8 > docs/man/logresolve.1
 rm docs/man/logresolve.8
 
+pushd prefork
 make DESTDIR=$RPM_BUILD_ROOT install
-
-### remove this
-# strip -g $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so
+popd
+# install worker binary
+install -m 755 worker/.libs/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -245,11 +265,9 @@ ln -s ../../../..%{_bindir}/libtool $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtoo
 sed -e "s|%{contentdir}/build|%{_libdir}/httpd/build|g" \
     -e "/AP_LIBS/d" -e "/abs_srcdir/d" \
     -e "/^LIBTOOL/s|/[^ ]*/libtool|%{_bindir}/libtool|" \
-    -e "s|^EXTRA_INCLUDES.*$|EXTRA_INCLUDES = -I\$(includedir) -I%{_includedir}/openssl|g" \
-  < build/config_vars.mk \
+    -e "/^EXTRA_INCLUDES/s|-I$RPM_BUILD_DIR[^ ]* ||g" \
+  < prefork/build/config_vars.mk \
   > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
-install -m 644 build/special.mk \
-    $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
 
 # Make the MMN accessible to module packages
 echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
@@ -295,6 +313,16 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
+
+# Remove unpackaged files
+rm -f $RPM_BUILD_ROOT%{_libdir}/libapr{,util}.{a,la} \
+      $RPM_BUILD_ROOT%{_libdir}/APRVARS $RPM_BUILD_ROOT%{_libdir}/*.exp \
+      $RPM_BUILD_ROOT/etc/httpd/conf/mime.types \
+      $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.exp \
+      $RPM_BUILD_ROOT%{_bindir}/ap?-config \
+      $RPM_BUILD_ROOT%{_sbindir}/{checkgid,dbmmanage,envvars*} \
+      $RPM_BUILD_ROOT%{contentdir}/htdocs/* \
+      $RPM_BUILD_ROOT%{contentdir}/cgi-bin/* 
 
 %pre
 # Add the "apache" user
@@ -366,6 +394,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/ht*
 %{_bindir}/logresolve
 %{_sbindir}/httpd
+%{_sbindir}/httpd.worker
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
 %attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
@@ -433,33 +462,48 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
-* Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.8
-- add security fixes for CVE CAN-2003-0542
-- return test page for "/+" in default httpd.conf
-- add bug fixes for #103049, #105725, #106454
-- add fixes for CGI regressions in -21.5 (#103744)
+* Mon Feb 24 2003 Joe Orton <jorton@redhat.com> 2.0.40-21
+- add security fix for CAN-2003-0020; replace non-printable characters
+  with '!' when printing to error log.
+- disable debuginfo on IA64.
 
-* Wed Jul  9 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.7
-- add security fixes for CVE CAN-2003-0192, CAN-2003-0253, 
-  CAN-2003-0254, CERT VU#379828
-- add bug fixes for #78019, #82985, #85022, #97111, #98545, #98653
-- install special.mk, fix apxs -q LIBTOOL (#92313)
-- add mod_include fixes from upstream
+* Tue Feb 11 2003 Joe Orton <jorton@redhat.com> 2.0.40-20
+- disable POSIX semaphores to support 2.4.18 kernel (#83324)
 
-* Tue May 27 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.6
-- add mod_ssl renegotiation fix
+* Wed Jan 29 2003 Joe Orton <jorton@redhat.com> 2.0.40-19
+- require xmlto 0.0.11 or later
+- fix apr_strerror on glibc2.3
 
-* Thu May 22 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.5
-- rebuild
+* Wed Jan 22 2003 Tim Powers <timp@redhat.com> 2.0.40-18
+- rebuilt
 
-* Mon May 12 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.4
-- add security fix for CAN-2003-0245
-- add bug fixes for #89179, #88575, #89086
+* Thu Jan 16 2003 Joe Orton <jorton@redhat.com> 2.0.40-17
+- add mod_cgid and httpd binary built with worker MPM (#75496)
+- allow choice of httpd binary in init script
+- pick appropriate CGI module based on loaded MPM in httpd.conf
+- source /etc/sysconfig/httpd in apachectl to get httpd choice
+- make "apachectl status" fail gracefully when links isn't found (#78159)
 
-* Tue Apr  1 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.3
-- add security fixes for CAN-2003-0020, CAN-2003-0132, CAN-2003-0083
-- add security fix for file descriptor leaks, #82142
-- add bug fixes for #73428, #82587, #86254
+* Mon Jan 13 2003 Joe Orton <jorton@redhat.com> 2.0.40-16
+- rebuild for OpenSSL 0.9.7
+
+* Fri Jan  3 2003 Joe Orton <jorton@redhat.com> 2.0.40-15
+- fix possible infinite recursion in config dir processing (#77206)
+- fix memory leaks in request body processing (#79282)
+
+* Thu Dec 12 2002 Joe Orton <jorton@redhat.com> 2.0.40-14
+- remove unstable shmht session cache from mod_ssl
+- get SSL libs from pkg-config if available (Nalin Dahyabhai)
+- stop "apxs -a -i" from inserting AddModule into httpd.conf (#78676)
+
+* Wed Nov  6 2002 Joe Orton <jorton@redhat.com> 2.0.40-13
+- fix location of installbuilddir in apxs when libdir!=/usr/lib
+
+* Wed Nov  6 2002 Joe Orton <jorton@redhat.com> 2.0.40-12
+- pass libdir to configure; clean up config_vars.mk
+- package instdso.sh, fixing apxs -i (#73428)
+- prevent build if upstream MMN differs from mmn macro
+- remove installed but unpackaged files
 
 * Wed Oct  9 2002 Joe Orton <jorton@redhat.com> 2.0.40-11
 - correct SERVER_NAME encoding in i18n error pages (thanks to Andre Malo)
