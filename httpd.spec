@@ -5,7 +5,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 6
+Release: 7
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -18,6 +18,8 @@ Source10: httpd.conf
 Source11: ssl.conf
 Source12: migration.html
 Source13: migration.css
+Source14: mod_ssl-Makefile.crt
+Source14: mod_ssl-Makefile.crl
 # build/scripts patches
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
@@ -155,6 +157,13 @@ install -m 644 $RPM_SOURCE_DIR/httpd.conf \
 for suffix in crl crt csr key prm; do
    mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/ssl.${suffix}
 done
+
+# Makefiles for certificate management
+for ext in crt crl; do 
+  install -m 644 $RPM_SOURCE_DIR/mod_ssl-Makefile.${ext} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/ssl.${ext}/Makefile.${ext}
+done
+ln -s ../../../usr/share/ssl/certs/Makefile $RPM_BUILD_ROOT/etc/httpd/conf
 
 # for holding mod_dav lock database
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
@@ -336,7 +345,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
-%dir %{_sysconfdir}/httpd/conf/ssl.*
+%attr(0700,root,root) %dir %{_sysconfdir}/httpd/conf/ssl.*
+%config %{_sysconfdir}/httpd/conf/Makefile
+%config %{_sysconfdir}/httpd/conf/ssl.*/*
 %attr(0700,apache,root) %dir %{_localstatedir}/cache/mod_ssl
 %attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.dir
 %attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.pag
@@ -355,6 +366,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Tue Sep  3 2002 Joe Orton <jorton@redhat.com> 2.0.40-7
+- add LoadModule lines for proxy modules in httpd.conf (#73349)
+- fix permissions of conf/ssl.*/ directories; add Makefiles for
+ certificate management (#73352)
+
 * Mon Sep  2 2002 Joe Orton <jorton@redhat.com> 2.0.40-6
 - provide "httpd-mmn" to manage module ABI compatibility
 
