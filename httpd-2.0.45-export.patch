@@ -2,6 +2,10 @@
 There is no need to "suck in" the apr/apr-util symbols when using
 a shared libapr{,util}, it just bloats the symbol table; so don't.
 
+Upstream-HEAD: 
+Upstream-2.0: omit
+Upstream-Status: EXPORT_DIRS change is conditional on using shared apr
+
 --- httpd-2.0.48/server/main.c.export
 +++ httpd-2.0.48/server/main.c
 @@ -669,28 +669,6 @@

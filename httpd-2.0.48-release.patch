@@ -1,3 +1,8 @@
+
+Upstream-HEAD: vendor
+Upstream-2.0: vendor
+Upstream-Status: vendor-specific change
+
 --- httpd-2.0.48/server/core.c.release
 +++ httpd-2.0.48/server/core.c
 @@ -2386,7 +2386,7 @@
