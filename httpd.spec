@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.49
-Release: 6
+Release: 7
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -56,6 +56,7 @@ Patch36: httpd-2.0.49-nolcrash.patch
 Patch37: httpd-2.0.46-autoindex.patch
 Patch38: httpd-2.0.46-deflate2.patch
 Patch39: httpd-2.0.49-suexecsuid.patch
+Patch40: httpd-2.0.49-vhostaddr.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -168,6 +169,7 @@ Security (TLS) protocols.
 %patch37 -p1 -b .autoindex
 %patch38 -p1 -b .deflate2
 %patch39 -p1 -b .suexecsuid
+%patch40 -p1 -b .vhostaddr
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -219,8 +221,12 @@ fi
 : Building for '%{distro}' with MMN %{mmn} and vendor string '%{vstring}'
 
 %build
+# forcibly prevent use of bundled apr, apr-util, pcre
+rm -rf srclib/{apr,apr-util,pcre}
+rm -f include/pcreposix.h
+
 # regenerate configure scripts
-./buildconf
+autoheader && autoconf || exit 1
 
 # Limit size of CHANGES to recent history
 echo '1,/Changes with Apache MPM/wq' | ed CHANGES
@@ -231,9 +237,6 @@ echo '1,/Changes with Apache MPM/wq' | ed CHANGES
 # update location of migration guide in apachectl
 %{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
 	support/apachectl.in
-
-# forcibly prevent use of bundled apr, apr-util
-rm -rf srclib/{apr,apr-util}
 
 # Build the migration guide
 sed 's/@DISTRO@/%{distro}/' < $RPM_SOURCE_DIR/migration.xml > migration.xml
@@ -579,7 +582,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
-* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
+* Wed Jun 16 2004 Joe Orton <jorton@redhat.com> 2.0.49-7
+- don't install or use bundled pcreposix.h
+- bump default MaxClients to 256
+- drop default Timeout to 2 minutes
+- merge from upstream:
+ * add fix for VirtualHost multiple address handling (Jeff Trawick)
+
+* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com> 2.0.49-6
 - rebuilt
 
 * Thu Jun 10 2004 Joe Orton <jorton@redhat.com> 2.0.49-5
