@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.50
-Release: 7.ent
+Release: 8
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -53,6 +53,7 @@ Patch32: httpd-2.0.48-vhost.patch
 Patch35: httpd-2.0.49-eocbucket.patch
 Patch37: httpd-2.0.46-autoindex.patch
 Patch38: httpd-2.0.50-userdir.patch
+Patch39: httpd-2.0.50-reclaim.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -78,7 +79,7 @@ License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
-BuildRequires: apr-devel >= 0.9.4-20, apr-util-devel, pcre-devel
+BuildRequires: apr-devel >= 0.9.4-20, apr-util-devel, pcre-devel, zlib-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Requires: httpd-suexec
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
@@ -169,6 +170,7 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch35 -p1 -b .eocbucket
 %patch37 -p1 -b .autoindex
 %patch38 -p1 -b .userdir
+%patch39 -p1 -b .reclaim
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -592,6 +594,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Tue Sep 14 2004 Joe Orton <jorton@redhat.com> 2.0.50-8
+- add improved child reclaim timing logic (#119128/#132360)
+- add BuildRequire zlib-devel for mod_deflate
+
 * Wed Sep  8 2004 Joe Orton <jorton@redhat.com> 2.0.50-7
 - prereq rather than just require httpd from -suexec (#132045)
 
