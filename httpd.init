@@ -73,11 +73,15 @@ stop() {
 	[ $RETVAL = 0 ] && rm -f ${lockfile} ${pidfile}
 }
 reload() {
-	echo -n $"Reloading $prog: "
-	check13 || exit 1
-	killproc $httpd -HUP
-	RETVAL=$?
-	echo
+    if ! LANG=$HTTPD_LANG $httpd $OPTIONS -t; then
+        failure $"Configuration syntax check for $httpd, will not reload"
+        RETVAL=$?
+    else
+        echo -n $"Reloading $prog: "
+        killproc $httpd -HUP
+        RETVAL=$?
+        echo
+    fi
 }
 
 # See how we were called.

@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.52
-Release: 5
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -23,11 +23,13 @@ Source12: welcome.conf
 Source13: manual.conf
 Source14: mod_ssl-Makefile.crt
 Source15: mod_ssl-Makefile.crl
+Source16: htsslpass.c
 # Documentation
 Source30: migration.xml
 Source31: migration.css
 Source32: html.xsl
 Source33: README.confd
+Source34: htsslpass.xml
 # build/scripts patches
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
@@ -49,6 +51,8 @@ Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
 Patch39: httpd-2.0.50-reclaim.patch
+Patch40: httpd-2.0.52-sslauth.patch
+Patch41: httpd-2.0.52-savebrigade.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -70,11 +74,13 @@ Patch91: httpd-2.0.46-testhook.patch
 Patch92: httpd-2.0.46-dumpcerts.patch
 # Security fixes
 Patch120: httpd-2.0.52-CAN-2004-0885.patch
+Patch121: httpd-2.0.52-CAN-2004-0942.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
-BuildRequires: apr-devel >= 0.9.4-20, apr-util-devel, pcre-devel, zlib-devel
+BuildRequires: apr-devel >= 0.9.4-20, apr-util-devel, pcre-devel >= 5.0, 
+BuildRequires: zlib-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Requires: httpd-suexec
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
@@ -86,19 +92,20 @@ Obsoletes: mod_put, mod_roaming
 Conflicts: pcre < 4.0
 
 %description
-Apache is a powerful, full-featured, efficient, and freely-available
-Web server. Apache is also the most popular Web server on the
-Internet.
+The Apache HTTP Server is a powerful, full-featured, efficient, and
+freely-available Web server. The Apache HTTP Server is also the
+most popular Web server on the Internet.
 
 %package devel
 Group: Development/Libraries
 Summary: Development tools for the Apache HTTP server.
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
-Requires: apr-devel, apr-util-devel, httpd = %{version}, pcre-devel
+Requires: apr-devel, apr-util-devel, httpd = %{version}, pcre-devel >= 5.0
 
 %description devel
 The httpd-devel package contains the APXS binary and other files
-that you need to build Dynamic Shared Objects (DSOs) for Apache.
+that you need to build Dynamic Shared Objects (DSOs) for the
+Apache HTTP Server.
 
 If you are installing the Apache HTTP server and you want to be
 able to compile or develop additional modules for Apache, you need
@@ -161,6 +168,8 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch29 -p1 -b .workerhup
 %patch30 -p1 -b .davmisc
 %patch39 -p1 -b .reclaim
+%patch40 -p1 -b .sslauth
+%patch41 -p1 -b .savebrigade
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -181,6 +190,7 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch92 -p1 -b .dumpcerts
 
 %patch120 -p1 -b .can0885
+%patch121 -p1 -b .can0942
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -231,8 +241,15 @@ sed 's/@DISTRO@/%{distro}/' < $RPM_SOURCE_DIR/migration.xml > migration.xml
 xmlto -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
+# Build the htsslpass man page
+xmlto man $RPM_SOURCE_DIR/htsslpass.xml
+
+# Build htsslpass
+cp $RPM_SOURCE_DIR/htsslpass.c . || exit 1
+gcc $RPM_OPT_FLAGS -Wall -Werror htsslpass.c -o htsslpass
+
 CFLAGS=$RPM_OPT_FLAGS
-CPPFLAGS="-DSSL_EXPERIMENTAL_ENGINE -I/usr/include/pcre"
+CPPFLAGS="-DSSL_EXPERIMENTAL_ENGINE"
 export CFLAGS CPPFLAGS
 
 function mpmbuild()
@@ -302,7 +319,11 @@ popd
 install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
 
 # link to system pcreposix.h
-ln -s ../pcre/pcreposix.h $RPM_BUILD_ROOT%{_includedir}/httpd/pcreposix.h
+ln -s ../pcreposix.h $RPM_BUILD_ROOT%{_includedir}/httpd/pcreposix.h
+
+# install htsslpass(1) and man page
+install -m 755 htsslpass $RPM_BUILD_ROOT%{_bindir}/htsslpass
+install -m 644 htsslpass.1 $RPM_BUILD_ROOT%{_mandir}/man1/htsslpass.1
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -519,6 +540,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/httpd.worker
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
+%exclude %{_bindir}/htsslpass
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -544,6 +566,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man?/*
 %exclude %{_mandir}/man8/apxs.8*
 %exclude %{_mandir}/man8/suexec.8*
+%exclude %{_mandir}/man1/htsslpass.1*
 
 %files manual
 %defattr(-,root,root)
@@ -552,6 +575,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n mod_ssl
 %defattr(-,root,root)
+%{_bindir}/htsslpass
+%{_mandir}/man1/htsslpass.1*
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,root,root) %dir %{_sysconfdir}/httpd/conf/ssl.*
@@ -579,6 +604,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Tue Nov 16 2004 Joe Orton <jorton@redhat.com> 2.0.52-6
+- add security fix for CVE CAN-2004-0942 (memory consumption DoS)
+- SELinux: run httpd -t under runcon in configtest (Steven Smalley)
+- fix SSLSessionCache comment for distcache in ssl.conf
+- restart using SIGHUP not SIGUSR1 after logrotate
+- add ap_save_brigade fix (upstream #31247)
+- mod_ssl: fix possible segfault in auth hook (upstream #31848)
+- add htsslpass(1) and configure as default SSLPassPhraseDialog (#128677)
+- apachectl: restore use of $OPTIONS
+- apachectl, httpd.init: refuse to restart if $HTTPD -t fails
+- apachectl: run $HTTPD -t in user SELinux context for configtest
+- update for pcre-5.0 header locations
+
 * Sat Nov 13 2004 Jeff Johnson <jbj@redhat.com> 2.0.52-5
 - rebuild against db-4.3.21 aware apr-util.
 

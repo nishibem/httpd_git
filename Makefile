@@ -1,5 +1,5 @@
 # Makefile for source rpm: httpd
-# $Id: Makefile,v 1.4 2004/10/13 10:44:51 jorton Exp $
+# $Id: Makefile,v 1.5 2004/10/13 16:35:07 jorton Exp $
 NAME := httpd
 SPECFILE = $(firstword $(wildcard *.spec))
 UPSTREAM_CHECKS = asc
@@ -21,4 +21,4 @@ status.html: status.xml status-html.xsl
 	@xsltproc status-html.xsl $< > $@
 
 view-status: status.html
-	gnome-moz-remote `pwd`/$<
+	firefox -remote 'openFile($(shell pwd)/$<)'
