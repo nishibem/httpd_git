@@ -249,27 +249,27 @@ stock Apache 2.0 configuration should note the following:</para>
 
 <itemizedlist>
 
-<listitem><simpara>The <literal>AddModule</literal> and
+<listitem><para>The <literal>AddModule</literal> and
 <literal>ClearModuleList</literal> directives no longer exist. These
 directives where used to ensure that modules could be enabled in the
 correct order. The new Apache 2.0 API allows modules to explicitly
 specify their ordering, eliminating the need for these
-directives.</simpara></listitem>
+directives.</para></listitem>
 
-<listitem><simpara>The order of the <literal>LoadModule</literal> lines
-is thus no longer relevant.</simpara></listitem>
+<listitem><para>The order of the <literal>LoadModule</literal> lines
+is thus no longer relevant.</para></listitem>
 
-<listitem><simpara>Many modules have been added, removed, renamed, split
-up, or incorporated with each other.</simpara></listitem>
+<listitem><para>Many modules have been added, removed, renamed, split
+up, or incorporated with each other.</para></listitem>
 
-<listitem><simpara><literal>LoadModule</literal> lines for modules
+<listitem><para><literal>LoadModule</literal> lines for modules
 packaged in their own RPMs (&mod_ssl;, <literal>php</literal>,
 &mod_perl; and the like) are no longer necessary as they can be found
 in the relevant file in the directory
-<filename>/etc/httpd/conf.d</filename>.</simpara></listitem>
+<filename>/etc/httpd/conf.d</filename>.</para></listitem>
 
-<listitem><simpara>The various <literal>HAVE_XXX</literal> definitions
-are no longer defined.</simpara></listitem>
+<listitem><para>The various <literal>HAVE_XXX</literal> definitions
+are no longer defined.</para></listitem>
 
 </itemizedlist>
 
