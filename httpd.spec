@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.50
-Release: 6.ent
+Release: 7
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -136,7 +136,7 @@ Security (TLS) protocols.
 %package suexec
 Group: System Environment/Daemons
 Summary: suexec binary for the Apache HTTP server
-Requires: httpd = %{version}-%{release}
+PreReq: httpd = %{version}-%{release}
 
 %description suexec
 This package includes the /usr/sbin/suexec binary which can be installed
@@ -592,6 +592,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Wed Sep  8 2004 Joe Orton <jorton@redhat.com> 2.0.50-7
+- prereq rather than just require httpd from -suexec (#132045)
+
 * Sun Sep  5 2004 Joe Orton <jorton@redhat.com> 2.0.50-6
 - include /etc/sysconfig/httpd template (#112085)
 - pass $OPTIONS in httpd invocations in apachectl (#115910)
