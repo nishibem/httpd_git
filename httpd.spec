@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.52
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -579,6 +579,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Sat Nov 13 2004 Jeff Johnson <jbj@redhat.com> 2.0.52-5
+- rebuild against db-4.3.21 aware apr-util.
+
 * Thu Nov 11 2004 Jeff Johnson <jbj@jbj.org> 2.0.52-4
 - rebuild against db-4.3-21.
 
