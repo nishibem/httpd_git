@@ -16,7 +16,7 @@
 <!ENTITY htdbm "<command>htdbm</command>">
 <!ENTITY dbmmanage "<command>dbmmanage</command>">
 
-<!ENTITY distro "Fedora Core">
+<!ENTITY distro "@DISTRO@">
 
 <!ENTITY prefork "<emphasis>prefork</emphasis>">
 <!ENTITY worker "<emphasis>worker</emphasis>">

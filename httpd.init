@@ -29,6 +29,8 @@ INITLOG_ARGS=""
 apachectl=/usr/sbin/apachectl
 httpd=${HTTPD-/usr/sbin/httpd}
 prog=httpd
+pidfile=${PIDFILE-/var/run/httpd.pid}
+lockfile=${LOCKFILE-/var/lock/subsys/httpd}
 RETVAL=0
 
 # check for 1.3 configuration
@@ -57,7 +59,7 @@ start() {
         daemon $httpd $OPTIONS
         RETVAL=$?
         echo
-        [ $RETVAL = 0 ] && touch /var/lock/subsys/httpd
+        [ $RETVAL = 0 ] && touch ${lockfile}
         return $RETVAL
 }
 stop() {
@@ -65,7 +67,7 @@ stop() {
 	killproc $httpd
 	RETVAL=$?
 	echo
-	[ $RETVAL = 0 ] && rm -f /var/lock/subsys/httpd /var/run/httpd.pid
+	[ $RETVAL = 0 ] && rm -f ${lockfile} ${pidfile}
 }
 reload() {
 	echo -n $"Reloading $prog: "
@@ -92,7 +94,7 @@ case "$1" in
 	start
 	;;
   condrestart)
-	if [ -f /var/run/httpd.pid ] ; then
+	if [ -f ${pidfile} ] ; then
 		stop
 		start
 	fi
@@ -101,7 +103,7 @@ case "$1" in
         reload
 	;;
   graceful|help|configtest|fullstatus)
-	$apachectl $@
+	$apachectl $OPTIONS $@
 	RETVAL=$?
 	;;
   *)

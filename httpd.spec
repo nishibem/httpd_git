@@ -1,11 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
+%define vstring Red Hat
+%define distro Red Hat Enterprise Linux
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.48
-Release: 10
+Release: 16.ent
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -13,6 +15,7 @@ Source3: httpd.logrotate
 Source4: httpd.init
 Source6: powered_by.gif
 Source7: powered_by_fedora.png
+Source8: powered_by_rh.png
 Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
@@ -37,7 +40,6 @@ Patch9: httpd-2.0.48-vpathinc.patch
 Patch20: httpd-2.0.45-encode.patch
 Patch21: httpd-2.0.45-davfs.patch
 Patch22: httpd-2.0.45-davetag.patch
-Patch23: httpd-headusage.patch
 Patch24: httpd-2.0.47-sslcleanup.patch
 Patch25: httpd-2.0.47-ldapshm.patch
 Patch26: httpd-2.0.46-shmcb.patch
@@ -54,6 +56,10 @@ Patch36: httpd-2.0.48-sslvars.patch
 Patch37: httpd-2.0.48-include.patch
 Patch38: httpd-2.0.48-autoindex.patch
 Patch39: httpd-2.0.48-proxy11.patch
+Patch40: httpd-2.0.48-sslpphrase.patch
+Patch41: httpd-2.0.48-worker.patch
+Patch42: httpd-2.0.46-davbadfrag.patch
+Patch43: httpd-2.0.46-dav401dest.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -68,6 +74,9 @@ Patch79: httpd-2.0.48-sslstatus.patch
 Patch80: httpd-2.0.48-corelimit.patch
 Patch81: httpd-2.0.46-rolog.patch
 Patch82: httpd-2.0.48-distcache.patch
+Patch83: httpd-2.0.48-debuglog.patch
+Patch84: httpd-2.0.48-abench.patch
+Patch85: httpd-2.0.48-fdsetsize.patch
 # Security fixes
 Patch120: httpd-2.0.48-CAN-2003-0020.patch
 # Documentation fixes
@@ -143,7 +152,6 @@ Security (TLS) protocols.
 %patch20 -p1
 %patch21 -p1 -b .davfs
 %patch22 -p1 -b .davetag
-%patch23 -p1 -b .head
 %patch24 -p1 -b .sslcleanup
 %patch25 -p1 -b .ldapshm
 %patch26 -p1 -b .shmcb
@@ -160,6 +168,10 @@ Security (TLS) protocols.
 %patch37 -p1 -b .include
 %patch38 -p1 -b .autoindex
 %patch39 -p1 -b .proxy11
+%patch40 -p1 -b .sslpphrase
+%patch41 -p1 -b .worker
+%patch42 -p1 -b .davbadfrag
+%patch43 -p1 -b .dav401dest
 
 %patch71 -p0 -b .xfsz
 %patch72 -p0 -b .pod
@@ -173,16 +185,19 @@ Security (TLS) protocols.
 %patch80 -p1 -b .corelimit
 %patch81 -p1 -b .rolog
 %patch82 -p1 -b .distcache
+%patch83 -p1 -b .debuglog
+%patch84 -p1 -b .abench
+%patch85 -p1 -b .fdsetsize
 
 %patch120 -p1 -b .can0020
 
 %patch170 -p1 -b .manpages
 
 # Patch in vendor/release string
-sed "s/@RELEASE@/Fedora/" < %{PATCH70} | patch -p1
+sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
-vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include \`pwd\`/include/ap_mmn.h | sed -n '/^2/p'`
+vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
 if test "x${vmmn}" != "x%{mmn}"; then
    : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}.
    : Update the mmn macro and rebuild.
@@ -191,7 +206,7 @@ fi
 
 # Conditionally enable PIE support
 if echo 'static int foo[30000]; int main () { return 0; }' | 
-   gcc -pie -fpie -O2 -xc - -o pietest 2>/dev/null && 
+   gcc -pie -fpie -O2 -xc - -o pietest && 
    ./pietest; then
 %patch6 -p1 -b .pie
   : PIE support enabled
@@ -199,9 +214,15 @@ else
   : WARNING: PIE support not enabled
 fi
 
+: Building for '%{distro}' with MMN %{mmn} and vendor string '%{vstring}'
+
 %build
 # regenerate configure scripts
 ./buildconf
+
+# Limit size of CHANGES to recent history
+sed '/Changes with Apache MPM/,$d' < CHANGES > CHANGES.new
+mv -f CHANGES.new CHANGES
 
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
@@ -213,8 +234,9 @@ fi
 # forcibly prevent use of bundled apr, apr-util
 rm -rf srclib/{apr,apr-util}
 
-# build the migration guide
-xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks $RPM_SOURCE_DIR/migration.xml
+# Build the migration guide
+sed 's/@DISTRO@/%{distro}/' < $RPM_SOURCE_DIR/migration.xml > migration.xml
+xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
 CFLAGS="$RPM_OPT_FLAGS -DSSL_EXPERIMENTAL_ENGINE"
@@ -346,6 +368,7 @@ ln -s ../../../..${apr_libtool} $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtool
 sed -e "s|%{contentdir}/build|%{_libdir}/httpd/build|g" \
     -e "/AP_LIBS/d" -e "/abs_srcdir/d" \
     -e "/^LIBTOOL/s|/bin/sh /[^ ]*/libtool|/bin/sh ${apr_libtool}|" \
+    -e "/^installbuilddir/s| = .*$| = /etc/httpd/build|" \
     -e "s|^EXTRA_INCLUDES.*$|EXTRA_INCLUDES = -I\$(includedir) -I\$(APR_INCLUDEDIR) -I%{_includedir}/openssl|g" \
   < prefork/build/config_vars.mk \
   > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
@@ -368,6 +391,8 @@ find $RPM_BUILD_ROOT%{contentdir}/manual \( \
 install -m 644 $RPM_SOURCE_DIR/powered_by.gif \
 	$RPM_BUILD_ROOT%{contentdir}/icons
 install -m 644 $RPM_SOURCE_DIR/powered_by_fedora.png \
+	$RPM_BUILD_ROOT%{contentdir}/icons
+install -m 644 $RPM_SOURCE_DIR/powered_by_rh.png \
 	$RPM_BUILD_ROOT%{contentdir}/icons
 
 # logs
@@ -444,7 +469,6 @@ if [ $1 = 0 ]; then
 fi
 
 %post -n mod_ssl
-/sbin/ldconfig ### is this needed?
 umask 077
 
 if [ ! -f %{_sysconfdir}/httpd/conf/ssl.key/server.key ] ; then
@@ -560,6 +584,35 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu Feb 26 2004 Joe Orton <jorton@redhat.com> 2.0.48-16.ent
+- rebuild
+
+* Mon Feb 23 2004 Joe Orton <jorton@redhat.com> 2.0.48-16
+- fix apxs -q installbuilddir
+- really update to ab from HEAD
+- remove check that accept() returns an fd < FD_SETSIZE 
+
+* Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com> 2.0.48-15
+- rebuilt
+
+* Tue Feb  3 2004 Joe Orton <jorton@redhat.com> 2.0.48-14
+- mod_dav: fix 401 on destination and reject unescaped fragment in URI
+- remove redundant ldconfig invocation from mod_ssl %%post
+- remove unnecessary -headusage patch
+
+* Fri Jan 30 2004 Joe Orton <jorton@redhat.com> 2.0.48-13
+- allow further customisation of init script (Peter Bieringer, #114619)
+- worker fixes from upstream
+- use basename(filename) in APLOG_MARK to reduce noise levels at 
+  "LogLevel debug"
+
+* Wed Jan 28 2004 Joe Orton <jorton@redhat.com> 2.0.48-12
+- mod_ssl: cosmetic tweaks for pass phrase prompting
+- simplify rebranding a little
+
+* Tue Jan 27 2004 Joe Orton <jorton@redhat.com> 2.0.48-11
+- trim pre-2.0 history from CHANGES to limit size
+
 * Tue Jan 27 2004 Joe Orton <jorton@redhat.com> 2.0.48-10
 - update to ab from HEAD
 - remove dbmmanage man page (part of #114080)
