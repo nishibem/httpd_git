@@ -1,6 +1,6 @@
 --- httpd-2.0.48/server/core.c.release
 +++ httpd-2.0.48/server/core.c
-@@ -2429,7 +2429,7 @@
+@@ -2386,7 +2386,7 @@
          ap_add_version_component(pconf, AP_SERVER_BASEPRODUCT "/" AP_SERVER_MAJORVERSION);
      }
      else {

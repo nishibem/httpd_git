@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.48
-Release: 16.ent
+Version: 2.0.49
+Release: 2.ent
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -30,7 +30,6 @@ Source33: README.confd
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
 Patch3: httpd-2.0.48-linkmods.patch
-Patch4: httpd-2.0.45-parallel.patch
 Patch5: httpd-2.0.45-deplibs.patch
 Patch6: httpd-2.0.47-pie.patch
 Patch7: httpd-2.0.45-syspcre.patch
@@ -38,38 +37,29 @@ Patch8: httpd-2.0.48-suexeclibs.patch
 Patch9: httpd-2.0.48-vpathinc.patch
 # Bug fixes
 Patch20: httpd-2.0.45-encode.patch
-Patch21: httpd-2.0.45-davfs.patch
 Patch22: httpd-2.0.45-davetag.patch
-Patch24: httpd-2.0.47-sslcleanup.patch
 Patch25: httpd-2.0.47-ldapshm.patch
 Patch26: httpd-2.0.46-shmcb.patch
 Patch27: httpd-2.0.46-sslmutex.patch
-Patch28: httpd-2.0.46-sslio.patch
-Patch29: httpd-2.0.46-graceful.patch
-Patch30: httpd-2.0.46-metharray.patch
-Patch31: httpd-2.0.48-usertrack.patch
-Patch32: httpd-2.0.46-execfail.patch
-Patch33: httpd-2.0.46-logtimez.patch
-Patch34: httpd-2.0.46-sslerr.patch
 Patch35: httpd-2.0.46-md5dig.patch
-Patch36: httpd-2.0.48-sslvars.patch
-Patch37: httpd-2.0.48-include.patch
-Patch38: httpd-2.0.48-autoindex.patch
 Patch39: httpd-2.0.48-proxy11.patch
 Patch40: httpd-2.0.48-sslpphrase.patch
 Patch41: httpd-2.0.48-worker.patch
-Patch42: httpd-2.0.46-davbadfrag.patch
-Patch43: httpd-2.0.46-dav401dest.patch
+Patch44: httpd-2.0.48-workerhup.patch
+Patch45: httpd-2.0.48-davmisc.patch
+Patch46: httpd-2.0.48-limitxml.patch
+Patch47: httpd-2.0.48-vhost.patch
+Patch48: httpd-2.0.49-sslcache.patch
+Patch49: httpd-2.0.49-sslcleanup.patch
+Patch50: httpd-2.0.49-eocbucket.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
 Patch72: httpd-2.0.40-pod.patch
 Patch73: httpd-2.0.40-noshmht.patch
-Patch74: httpd-2.0.45-proxy.patch
 Patch75: httpd-2.0.45-export.patch
 Patch76: httpd-2.0.48-dynlimit.patch
 Patch77: httpd-2.0.48-dynamic.patch
-Patch78: httpd-2.0.48-status.patch
 Patch79: httpd-2.0.48-sslstatus.patch
 Patch80: httpd-2.0.48-corelimit.patch
 Patch81: httpd-2.0.46-rolog.patch
@@ -77,10 +67,10 @@ Patch82: httpd-2.0.48-distcache.patch
 Patch83: httpd-2.0.48-debuglog.patch
 Patch84: httpd-2.0.48-abench.patch
 Patch85: httpd-2.0.48-fdsetsize.patch
-# Security fixes
-Patch120: httpd-2.0.48-CAN-2003-0020.patch
-# Documentation fixes
-Patch170: httpd-2.0.48-manpages.patch
+Patch86: httpd-2.0.48-sslheader.patch
+Patch87: httpd-2.0.48-sslvars2.patch
+Patch88: httpd-2.0.48-rewritessl.patch
+Patch89: httpd-2.0.49-largefile.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -142,7 +132,6 @@ Security (TLS) protocols.
 %patch1 -p0 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .linkmods
-%patch4 -p1 -b .parallel
 %patch5 -p1 -b .deplibs
 %patch7 -p1 -b .syspcre
 %patch8 -p1 -b .suexeclibs
@@ -150,37 +139,28 @@ Security (TLS) protocols.
 
 # no -b to prevent droplets in install root
 %patch20 -p1
-%patch21 -p1 -b .davfs
 %patch22 -p1 -b .davetag
-%patch24 -p1 -b .sslcleanup
 %patch25 -p1 -b .ldapshm
 %patch26 -p1 -b .shmcb
 %patch27 -p1 -b .sslmutex
-%patch28 -p1 -b .sslio
-%patch29 -p1 -b .graceful
-%patch30 -p1 -b .metharray
-%patch31 -p1 -b .usertrack
-%patch32 -p1 -b .execfail
-%patch33 -p1 -b .logtimez
-%patch34 -p1 -b .sslerr
 %patch35 -p1 -b .md5dig
-%patch36 -p1 -b .sslvars
-%patch37 -p1 -b .include
-%patch38 -p1 -b .autoindex
-%patch39 -p1 -b .proxy11
+## %patch39 -p1 -b .proxy11 ### NEEDS MERGE
 %patch40 -p1 -b .sslpphrase
 %patch41 -p1 -b .worker
-%patch42 -p1 -b .davbadfrag
-%patch43 -p1 -b .dav401dest
+%patch44 -p1 -b .workerhup
+%patch45 -p1 -b .davmisc
+%patch46 -p1 -b .limitxml
+%patch47 -p1 -b .vhost
+%patch48 -p1 -b .sslcache
+%patch49 -p1 -b .sslcleanup
+%patch50 -p1 -b .eocbucket
 
 %patch71 -p0 -b .xfsz
 %patch72 -p0 -b .pod
 %patch73 -p1 -b .noshmht
-%patch74 -p1 -b .proxy
 %patch75 -p1 -b .export
 %patch76 -p1 -b .dynlimit
 %patch77 -p1 -b .dynamic
-%patch78 -p1 -b .status
 %patch79 -p1 -b .sslstatus
 %patch80 -p1 -b .corelimit
 %patch81 -p1 -b .rolog
@@ -188,13 +168,16 @@ Security (TLS) protocols.
 %patch83 -p1 -b .debuglog
 %patch84 -p1 -b .abench
 %patch85 -p1 -b .fdsetsize
-
-%patch120 -p1 -b .can0020
-
-%patch170 -p1 -b .manpages
+%patch86 -p1 -b .sslheader
+%patch87 -p1 -b .sslvars2
+%patch88 -p1 -b .rewritessl
+%patch89 -p1 -b .largefile
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
+
+# Touch mod_ssl expression parser sources to prevent regenerating it
+touch modules/ssl/ssl_expr_*.[chyl]
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
@@ -239,16 +222,14 @@ sed 's/@DISTRO@/%{distro}/' < $RPM_SOURCE_DIR/migration.xml > migration.xml
 xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
-CFLAGS="$RPM_OPT_FLAGS -DSSL_EXPERIMENTAL_ENGINE"
-if pkg-config openssl ; then
+CFLAGS=$RPM_OPT_FLAGS
+CPPFLAGS="-DSSL_EXPERIMENTAL_ENGINE"
+if pkg-config openssl; then
 	# configure -C barfs with trailing spaces in CFLAGS
-	CFLAGS="$CFLAGS `pkg-config --cflags openssl | sed 's/ *$//'`"
-	AP_LIBS="$AP_LIBS `pkg-config --libs openssl`"
-else
-	AP_LIBS="-lssl -lcrypto"
+	CPPFLAGS="$CPPFLAGS `pkg-config --cflags openssl | sed 's/ *$//'`"
+	SSL_LIBS="`pkg-config --libs openssl`"
 fi
-export CFLAGS
-export AP_LIBS
+export CFLAGS CPPFLAGS SSL_LIBS
 
 function mpmbuild()
 {
@@ -438,9 +419,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.exp \
       $RPM_BUILD_ROOT%{_mandir}/man1/dbmmanage.* \
       $RPM_BUILD_ROOT%{contentdir}/cgi-bin/*
 
-# Remove headers which needn't be public
-rm -f $RPM_BUILD_ROOT%{_includedir}/httpd/{ssl_expr_parse.h,ssl_util_table.h}
-
 # Make suexec a+rw so it can be stripped.  %%files lists real permissions
 chmod 755 $RPM_BUILD_ROOT%{_sbindir}/suexec
 
@@ -584,8 +562,36 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
-* Thu Feb 26 2004 Joe Orton <jorton@redhat.com> 2.0.48-16.ent
-- rebuild
+* Fri Mar 26 2004 Joe Orton <jorton@redhat.com> 2.0.49-2
+- mod_ssl: fix session cache memory leak (Madhu Mathihalli)
+- mod_ssl: fix SEGV when trying to shutdown during pool cleanup
+- merge the mod_proxy HTTP/1.1-compliance fixes
+- apply fix for #118020
+
+* Thu Mar 18 2004 Joe Orton <jorton@redhat.com> 2.0.49-1
+- update to 2.0.49 (#118798, thanks to Robert Scheck)
+- only link ab and mod_ssl against SSL_LIBS
+- open log files using APR_LARGEFILE where available
+
+* Wed Mar 17 2004 Joe Orton <jorton@redhat.com> 2.0.48-18
+- add fix for #118020
+- ssl.conf tweaks: seed SSL PRNG with 256 bytes from /dev/urandom
+
+* Mon Mar 15 2004 Joe Orton <jorton@redhat.com> 2.0.48-17
+- use "SSLMutex default" in default ssl.conf
+- limit to 128K XML request bodies in default httpd.conf; fix to 
+  give a 413 error not a 400 if the limit is exceeded
+- mod_rewrite: add %%{SSL:...} and %%{HTTPS} variable lookups
+- mod_dav: propagate executable property across COPY/MOVE
+- mod_dav: give 507 on out-of-space errors in more places
+- mod_ssl: add ssl_is_https optional function
+- mod_ssl: support indexed lookup of DN components
+- mod_ssl: optimised variable lookup
+- mod_ssl: install only minimal mod_ssl.h
+- worker: fix potential hang at restart
+
+* Tue Mar 02 2004 Elliot Lee <sopwith@redhat.com> 2.0.48-16.1
+- rebuilt
 
 * Mon Feb 23 2004 Joe Orton <jorton@redhat.com> 2.0.48-16
 - fix apxs -q installbuilddir
