@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.49
-Release: 4.ent
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -30,54 +30,61 @@ Source33: README.confd
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
 Patch3: httpd-2.0.48-linkmods.patch
-Patch5: httpd-2.0.45-deplibs.patch
-Patch6: httpd-2.0.47-pie.patch
-Patch7: httpd-2.0.45-syspcre.patch
-Patch8: httpd-2.0.48-suexeclibs.patch
-Patch9: httpd-2.0.48-vpathinc.patch
+Patch4: httpd-2.0.45-deplibs.patch
+Patch5: httpd-2.0.47-pie.patch
+Patch6: httpd-2.0.45-syspcre.patch
+Patch7: httpd-2.0.48-suexeclibs.patch
+Patch8: httpd-2.0.48-vpathinc.patch
 # Bug fixes
 Patch20: httpd-2.0.45-encode.patch
-Patch22: httpd-2.0.45-davetag.patch
-Patch25: httpd-2.0.47-ldapshm.patch
-Patch26: httpd-2.0.46-shmcb.patch
-Patch27: httpd-2.0.46-sslmutex.patch
-Patch35: httpd-2.0.46-md5dig.patch
-Patch39: httpd-2.0.48-proxy11.patch
-Patch40: httpd-2.0.48-sslpphrase.patch
-Patch41: httpd-2.0.48-worker.patch
-Patch44: httpd-2.0.48-workerhup.patch
-Patch45: httpd-2.0.48-davmisc.patch
-Patch46: httpd-2.0.48-limitxml.patch
-Patch47: httpd-2.0.48-vhost.patch
-Patch48: httpd-2.0.49-sslcache.patch
-Patch49: httpd-2.0.49-sslcleanup.patch
-Patch50: httpd-2.0.49-eocbucket.patch
-Patch51: httpd-2.0.49-nolcrash.patch
+Patch21: httpd-2.0.45-davetag.patch
+Patch22: httpd-2.0.47-ldapshm.patch
+Patch23: httpd-2.0.46-shmcb.patch
+Patch24: httpd-2.0.46-sslmutex.patch
+Patch25: httpd-2.0.46-md5dig.patch
+Patch26: httpd-2.0.48-proxy11.patch
+Patch27: httpd-2.0.48-sslpphrase.patch
+Patch28: httpd-2.0.48-worker.patch
+Patch29: httpd-2.0.48-workerhup.patch
+Patch30: httpd-2.0.48-davmisc.patch
+Patch31: httpd-2.0.48-limitxml.patch
+Patch32: httpd-2.0.48-vhost.patch
+Patch33: httpd-2.0.46-sslscache.patch
+Patch34: httpd-2.0.49-sslcleanup.patch
+Patch35: httpd-2.0.49-eocbucket.patch
+Patch36: httpd-2.0.49-nolcrash.patch
+Patch37: httpd-2.0.46-autoindex.patch
+Patch38: httpd-2.0.46-deflate2.patch
+Patch39: httpd-2.0.49-suexecsuid.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
 Patch72: httpd-2.0.40-pod.patch
 Patch73: httpd-2.0.40-noshmht.patch
-Patch75: httpd-2.0.45-export.patch
-Patch76: httpd-2.0.48-dynlimit.patch
-Patch77: httpd-2.0.48-dynamic.patch
-Patch79: httpd-2.0.48-sslstatus.patch
-Patch80: httpd-2.0.48-corelimit.patch
-Patch81: httpd-2.0.46-rolog.patch
-Patch82: httpd-2.0.48-distcache.patch
-Patch83: httpd-2.0.48-debuglog.patch
-Patch84: httpd-2.0.48-abench.patch
-Patch85: httpd-2.0.48-fdsetsize.patch
-Patch86: httpd-2.0.48-sslheader.patch
-Patch87: httpd-2.0.48-sslvars2.patch
-Patch88: httpd-2.0.48-rewritessl.patch
-Patch89: httpd-2.0.49-largefile.patch
-Patch90: httpd-2.0.46-cgibucket.patch
+Patch74: httpd-2.0.45-export.patch
+Patch75: httpd-2.0.48-dynlimit.patch
+Patch76: httpd-2.0.48-dynamic.patch
+Patch77: httpd-2.0.48-sslstatus.patch
+Patch78: httpd-2.0.48-corelimit.patch
+Patch79: httpd-2.0.46-rolog.patch
+Patch80: httpd-2.0.48-distcache.patch
+Patch81: httpd-2.0.48-debuglog.patch
+Patch82: httpd-2.0.48-abench.patch
+Patch83: httpd-2.0.48-fdsetsize.patch
+Patch84: httpd-2.0.48-sslheader.patch
+Patch85: httpd-2.0.48-sslvars2.patch
+Patch86: httpd-2.0.48-rewritessl.patch
+Patch87: httpd-2.0.49-largefile.patch
+Patch88: httpd-2.0.46-cgibucket.patch
+Patch89: httpd-2.0.49-headerssl.patch
+Patch90: httpd-2.0.49-workerstack.patch
+# Security fixes
+Patch200: httpd-2.0.46-CAN-2004-0488.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
-BuildRequires: apr-devel >= 0.9.3-10, apr-util-devel, pcre-devel
+BuildRequires: apr-devel >= 0.9.4-15, apr-util-devel, pcre-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
@@ -135,48 +142,55 @@ Security (TLS) protocols.
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .linkmods
-%patch5 -p1 -b .deplibs
-%patch7 -p1 -b .syspcre
-%patch8 -p1 -b .suexeclibs
-%patch9 -p1 -b .vpathinc
+%patch4 -p1 -b .deplibs
+%patch6 -p1 -b .syspcre
+%patch7 -p1 -b .suexeclibs
+%patch8 -p1 -b .vpathinc
 
 # no -b to prevent droplets in install root
 %patch20 -p1
-%patch22 -p1 -b .davetag
-%patch25 -p1 -b .ldapshm
-%patch26 -p1 -b .shmcb
-%patch27 -p1 -b .sslmutex
-%patch35 -p1 -b .md5dig
-## %patch39 -p1 -b .proxy11 ### NEEDS MERGE
-%patch40 -p1 -b .sslpphrase
-%patch41 -p1 -b .worker
-%patch44 -p1 -b .workerhup
-%patch45 -p1 -b .davmisc
-%patch46 -p1 -b .limitxml
-%patch47 -p1 -b .vhost
-%patch48 -p1 -b .sslcache
-%patch49 -p1 -b .sslcleanup
-%patch50 -p1 -b .eocbucket
-%patch51 -p1 -b .nolcrash
+%patch21 -p1 -b .davetag
+%patch22 -p1 -b .ldapshm
+%patch23 -p1 -b .shmcb
+%patch24 -p1 -b .sslmutex
+%patch25 -p1 -b .md5dig
+## %patch26 -p1 -b .proxy11 ### NEEDS MERGE
+%patch27 -p1 -b .sslpphrase
+%patch28 -p1 -b .worker
+%patch29 -p1 -b .workerhup
+%patch30 -p1 -b .davmisc
+%patch31 -p1 -b .limitxml
+%patch32 -p1 -b .vhost
+%patch33 -p1 -b .sslscache
+%patch34 -p1 -b .sslcleanup
+%patch35 -p1 -b .eocbucket
+%patch36 -p1 -b .nolcrash
+%patch37 -p1 -b .autoindex
+%patch38 -p1 -b .deflate2
+%patch39 -p1 -b .suexecsuid
 
 %patch71 -p0 -b .xfsz
-%patch72 -p0 -b .pod
+%patch72 -p1 -b .pod
 %patch73 -p1 -b .noshmht
-%patch75 -p1 -b .export
-%patch76 -p1 -b .dynlimit
-%patch77 -p1 -b .dynamic
-%patch79 -p1 -b .sslstatus
-%patch80 -p1 -b .corelimit
-%patch81 -p1 -b .rolog
-%patch82 -p1 -b .distcache
-%patch83 -p1 -b .debuglog
-%patch84 -p1 -b .abench
-%patch85 -p1 -b .fdsetsize
-%patch86 -p1 -b .sslheader
-%patch87 -p1 -b .sslvars2
-%patch88 -p1 -b .rewritessl
-%patch89 -p1 -b .largefile
-%patch90 -p1 -b .cgibucket
+%patch74 -p1 -b .export
+%patch75 -p1 -b .dynlimit
+%patch76 -p1 -b .dynamic
+%patch77 -p1 -b .sslstatus
+%patch78 -p1 -b .corelimit
+%patch79 -p1 -b .rolog
+%patch80 -p1 -b .distcache
+%patch81 -p1 -b .debuglog
+%patch82 -p1 -b .abench
+%patch83 -p1 -b .fdsetsize
+%patch84 -p1 -b .sslheader
+%patch85 -p1 -b .sslvars2
+%patch86 -p1 -b .rewritessl
+%patch87 -p1 -b .largefile
+%patch88 -p1 -b .cgibucket
+%patch89 -p1 -b .headerssl
+%patch90 -p1 -b .workerstack
+
+%patch200 -p1 -b .can0488
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -196,7 +210,7 @@ fi
 if echo 'static int foo[30000]; int main () { return 0; }' | 
    gcc -pie -fpie -O2 -xc - -o pietest && 
    ./pietest; then
-%patch6 -p1 -b .pie
+%patch5 -p1 -b .pie
   : PIE support enabled
 else
   : WARNING: PIE support not enabled
@@ -565,6 +579,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu Jun 10 2004 Joe Orton <jorton@redhat.com> 2.0.49-5
+- remove comments about ScoreBoardFile in httpd.conf
+- avoid redundant name lookup in pod code
+- mod_headers: add %{...}s feature for using SSL variables
+- mod_autoindex: don't truncate output on stat() failure (#117959)
+- mod_ssl: fix shmcb corruption with small caches (Geoff Thorpe)
+- mod_ssl: security fix for overflow in FakeBasicAuth (CVE CAN-2004-0488)
+- mod_deflate: fix memory consumption for large responses
+- check that suexec is setuid root (André Malo)
+- worker: add ThreadStackSize (Jeff Trawick) and ThreadGuardSize directives
+
 * Thu May  6 2004 Joe Orton <jorton@redhat.com> 2.0.49-4
 - make "noindex" page valid XHTML 1.1 (Pascal Volk, #122020)
 - fix SEGV with no Listen directives (Michael Corcoran)
