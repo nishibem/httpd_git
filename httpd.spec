@@ -5,7 +5,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.48
-Release: 1.2
+Release: 10
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -26,41 +26,64 @@ Source33: README.confd
 # build/scripts patches
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
-Patch3: httpd-2.0.36-sslink.patch
+Patch3: httpd-2.0.48-linkmods.patch
 Patch4: httpd-2.0.45-parallel.patch
 Patch5: httpd-2.0.45-deplibs.patch
 Patch6: httpd-2.0.47-pie.patch
 Patch7: httpd-2.0.45-syspcre.patch
+Patch8: httpd-2.0.48-suexeclibs.patch
+Patch9: httpd-2.0.48-vpathinc.patch
 # Bug fixes
 Patch20: httpd-2.0.45-encode.patch
 Patch21: httpd-2.0.45-davfs.patch
 Patch22: httpd-2.0.45-davetag.patch
 Patch23: httpd-headusage.patch
 Patch24: httpd-2.0.47-sslcleanup.patch
-Patch26: httpd-2.0.47-ldapshm.patch
-Patch27: httpd-2.0.46-shmcb.patch
-Patch32: httpd-2.0.46-sslmutex.patch
-Patch34: httpd-2.0.46-sslio.patch
-Patch36: httpd-2.0.46-graceful.patch
-# features/functional changes
-Patch41: httpd-2.0.36-redhat.patch
-Patch42: httpd-2.0.40-xfsz.patch
-Patch43: httpd-2.0.40-pod.patch
-Patch44: httpd-2.0.40-noshmht.patch
-Patch45: httpd-2.0.45-proxy.patch
-# Ugly hacks which should never see the light of day
-Patch60: httpd-2.0.48-ssl47to48.patch
+Patch25: httpd-2.0.47-ldapshm.patch
+Patch26: httpd-2.0.46-shmcb.patch
+Patch27: httpd-2.0.46-sslmutex.patch
+Patch28: httpd-2.0.46-sslio.patch
+Patch29: httpd-2.0.46-graceful.patch
+Patch30: httpd-2.0.46-metharray.patch
+Patch31: httpd-2.0.48-usertrack.patch
+Patch32: httpd-2.0.46-execfail.patch
+Patch33: httpd-2.0.46-logtimez.patch
+Patch34: httpd-2.0.46-sslerr.patch
+Patch35: httpd-2.0.46-md5dig.patch
+Patch36: httpd-2.0.48-sslvars.patch
+Patch37: httpd-2.0.48-include.patch
+Patch38: httpd-2.0.48-autoindex.patch
+Patch39: httpd-2.0.48-proxy11.patch
+# Features/functional changes
+Patch70: httpd-2.0.48-release.patch
+Patch71: httpd-2.0.40-xfsz.patch
+Patch72: httpd-2.0.40-pod.patch
+Patch73: httpd-2.0.40-noshmht.patch
+Patch74: httpd-2.0.45-proxy.patch
+Patch75: httpd-2.0.45-export.patch
+Patch76: httpd-2.0.48-dynlimit.patch
+Patch77: httpd-2.0.48-dynamic.patch
+Patch78: httpd-2.0.48-status.patch
+Patch79: httpd-2.0.48-sslstatus.patch
+Patch80: httpd-2.0.48-corelimit.patch
+Patch81: httpd-2.0.46-rolog.patch
+Patch82: httpd-2.0.48-distcache.patch
+# Security fixes
+Patch120: httpd-2.0.48-CAN-2003-0020.patch
+# Documentation fixes
+Patch170: httpd-2.0.48-manpages.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
-BuildPrereq: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
-BuildPrereq: apr-devel >= 0.9.3-10, apr-util-devel, pcre-devel
+BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
+BuildRequires: apr-devel >= 0.9.3-10, apr-util-devel, pcre-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
 Provides: webserver
 Provides: httpd-mmn = %{mmn}
-Obsoletes: apache, secureweb, mod_dav
+Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache, stronghold-htdocs
+Obsoletes: mod_put, mod_roaming
 
 %description
 Apache is a powerful, full-featured, efficient, and freely-available
@@ -70,7 +93,7 @@ Internet.
 %package devel
 Group: Development/Libraries
 Summary: Development tools for the Apache HTTP server.
-Obsoletes: secureweb-devel, apache-devel
+Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
 Requires: apr-devel, apr-util-devel, httpd = %{version}
 
 %description devel
@@ -95,9 +118,10 @@ also be found at http://httpd.apache.org/docs-2.0/.
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP server
 Serial: 1
-BuildPrereq: openssl-devel
+BuildRequires: openssl-devel, distcache-devel
 Prereq: openssl, dev, /bin/cat
-Requires: httpd, make, httpd-mmn = %{mmn}
+Requires: httpd = %{version}-%{release}, make, httpd-mmn = %{mmn}
+Obsoletes: stronghold-mod_ssl
 
 %description -n mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -108,15 +132,12 @@ Security (TLS) protocols.
 %setup -q
 %patch1 -p0 -b .apctl
 %patch2 -p1 -b .apxs
-%patch3 -p0 -b .sslink
-%patch4 -p0 -b .parallel
+%patch3 -p1 -b .linkmods
+%patch4 -p1 -b .parallel
 %patch5 -p1 -b .deplibs
 %patch7 -p1 -b .syspcre
-
-# Conditionally enable PIE support
-if echo 'int main () { return 0; }' | gcc -pie -fpie -O2 -xc - -o pietest 2>/dev/null; then
-%patch6 -p1 -b .pie
-fi
+%patch8 -p1 -b .suexeclibs
+%patch9 -p1 -b .vpathinc
 
 # no -b to prevent droplets in install root
 %patch20 -p1
@@ -124,26 +145,58 @@ fi
 %patch22 -p1 -b .davetag
 %patch23 -p1 -b .head
 %patch24 -p1 -b .sslcleanup
-%patch26 -p1 -b .ldapshm
-%patch27 -p1 -b .shmcb
-%patch32 -p1 -b .sslmutex
-%patch34 -p1 -b .sslio
-%patch36 -p1 -b .graceful
+%patch25 -p1 -b .ldapshm
+%patch26 -p1 -b .shmcb
+%patch27 -p1 -b .sslmutex
+%patch28 -p1 -b .sslio
+%patch29 -p1 -b .graceful
+%patch30 -p1 -b .metharray
+%patch31 -p1 -b .usertrack
+%patch32 -p1 -b .execfail
+%patch33 -p1 -b .logtimez
+%patch34 -p1 -b .sslerr
+%patch35 -p1 -b .md5dig
+%patch36 -p1 -b .sslvars
+%patch37 -p1 -b .include
+%patch38 -p1 -b .autoindex
+%patch39 -p1 -b .proxy11
 
-%patch41 -p0 -b .redhat
-%patch42 -p0 -b .xfsz
-%patch43 -p0 -b .pod
-%patch44 -p1 -b .noshmht
-%patch45 -p1 -b .proxy
+%patch71 -p0 -b .xfsz
+%patch72 -p0 -b .pod
+%patch73 -p1 -b .noshmht
+%patch74 -p1 -b .proxy
+%patch75 -p1 -b .export
+%patch76 -p1 -b .dynlimit
+%patch77 -p1 -b .dynamic
+%patch78 -p1 -b .status
+%patch79 -p1 -b .sslstatus
+%patch80 -p1 -b .corelimit
+%patch81 -p1 -b .rolog
+%patch82 -p1 -b .distcache
 
-%patch60 -p1 -b .ssl47to48
+%patch120 -p1 -b .can0020
+
+%patch170 -p1 -b .manpages
+
+# Patch in vendor/release string
+sed "s/@RELEASE@/Fedora/" < %{PATCH70} | patch -p1
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
-vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include \`pwd\`/include/ap_mmn.h | grep -v '#'`
+vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include \`pwd\`/include/ap_mmn.h | sed -n '/^2/p'`
 if test "x${vmmn}" != "x%{mmn}"; then
    : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}.
    : Update the mmn macro and rebuild.
    exit 1
+fi
+
+# Conditionally enable PIE support
+if echo 'static int foo[30000]; int main () { return 0; }' | 
+   gcc -pie -fpie -O2 -xc - -o pietest 2>/dev/null && 
+   ./pietest; then
+%patch6 -p1 -b .pie
+  : PIE support enabled
+else
+  : WARNING: PIE support not enabled
 fi
 
 %build
@@ -179,11 +232,7 @@ function mpmbuild()
 {
 mpm=$1; shift
 mkdir $mpm; pushd $mpm
-cat > config.cache <<EOF
-ac_cv_func_pthread_mutexattr_setpshared=no
-ac_cv_func_sem_open=no
-EOF
-../configure -C \
+../configure \
  	--prefix=%{_sysconfdir}/httpd \
  	--exec-prefix=%{_prefix} \
  	--bindir=%{_bindir} \
@@ -211,7 +260,7 @@ popd
 
 # Only bother enabling optional modules for main build.
 mpmbuild prefork --enable-mods-shared=all \
-	--enable-ssl --with-ssl \
+	--enable-ssl --with-ssl --enable-distcache \
 	--enable-deflate \
 	--enable-proxy --enable-proxy-connect \
 	--enable-proxy-http --enable-proxy-ftp \
@@ -238,9 +287,7 @@ rm -rf $RPM_BUILD_ROOT
 
 # Classify ab and logresolve as section 1 commands, as they are in /usr/bin
 mv docs/man/ab.8 docs/man/ab.1
-sed -e "1s/logresolve 8/logresolve 1/" \
-  < docs/man/logresolve.8 > docs/man/logresolve.1
-rm docs/man/logresolve.8
+mv docs/man/logresolve.8 docs/man/logresolve.1
 
 pushd prefork
 make DESTDIR=$RPM_BUILD_ROOT install
@@ -363,18 +410,28 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.exp \
       $RPM_BUILD_ROOT%{_bindir}/ap?-config \
       $RPM_BUILD_ROOT%{_sbindir}/{checkgid,dbmmanage,envvars*} \
       $RPM_BUILD_ROOT%{contentdir}/htdocs/* \
-      $RPM_BUILD_ROOT%{contentdir}/cgi-bin/* 
+      $RPM_BUILD_ROOT%{_mandir}/man1/dbmmanage.* \
+      $RPM_BUILD_ROOT%{contentdir}/cgi-bin/*
 
 # Remove headers which needn't be public
 rm -f $RPM_BUILD_ROOT%{_includedir}/httpd/{ssl_expr_parse.h,ssl_util_table.h}
+
+# Make suexec a+rw so it can be stripped.  %%files lists real permissions
+chmod 755 $RPM_BUILD_ROOT%{_sbindir}/suexec
 
 %pre
 # Add the "apache" user
 /usr/sbin/useradd -c "Apache" -u 48 \
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
-%triggerpostun -- apache < 2.0
+%triggerpostun -- apache < 2.0, stronghold-apache < 2.0
 /sbin/chkconfig --add httpd
+
+# Prevent removal of index.html on upgrades from 1.3
+%triggerun -- apache < 2.0, stronghold-apache < 2.0
+if [ -r %{contentdir}/index.html -a ! -r %{contentdir}/index.html.rpmold ]; then
+  mv %{contentdir}/index.html %{contentdir}/index.html.rpmold
+fi
 
 %post
 # Register the httpd service
@@ -453,10 +510,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
-# everything but mod_ssl.so:
-%{_libdir}/httpd/modules/mod_[a-r]*.so
-%{_libdir}/httpd/modules/mod_s[petu]*.so
-%{_libdir}/httpd/modules/mod_[t-z]*.so
+%{_libdir}/httpd/modules/mod*.so
+%exclude %{_libdir}/httpd/modules/mod_ssl.so
 
 %dir %{contentdir}
 %dir %{contentdir}/cgi-bin
@@ -474,12 +529,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
 
-%{_mandir}/man1/*
-
-%{_mandir}/man8/apachectl*
-%{_mandir}/man8/httpd*
-%{_mandir}/man8/rotatelogs*
-%{_mandir}/man8/suexec*
+%{_mandir}/man?/*
+%exclude %{_mandir}/man8/apxs.8*
 
 %files manual
 %defattr(-,root,root)
@@ -506,15 +557,71 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
 %{_libdir}/httpd/build/instdso.sh
+%{_libdir}/httpd/build/libtool
 
 %changelog
-* Wed Nov 19 2003 Joe Orton <jorton@redhat.com> 2.0.48-1.2
-- bug fix for #110184
+* Tue Jan 27 2004 Joe Orton <jorton@redhat.com> 2.0.48-10
+- update to ab from HEAD
+- remove dbmmanage man page (part of #114080)
+- mod_ssl: fix streaming nph- CGI scripts over SSL
+- mod_autoindex: fixes from 2.0 branch (André Malo)
+- add NameVirtualHost vs mod_ssl warning to httpd.conf (#114315)
+- mod_proxy: HTTP/1.1-compliance fixes from HEAD
 
-* Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.48-1.1
-- update to 2.0.48 (#108608, thanks to Robert Scheck)
+* Tue Jan 20 2004 Joe Orton <jorton@redhat.com> 2.0.48-9
+- use a large BSS in the test PIE executable to trigger bugs early
+- tighten check on CPP output in MMN check (#113934)
+
+* Mon Jan 19 2004 Joe Orton <jorton@redhat.com> 2.0.48-8
+- add man page fixes
+- mod_include: use parser rewrite+fixes from 2.0 branch (André Malo et al)
+- mod_ssl: add distcache support (Geoff Thorpe)
+- mod_ssl: SSL variable handling fixes for non-SSL connections (various)
+- allow linking modules against specific libraries found during configure
+
+* Mon Jan 19 2004 Joe Orton <jorton@redhat.com> 2.0.48-7
+- hack to ensure that /usr/sbin/suexec gets stripped
+- merges from upstream:
+ * fix for CVE CAN-2003-0020 (André Malo)
+ * open log files read-only (Jeff Trawick)
+ * mod_cgi: fix logging of script exec failure messages (Jeff Trawick)
+ * mod_proxy: fix leak in request body handling (Larry Toppi)
+- merges from Taroon:
+ * move away /var/www/html/index.html before upgrade from 1.3 (#70705)
+ * allow upgrade from Stronghold 4.0
+ * migration guide updates 
+ * mod_log_config: fix logging of timezone (upstream #23642)
+ * mod_ssl: restore readable error descriptions in error log
+
+* Mon Jan 19 2004 Joe Orton <jorton@redhat.com> 2.0.48-6
+- fix httpd.init issues reported by Behdad Esfahbod
+- add fix for mod_usertrack (#113269)
+- automatically raise RLIMIT_CORE if CoreDumpDirectory is used
+- emit warning at end of %%prep if PIE support is not enabled
+- add symlink to libtool script from build directory (#113720)
+- don't link suexec against the world
+
+* Sun Jan 04 2004 Joe Orton <jorton@redhat.com> 2.0.48-5
+- use graceful restart in logrotate
+- bump default MaxRequestsPerChild for prefork to 4000
+- move vendor string for Server header into spec file
+- include mod_status extension hook and use it in mod_ssl to include
+  SSL session cache statistics in server-status output
+
+* Thu Dec 18 2003 Joe Orton <jorton@redhat.com> 2.0.48-4
+- rebuild
+
+* Sat Dec 13 2003 Jeff Johnson <jbj@jbj.org> 2.0.48-3
+- rebuild against db-4.2.52.
+
+* Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.48-2
+- update to 2.0.48
 - includes security fix for CVE CAN-2003-0542
-- reinstate mpm_common.h (#108080)
+- include mpm*.h to fix mod_fastcgi build (#108080)
+- increase DYNAMIC_MODULE_LIMIT to 128
+- re-enable ap_hack_* export trimming patch
+- only use -export-dynamic when linking httpd, not suexec etc
+- don't load mod_unique_id by default
 
 * Thu Oct 23 2003 Joe Orton <jorton@redhat.com> 2.0.47-10
 - httpd.conf: configure test page in welcome.conf, load suexec, 
@@ -530,6 +637,9 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Oct 22 2003 Joe Orton <jorton@redhat.com> 2.0.47-9
 - updated index.html (Matt Wilson, #107378)
 - change server version string comment to "(Fedora)"
+
+* Mon Oct 13 2003 Jeff Johnson <jbj@jbj.org> 2.0.47-8.1
+- rebuild against db-4.2.42.
 
 * Wed Oct  8 2003 Joe Orton <jorton@redhat.com> 2.0.47-8
 - use -fPIE not -fpie to fix s390x (Florian La Roche)

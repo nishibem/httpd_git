@@ -31,10 +31,10 @@
 <abstract>
 
 <para>This HOWTO covers the migration of &distro; web servers from
-version 1.3 of the Apache HTTP server to version 2.0.  It explains the
-relevant differences between the 1.3 and 2.0 packages, and describes
-the process required to migrate the server configuration from 1.3 to
-2.0.</para>
+Apache 1.3 packages to Apache 2.0 packages.  It
+explains the relevant differences between the 1.3 and 2.0 packages,
+and describes the process required to migrate your server's
+configuration from 1.3 to 2.0.</para>
 
 </abstract>
 </artheader>
@@ -101,7 +101,7 @@ for both 1.3 and 2.0 are divided into three sections, and for each of
 these this document will suggest what is hopefully the easiest
 route.</para>
 
-<para>If your &httpdconf; has been modified from the default
+<para>If your &httpdconf; has been modified from the default configuration
 and you have saved a copy of the original then you may find the
 <command>diff</command> command comes in handy.  Invoked as:
 
