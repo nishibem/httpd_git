@@ -3,11 +3,11 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.36
-Release: 7
+Version: 2.0.40
+Release: 1
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
-Source0: httpd://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
+Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
@@ -18,18 +18,9 @@ Source11: ssl.conf
 Source12: migration.html
 Source13: migration.css
 # build/scripts patches
-Patch0: httpd-2.0.36-destdir.patch
-Patch1: httpd-2.0.36-apctl.patch
+Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
 Patch3: httpd-2.0.36-sslink.patch
-# fixes
-Patch10: httpd-2.0.36-include.patch
-Patch11: httpd-2.0.36-synok.patch
-Patch12: httpd-2.0.36-suexec.patch
-Patch13: httpd-2.0.36-userdir.patch
-Patch14: httpd-2.0.36-mutex.patch
-Patch15: httpd-2.0.36-restart.patch
-Patch16: httpd-2.0.36-loop.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
@@ -88,18 +79,9 @@ Security (TLS) protocols.
 
 %prep
 %setup -q
-%patch0 -p0 -b .destdir
 %patch1 -p0 -b .apctl
 %patch2 -p0 -b .apxs
 %patch3 -p0 -b .sslink
-
-%patch10 -p0 -b .incl
-%patch11 -p0 -b .synok
-%patch12 -p0 -b .suexec
-%patch13 -p0 -b .userdir
-%patch14 -p0 -b .mutex
-%patch15 -p0 -b .restart
-%patch16 -p0 -b .loop
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
@@ -346,6 +328,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Mon Aug 12 2002 Joe Orton <jorton@redhat.com> 2.0.40-1
+- update to 2.0.40
+
+* Wed Jul 24 2002 Joe Orton <jorton@redhat.com> 2.0.36-8
+- improve comment on use of UserDir in default config (#66886)
+
 * Wed Jul 10 2002 Joe Orton <jorton@redhat.com> 2.0.36-7
 - use /sbin/nologin as shell for apache user (#68371)
 - add patch from CVS to fix possible infinite loop when processing
