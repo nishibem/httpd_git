@@ -1,10 +1,11 @@
 %define contentdir /var/www
 %define suexec_caller apache
+%define mmn 20020628
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 5
+Release: 6
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -34,6 +35,7 @@ Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
 Provides: webserver
+Provides: httpd-mmn = %{mmn}
 Conflicts: thttpd
 Obsoletes: apache, secureweb, mod_dav
 
@@ -72,7 +74,7 @@ Summary: SSL/TLS module for the Apache HTTP server
 Serial: 1
 BuildPrereq: openssl-devel
 Prereq: openssl, dev, /bin/cat
-Requires: httpd, make
+Requires: httpd, make, httpd-mmn = %{mmn}
 
 %description -n mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -173,6 +175,9 @@ ln -s ../../../..%{_bindir}/libtool $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtoo
 sed -e "s|/var/www/build|%{_libdir}/httpd/build|g" \
     -e "/AP_LIBS/d" -e "/abs_srcdir/d" < build/config_vars.mk \
   > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
+
+# Make the MMN accessible to module packages
+echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 
 # docroot
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
@@ -350,6 +355,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Mon Sep  2 2002 Joe Orton <jorton@redhat.com> 2.0.40-6
+- provide "httpd-mmn" to manage module ABI compatibility
+
 * Sun Sep  1 2002 Joe Orton <jorton@redhat.com> 2.0.40-5
 - fix SSL session cache (#69699)
 - revert addition of LDAP support to apr-util
