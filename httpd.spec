@@ -5,7 +5,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 11.3
+Release: 11.5
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -28,11 +28,14 @@ Patch3: httpd-2.0.36-sslink.patch
 Patch20: httpd-2.0.40-davsegv.patch
 Patch21: httpd-2.0.40-leaks.patch
 Patch22: httpd-2.0.40-nphcgi.patch
+Patch23: httpd-2.0.40-proxy.patch
+Patch24: httpd-2.0.40-range.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
 Patch42: httpd-2.0.40-xfsz.patch
 Patch43: httpd-2.0.40-pod.patch
+Patch44: httpd-2.0.40-prctl.patch
 # Security fixes
 Patch60: httpd-2.0.40-CAN-2002-0840.patch
 Patch61: httpd-2.0.40-CAN-2002-0843.patch
@@ -40,6 +43,7 @@ Patch62: httpd-2.0.40-CAN-2003-0132.patch
 Patch63: httpd-2.0.40-CAN-2003-0020.patch
 Patch64: httpd-2.0.40-fdleak.patch
 Patch65: httpd-2.0.40-CAN-2003-0083.patch
+Patch66: httpd-2.0.40-CAN-2003-0245.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -103,11 +107,14 @@ Security (TLS) protocols.
 %patch20 -p1 -b .davsegv
 %patch21 -p0 -b .leaks
 %patch22 -p1 -b .nphcgi
+%patch23 -p1 -b .proxy
+%patch24 -p1 -b .range
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
 %patch42 -p0 -b .xfsz
 %patch43 -p0 -b .pod
+%patch44 -p1 -b .prctl
 
 %patch60 -p1 -b .can0840
 %patch61 -p1 -b .can0843
@@ -115,6 +122,7 @@ Security (TLS) protocols.
 %patch63 -p1 -b .can0020
 %patch64 -p1 -b .fdleak
 %patch65 -p1 -b .can0083
+%patch66 -p1 -b .can0245
 
 # copy across the migration guide and sed it's location into apachectl
 cp $RPM_SOURCE_DIR/migration.{html,css} .
@@ -395,6 +403,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu May 22 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.5
+- rebuild
+
+* Mon May 12 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.4
+- add security fix for CAN-2003-0245
+- add bug fixes for #89179, #88575, #89086
+
 * Tue Apr  1 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.3
 - add security fixes for CAN-2003-0020, CAN-2003-0132, CAN-2003-0083
 - add security fix for file descriptor leaks, #82142
