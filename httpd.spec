@@ -4,7 +4,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 1
+Release: 2
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -211,6 +211,9 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
 /usr/sbin/useradd -c "Apache" -u 48 \
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
+%triggerpostun -- apache < 2.0
+/sbin/chkconfig --add httpd
+
 %post
 # Register the httpd service
 /sbin/chkconfig --add httpd
@@ -328,6 +331,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Wed Aug 21 2002 Bill Nottingham <notting@redhat.com> 2.0.40-2
+- add trigger (#68657)
+
 * Mon Aug 12 2002 Joe Orton <jorton@redhat.com> 2.0.40-1
 - update to 2.0.40
 
