@@ -1,18 +1,19 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.50
-Release: 5.ent
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
+Source5: httpd.sysconf
 Source6: powered_by.gif
 Source7: powered_by_fedora.png
 Source8: powered_by_rh.png
@@ -328,6 +329,10 @@ rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/*.conf
 install -m 644 $RPM_SOURCE_DIR/httpd.conf \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/httpd.conf
 
+mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
+install -m 644 $RPM_SOURCE_DIR/httpd.sysconf \
+   $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/httpd
+
 # mod_ssl bits
 for suffix in crl crt csr key prm; do
    mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/ssl.${suffix}
@@ -518,6 +523,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/httpd/conf.d
 %{_sysconfdir}/httpd/conf.d/README
 
+%config(noreplace) %{_sysconfdir}/sysconfig/httpd
+
 %{_bindir}/ab
 %{_bindir}/ht*
 %{_bindir}/logresolve
@@ -585,6 +592,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Sun Sep  5 2004 Joe Orton <jorton@redhat.com> 2.0.50-6
+- include /etc/sysconfig/httpd template (#112085)
+- pass $OPTIONS in httpd invocations in apachectl (#115910)
+- do not pass $OPTIONS to apachectl from init script
+- start httpd in C locale by default from apachectl
+
 * Wed Sep  1 2004 Joe Orton <jorton@redhat.com> 2.0.50-5
 - move manual configuration into conf.d/manual.conf (#131208)
 - add test_hook from HEAD, -t -DDUMP_CERTS for mod_ssl

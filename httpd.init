@@ -106,7 +106,7 @@ case "$1" in
         reload
 	;;
   graceful|help|configtest|fullstatus)
-	$apachectl $OPTIONS $@
+	$apachectl $@
 	RETVAL=$?
 	;;
   *)
