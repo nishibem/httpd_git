@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.51
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -227,7 +227,7 @@ echo '1,/Changes with Apache MPM/wq' | ed CHANGES
 
 # Build the migration guide
 sed 's/@DISTRO@/%{distro}/' < $RPM_SOURCE_DIR/migration.xml > migration.xml
-xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
+xmlto -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
 CFLAGS=$RPM_OPT_FLAGS
@@ -578,6 +578,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Sat Sep 18 2004 Joe Orton <jorton@redhat.com> 2.0.51-5
+- switch to Jeff Trawick's child reclaim timing logic patch
+- migration guide updates
+
 * Thu Sep 16 2004 Joe Orton <jorton@redhat.com> 2.0.51-4
 - fix pcre includes
 
