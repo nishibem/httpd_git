@@ -16,6 +16,11 @@
 <!ENTITY htdbm "<command>htdbm</command>">
 <!ENTITY dbmmanage "<command>dbmmanage</command>">
 
+<!ENTITY distro "Fedora Core">
+
+<!ENTITY prefork "<emphasis>prefork</emphasis>">
+<!ENTITY worker "<emphasis>worker</emphasis>">
+
 ]>
 
 <article>
@@ -25,11 +30,11 @@
 
 <abstract>
 
-<para>This HOWTO covers the migration of Red Hat Linux webservers from
-Red Hat's Apache 1.3 packages to Red Hat's Apache 2.0 packages.  It
-explains the relevant differences between the 1.3 and 2.0 packages,
-and describes the process required to migrate your server's
-configuration from 1.3 to 2.0.</para>
+<para>This HOWTO covers the migration of &distro; web servers from
+version 1.3 of the Apache HTTP server to version 2.0.  It explains the
+relevant differences between the 1.3 and 2.0 packages, and describes
+the process required to migrate the server configuration from 1.3 to
+2.0.</para>
 
 </abstract>
 </artheader>
@@ -77,19 +82,14 @@ linkend="mod_auth_dbm"/>); the logrotate configuration file has been
 renamed from <filename>/etc/logrotate.d/apache</filename> to
 <filename>/etc/logrotate.d/httpd</filename>.</para>
 
-<!--
-<para>A complete breakdown of the filesystem changes can be found in
-<xref linkend="fschanges"/>.</para>
--->
-
 </sect2>
 </sect1>
 
 <sect1>
 <title>Migrating your configuration</title>
 
-<para>If you have upgraded your server from a previous version of Red
-Hat Linux upon which Apache was installed then the stock configuration
+<para>If you have upgraded your server from a previous version of 
+&distro; upon which Apache was installed then the stock configuration
 file from the Apache 2.0 package will have been created as
 <filename>/etc/httpd/conf/httpd.conf.rpmnew</filename>, leaving your
 original &httpdconf; untouched.  It is, of course, entirely up to you
@@ -101,8 +101,8 @@ for both 1.3 and 2.0 are divided into three sections, and for each of
 these this document will suggest what is hopefully the easiest
 route.</para>
 
-<para>If your &httpdconf; is a modified version of the default Red Hat
-one and you have saved a copy of the original then you may find the
+<para>If your &httpdconf; has been modified from the default
+and you have saved a copy of the original then you may find the
 <command>diff</command> command comes in handy.  Invoked as:
 
 <informalexample>
@@ -190,19 +190,25 @@ url="http://httpd.apache.org/docs-2.0/mod/core.html#servername"><literal>ServerN
 <para>In Apache 2.0, the responsibility for accepting requests and
 dispatching children to handle them has been abstracted into a group
 of modules called Multi-Processing Modules (MPMs); the original Apache
-1.3 behaviour has now been moved into the prefork MPM.</para>
+1.3 behaviour has now been moved into the &prefork; MPM.</para>
 
-<para>The MPM supplied by default on Red Hat Linux is prefork which
+<para>The MPM used by default on &distro; is &prefork; which
 accepts the same directives (<literal>StartServers</literal>,
 <literal>MinSpareServers</literal>,
 <literal>MaxSpareServers</literal>, <literal>MaxClients</literal> and
 <literal>MaxRequestsPerChild</literal>) as Apache 1.3 and as such the
 values of these directives may be migrated across directly.</para>
 
-<para>In the stock Apache 2.0 configuration file you may notice
-directives for two other MPMs: worker and perchild.  Currently only
-the prefork MPM is available on Red Hat Linux, although other MPMs may
-be made available at some later date.</para>
+<para>An alternative, thread-based MPM called &worker; is also available;
+to use this MPM, add the line:
+
+<informalexample>
+<programlisting>
+HTTPD=/usr/sbin/httpd.worker
+</programlisting>
+</informalexample>
+
+to the file <filename>/etc/sysconfig/httpd</filename>.</para>
 
 <para>See also:
 <itemizedlist>
@@ -220,8 +226,8 @@ Multi-Processing Modules</ulink></listitem>
 <para>There are many changes required here and it is highly
 recommended that anyone trying to modify an Apache 1.3 configuration
 to suit Apache 2.0 (as opposed to migrating your changes into the
-Apache 2.0 configuration) simply copy this section from the stock Red
-Hat Linux Apache 2.0 configuration.  If you do decide to try and
+Apache 2.0 configuration) simply copy this section from the stock 
+&distro; Apache 2.0 configuration.  If you do decide to try and
 modify your original file, please note that it is of paramount
 importance that your &httpdconf; contains the following directive:
 
@@ -285,7 +291,7 @@ replace these with <literal>Include</literal> directives.  To ensure
 that the files are read in the order implied by the older directives
 the <literal>Include</literal> directives should be placed at the end
 of &httpdconf;, with the one corresponding to
-<literal>ResourceConfig</literal> preceeding the one corresponding to
+<literal>ResourceConfig</literal> preceding the one corresponding to
 <literal>AccessConfig</literal>.  If you were making use of the
 default values you will need to include them explicitly as
 <filename>conf/srm.conf</filename> and
@@ -351,7 +357,7 @@ url="http://httpd.apache.org/docs-2.0/mod/mod_userdir.html#userdir"><literal>Use
 
 <para>The <literal>AgentLog</literal>, <literal>RefererLog</literal>
 and <literal>RefererIgnore</literal> directives have been removed.
-Agent and referer logs are still available using the
+Agent and referrer logs are still available using the
 <literal>CustomLog</literal> and <literal>LogFormat</literal>
 directives.</para>
 
@@ -483,7 +489,7 @@ imagination.</para>
 <para>The way this actually works is that each request is served by
 exactly one <emphasis>handler</emphasis> module followed by zero or
 more <emphasis>filter</emphasis> modules.  Under Apache 1.3, for
-example, a PHP script would be handled in it's entirity by the PHP
+example, a PHP script would be handled entirely by the PHP
 module; under Apache 2.0 the request is initially
 <emphasis>handled</emphasis> by the core module (which serves static
 files) and subsequently <emphasis>filtered</emphasis> by the PHP
@@ -847,7 +853,7 @@ example:</para>
 <programlisting>
 &lt;Directory /var/www/perl&gt;
     SetHandler perl-script
-    <emphasis role="bold">PerlHandler ModPerl::Registry::handler</emphasis>
+    <emphasis role="bold">PerlResponseHandler ModPerl::Registry</emphasis>
     Options +ExecCGI
 &lt;/Directory&gt;
 </programlisting>
@@ -878,6 +884,33 @@ this file to be loaded, and hence for &mod_python; to work, you must
 have the statement <literal>Include conf.d/*.conf</literal> in your
 &httpdconf; as described in <xref linkend="dsosupport"/>.</para>
 
+</sect3>
+
+<sect3>
+<title>suexec</title>
+
+<para>In Apache 2.0, suexec is configured using the new
+<literal>SuexecUserGroup</literal> directive rather than 
+<literal>User</literal> and <literal>Group</literal>.</para>
+
+<example>
+<title>Apache 1.3 suexec configuration</title>
+<programlisting>
+&lt;VirtualHost vhost.example.com:80&gt;
+    User someone
+    Group somegroup
+&lt;/VirtualHost&gt;
+</programlisting>
+</example>
+
+<example>
+<title>Equivalent Apache 2.0 suexec configuration</title>
+<programlisting>
+&lt;VirtualHost vhost.example.com:80&gt;
+    SuexecUserGroup someone somegroup
+&lt;/VirtualHost&gt;
+</programlisting>
+</example>
 </sect3>
 </sect2>
 </sect1>
@@ -911,14 +944,5 @@ version than &mod_ssl; package for 1.3.</para></listitem>
 </itemizedlist>
 
 </appendix>
-
-<!--
-<appendix id="fschanges">
-<title>Filesystem Changes</title>
-
-<para>XXX</para>
-
-</appendix>
--->
 
 </article>

@@ -1,86 +1,127 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<HTML>
- <HEAD>
-  <TITLE>Test Page for the Apache Web Server on Red Hat Linux</TITLE>
- </HEAD>
-<!-- Background white, links blue (unvisited), navy (visited), red (active) -->
- <BODY BGCOLOR="#FFFFFF">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-  <H1 ALIGN="CENTER">Test Page</H1>
-  This page is used to test the proper operation of the Apache Web server after
-  it has been installed.  If you can read this page, it means that the Apache
-  Web server installed at this site is working properly.
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Test Page for the Apache HTTP Server on Fedora Core</title>
 
-  <HR WIDTH="50%">
+		<style type="text/css">
+			/*<![CDATA[*/
+			body {
+				background-color: #fff;
+				color: #000;
+				font-size: 0.9em;
+				font-family: sans-serif,helvetica;
+				margin: 0;
+				padding: 0;
+			}
+			:link {
+				color: #c00;
+			}
+			:visited {
+				color: #c00;
+			}
+			a:hover {
+				color: #f50;
+			}
+			h1 {
+				text-align: center;
+				margin: 0;
+				padding: 0.6em 2em 0.4em;
+				background-color: #22437f;
+				color: #fff;
+				font-weight: normal;
+				font-size: 1.75em;
+				border-bottom: 2px solid #000;
+			}
+			h1 strong {
+				font-weight: bold;
+			}
+			h2 {
+				font-size: 1.1em;
+				font-weight: bold;
+			}
+			hr {
+				display: none;
+			}
+			.content {
+				padding: 1em 5em;
+			}
+			.content-columns {
+				/* Setting relative positioning allows for 
+				absolute positioning for sub-classes */
+				position: relative;
+				padding-top: 1em;
+			}
+			.content-column-left {
+				/* Value for IE/Win; will be overwritten for other browsers */
+				width: 47%;
+				padding-right: 3%;
+				float: left;
+				padding-bottom: 2em;
+			}
+			.content-column-left hr {
+				display: none;
+			}
+			.content-column-right {
+				/* Values for IE/Win; will be overwritten for other browsers */
+				width: 47%;
+				padding-left: 3%;
+				float: left;
+				padding-bottom: 2em;
+			}
+			.content-columns>.content-column-left {
+				/* Non-IE/Win */
+			}
+			.content-columns>.content-column-right {
+				/* Non-IE/Win */
+			}
+			img {
+				border: 2px solid #fff;
+				padding: 2px;
+				pargin: 2px;
+			}
+			a:hover img {
+				border: 2px solid #f50;
+			}
+			/*]]>*/
+		</style>
+	</head>
 
-  <H2 ALIGN="CENTER">If you are the administrator of this website:</H2>
-  <P>
-  You may now add content to this directory, and replace this page.  Note that
-  until you do so, people visiting your website will see this page, and not your
-  content.
-  </P>
+	<body>
+		<h1>Fedora Core <strong>Test Page</strong></h1>
 
-  <P>If you have upgraded from Red Hat Linux 6.2 and earlier, then you are
-  seeing this page because the default <A
-  href="manual/mod/core.html#documentroot"><STRONG>DocumentRoot</STRONG></A>
-  set in <TT>/etc/httpd/conf/httpd.conf</TT> has changed.  Any subdirectories
-  which existed under <TT>/home/httpd</TT> should now be moved to
-  <TT>/var/www</TT>.  Alternatively, the contents of <TT>/var/www</TT> can be
-  moved to <TT>/home/httpd</TT>, and the configuration file can be updated
-  accordingly.
-  </P>
+		<div class="content">
+			<div class="content-middle">
+				<p>This page is used to test the proper operation of the Apache HTTP server after it has been installed. If you can read this page, it means that the Apache HTTP server installed at this site is working properly.</p>
+			</div>
+			<hr />
 
-  <HR WIDTH="50%">
-  <H2 ALIGN="CENTER">If you are a member of the general public:</H2>
+			<div class="content-columns">
+				<div class="content-column-left">
+					<h2>If you are a member of the general public:</h2>
 
-  <P>
-  The fact that you are seeing this page indicates that the website you just
-  visited is either experiencing problems, or is undergoing routine maintenance.
-  </P>
+					<p>The fact that you are seeing this page indicates that the website you just visited is either experiencing problems, or is undergoing routine maintenance.</p>
 
-  <P>
-  If you would like to let the administrators of this website know that you've
-  seen this page instead of the page you expected, you should send them e-mail.
-  In general, mail sent to the name "webmaster" and directed to the website's
-  domain should reach the appropriate person.
-  </P>
+					<p>If you would like to let the administrators of this website know that you've seen this page instead of the page you expected, you should send them e-mail. In general, mail sent to the name "webmaster" and directed to the website's domain should reach the appropriate person.</p>
 
-  <P>
-  For example, if you experienced problems while visiting www.example.com,
-  you should send e-mail to "webmaster@example.com".
-  </P>
+					<p>For example, if you experienced problems while visiting www.example.com, you should send e-mail to "webmaster@example.com".</p>
 
-  <HR WIDTH="50%">
+					<p>For information on Fedora Core, please visit the <a href="http://fedora.redhat.com/">Fedora Project website</a>.</p>
+					<hr />
+				</div>
 
-  <P>
-  The Apache <A HREF="manual/index.html" >documentation</A> has been included
-  with this distribution.
-  </P>
+				<div class="content-column-right">
+					<h2>If you are the website administrator:</h2>
 
-  <P>
-  For documentation and information on Red Hat Linux, please visit the
-  <a href="http://www.redhat.com/">Red Hat, Inc.</a> website. The manual for
-  Red Hat Linux is available <a href="http://www.redhat.com/manual">here</a>.
-  </P>
+					<p>You may now add content to the directory <tt>/var/www/html/</tt>. Note that until you do so, people visiting your website will see this page, and not your content. To prevent this page from ever being used, follow the instructions in the file <tt>/etc/httpd/conf.d/welcome.conf</tt>.</p>
 
-  <P>
-  You are free to use the image below on an Apache-powered Web
-  server.  Thanks for using Apache!
-  </P>
+					<div class="logos">
+						<p>You are free to use the image below on Apache and Fedora Core powered HTTP server. Thanks for using Apache and Fedora Core!</p>
 
-  <P ALIGN="CENTER">
-  <A HREF="http://www.apache.org/"><IMG SRC="/icons/apache_pb.gif" ALT="[ Powered
-by Apache ]"></A>
-  </P>
-
-  <P>
-  You are free to use the image below on a Red Hat Linux-powered Web
-  server. Thanks for using Red Hat Linux!
-  </P>
-
-  <P ALIGN="center">
-  <A HREF="http://www.redhat.com/"><IMG SRC="/icons/powered_by.gif" ALT="[ Powered
-by Red Hat Linux ]"></A>
-  </P>
- </BODY>
-</HTML>
+						<p><a href="http://httpd.apache.org/"><img src="/icons/apache_pb2.gif" alt="[ Powered by Apache ]"/></a> <a href="http://fedora.redhat.com/"><img src="/icons/powered_by_fedora.png" alt="[ Powered by Fedora Core ]" width="88" height="31" /></a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

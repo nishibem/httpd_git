@@ -1,24 +1,21 @@
 %define contentdir /var/www
 %define suexec_caller apache
-%define mmn 20020628
-
-%ifarch ia64
-# disable debuginfo on IA64
-%define debug_package %{nil}
-%endif
+%define mmn 20020903
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.40
-Release: 21.11
+Version: 2.0.47
+Release: 10
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
 Source6: powered_by.gif
+Source7: powered_by_fedora.png
 Source10: httpd.conf
 Source11: ssl.conf
+Source12: welcome.conf
 Source14: mod_ssl-Makefile.crt
 Source15: mod_ssl-Makefile.crl
 # Documentation
@@ -30,59 +27,39 @@ Source33: README.confd
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
 Patch3: httpd-2.0.36-sslink.patch
+Patch4: httpd-2.0.45-parallel.patch
+Patch5: httpd-2.0.45-deplibs.patch
+Patch6: httpd-2.0.47-pie.patch
+Patch7: httpd-2.0.45-syspcre.patch
 # Bug fixes
-Patch20: httpd-2.0.40-davsegv.patch
-Patch21: httpd-2.0.40-glibc23.patch
-Patch22: httpd-2.0.40-nphcgi.patch
-Patch23: httpd-2.0.40-leaks.patch
-Patch24: httpd-2.0.40-proxy.patch
-Patch25: httpd-2.0.40-range.patch
-Patch26: httpd-2.0.40-pipelog.patch
-Patch27: httpd-2.0.40-rwmap.patch
-Patch28: httpd-2.0.40-stream.patch
-Patch29: httpd-2.0.40-subreq.patch
-Patch30: httpd-2.0.40-sslexcl.patch
-Patch31: httpd-2.0.40-include.patch
-Patch32: httpd-2.0.46-graceful.patch
-Patch33: httpd-2.0.40-rand.patch
-Patch34: httpd-2.0.40-deflate.patch
-Patch35: httpd-2.0.46-metharray.patch
-Patch36: httpd-2.0.46-miscfix.patch
+Patch20: httpd-2.0.45-encode.patch
+Patch21: httpd-2.0.45-davfs.patch
+Patch22: httpd-2.0.45-davetag.patch
+Patch23: httpd-headusage.patch
+Patch24: httpd-2.0.47-sslcleanup.patch
+Patch25: httpd-2.0.47-include.patch
+Patch26: httpd-2.0.47-ldapshm.patch
+Patch27: httpd-2.0.46-shmcb.patch
+Patch32: httpd-2.0.46-sslmutex.patch
+Patch34: httpd-2.0.46-sslio.patch
+Patch36: httpd-2.0.46-graceful.patch
 # features/functional changes
-Patch40: httpd-2.0.36-cnfdir.patch
+Patch40: httpd-2.0.45-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
 Patch42: httpd-2.0.40-xfsz.patch
 Patch43: httpd-2.0.40-pod.patch
 Patch44: httpd-2.0.40-noshmht.patch
-Patch45: httpd-2.0.40-prctl.patch
-Patch46: httpd-2.0.48-fdsetsize.patch
-Patch47: httpd-2.0.40-sendfile.patch
-# Security fixes
-Patch60: httpd-2.0.40-CAN-2002-0840.patch
-Patch61: httpd-2.0.40-CAN-2002-0843.patch
-Patch62: httpd-2.0.40-CAN-2003-0020.patch
-Patch63: httpd-2.0.40-CAN-2003-0083.patch
-Patch64: httpd-2.0.40-CAN-2003-0132.patch
-Patch65: httpd-2.0.40-fdleak.patch
-Patch66: httpd-2.0.40-CAN-2003-0245.patch
-Patch67: httpd-2.0.40-CAN-2003-0189.patch
-Patch68: httpd-2.0.40-CAN-2003-0192.patch
-Patch69: httpd-2.0.40-CAN-2003-0253.patch
-Patch70: httpd-2.0.40-CAN-2003-0254.patch
-Patch71: httpd-2.0.40-VU379828.patch
-Patch72: httpd-2.0.40-CAN-2003-0542.patch
-Patch73: httpd-2.0.40-CAN-2003-0789.patch
-Patch74: httpd-2.0.40-CAN-2004-0113.patch
+Patch45: httpd-2.0.45-proxy.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildPrereq: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
+BuildPrereq: apr-devel >= 0.9.3-10, apr-util-devel, pcre-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
 Provides: webserver
 Provides: httpd-mmn = %{mmn}
-Conflicts: thttpd
 Obsoletes: apache, secureweb, mod_dav
 
 %description
@@ -94,7 +71,7 @@ Internet.
 Group: Development/Libraries
 Summary: Development tools for the Apache HTTP server.
 Obsoletes: secureweb-devel, apache-devel
-Requires: libtool, httpd = %{version}
+Requires: apr-devel, apr-util-devel, httpd = %{version}
 
 %description devel
 The httpd-devel package contains the APXS binary and other files
@@ -112,7 +89,7 @@ Obsoletes: secureweb-manual, apache-manual
 %description manual
 The httpd-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
-also be found at http://httpd.apache.org/docs/.
+also be found at http://httpd.apache.org/docs-2.0/.
 
 %package -n mod_ssl
 Group: System Environment/Daemons
@@ -129,53 +106,37 @@ Security (TLS) protocols.
 
 %prep
 %setup -q
-%patch1 -p1 -b .apctl
+%patch1 -p0 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p0 -b .sslink
+%patch4 -p0 -b .parallel
+%patch5 -p1 -b .deplibs
+%patch7 -p1 -b .syspcre
 
-%patch20 -p1 -b .davsegv
-%patch21 -p1 -b .glibc23
-%patch22 -p1 -b .nphcgi
-%patch23 -p0 -b .leaks
-%patch24 -p1 -b .proxy
-%patch25 -p1 -b .range
-%patch26 -p1 -b .pipelog
-%patch27 -p1 -b .rwmap
-%patch28 -p1 -b .stream
-%patch29 -p1 -b .subreq
-%patch30 -p1 -b .sslexcl
-%patch31 -p1 -b .include
-%patch32 -p1 -b .graceful
-%patch33 -p1 -b .rand
-%patch34 -p1 -b .deflate
-%patch35 -p1 -b .metharray
-%patch36 -p1 -b .miscfix
+# Conditionally enable PIE support
+if echo 'int main () { return 0; }' | gcc -pie -fpie -O2 -xc - -o pietest 2>/dev/null; then
+%patch6 -p1 -b .pie
+fi
 
-%patch40 -p0 -b .cnfdir
+# no -b to prevent droplets in install root
+%patch20 -p1
+%patch21 -p1 -b .davfs
+%patch22 -p1 -b .davetag
+%patch23 -p1 -b .head
+%patch24 -p1 -b .sslcleanup
+%patch25 -p1 -b .include
+%patch26 -p1 -b .ldapshm
+%patch27 -p1 -b .shmcb
+%patch32 -p1 -b .sslmutex
+%patch34 -p1 -b .sslio
+%patch36 -p1 -b .graceful
+
+%patch40 -p1 -b .cnfdir
 %patch41 -p0 -b .redhat
 %patch42 -p0 -b .xfsz
-%patch43 -p1 -b .pod
-%patch44 -p0 -b .noshmht
-%patch45 -p1 -b .prctl
-%patch46 -p1 -b .fdsetsize
-%patch47 -p1 -b .sendfile
-
-# no -b to prevent droplets in install root.
-%patch60 -p1
-%patch61 -p1 -b .can0843
-%patch62 -p1 -b .can0020
-%patch63 -p1 -b .can0083
-%patch64 -p1 -b .can0132
-%patch65 -p1 -b .fdleak
-%patch66 -p1 -b .can0245
-%patch67 -p1 -b .can0189
-%patch68 -p1 -b .can0192
-%patch69 -p1 -b .can0253
-%patch70 -p1 -b .can0254
-%patch71 -p1 -b .vu379828
-%patch72 -p1 -b .can0542
-%patch73 -p1 -b .can0789
-%patch74 -p1 -b .can0113
+%patch43 -p0 -b .pod
+%patch44 -p1 -b .noshmht
+%patch45 -p1 -b .proxy
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include \`pwd\`/include/ap_mmn.h | grep -v '#'`
@@ -186,22 +147,21 @@ if test "x${vmmn}" != "x%{mmn}"; then
 fi
 
 %build
-# update location of migration guide in apachectl
-%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
-	support/apachectl.in
-
 # regenerate configure scripts
 ./buildconf
 
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
 	support/apxs.in
+# update location of migration guide in apachectl
+%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
+	support/apachectl.in
 
 # build the migration guide
 xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks $RPM_SOURCE_DIR/migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
-CFLAGS="$RPM_OPT_FLAGS"
+CFLAGS="$RPM_OPT_FLAGS -DSSL_EXPERIMENTAL_ENGINE"
 if pkg-config openssl ; then
 	# configure -C barfs with trailing spaces in CFLAGS
 	CFLAGS="$CFLAGS `pkg-config --cflags openssl | sed 's/ *$//'`"
@@ -209,7 +169,8 @@ if pkg-config openssl ; then
 else
 	AP_LIBS="-lssl -lcrypto"
 fi
-export CFLAGS AP_LIBS
+export CFLAGS
+export AP_LIBS
 
 function mpmbuild()
 {
@@ -230,14 +191,15 @@ EOF
 	--includedir=%{_includedir}/httpd \
 	--libexecdir=%{_libdir}/httpd/modules \
 	--datadir=%{contentdir} \
+        --with-installbuilddir=%{_libdir}/httpd/build \
 	--with-mpm=$mpm \
+        --with-apr=%{_prefix} --with-apr-util=%{_prefix} \
 	--enable-suexec --with-suexec \
 	--with-suexec-caller=%{suexec_caller} \
 	--with-suexec-docroot=%{contentdir} \
 	--with-suexec-logfile=%{_localstatedir}/log/httpd/suexec.log \
 	--with-suexec-bin=%{_sbindir}/suexec \
-	--with-suexec-uidmin=500 --with-suexec-gidmin=500 \
-        --with-devrandom=/dev/urandom \
+	--with-suexec-uidmin=500 --with-suexec-gidmin=100 \
 	$*
 
 make %{?_smp_mflags}
@@ -247,9 +209,14 @@ popd
 # Only bother enabling optional modules for main build.
 mpmbuild prefork --enable-mods-shared=all \
 	--enable-ssl --with-ssl \
-	--enable-deflate --enable-cgid \
+	--enable-deflate \
 	--enable-proxy --enable-proxy-connect \
-	--enable-proxy-http --enable-proxy-ftp
+	--enable-proxy-http --enable-proxy-ftp \
+        --disable-ext-filter \
+        --enable-cache --enable-mem-cache \
+        --enable-file-cache --enable-disk-cache \
+        --enable-ldap --enable-auth-ldap \
+        --enable-logio
 
 # To prevent most modules being built statically into httpd.worker, 
 # easiest way seems to be enable them shared.
@@ -276,7 +243,7 @@ pushd prefork
 make DESTDIR=$RPM_BUILD_ROOT install
 popd
 # install worker binary
-install -m 755 worker/.libs/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
+install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -284,6 +251,8 @@ install -m 644 $RPM_SOURCE_DIR/README.confd \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
 install -m 644 $RPM_SOURCE_DIR/ssl.conf \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/ssl.conf
+install -m 644 $RPM_SOURCE_DIR/welcome.conf \
+   $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/welcome.conf
 
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/*.conf
 install -m 644 $RPM_SOURCE_DIR/httpd.conf \
@@ -308,21 +277,23 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_ssl
 touch $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_ssl/scache.{dir,pag,sem}
 
+# create cache root
+mkdir $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_proxy
+
 # move utilities to /usr/bin
 mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
    $RPM_BUILD_ROOT%{_bindir}
 
-# make libtool a symlink
+# move builddir to the right place
 mv $RPM_BUILD_ROOT%{contentdir}/build $RPM_BUILD_ROOT%{_libdir}/httpd/build
-rm $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtool
 ln -s ../../../..%{_bindir}/libtool $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtool
 
-# fix up config_vars file: relocate the build directory into libdir;
-# reference correct libtool; remove references to RPM build root.
+# Install and sanitize config_vars file: relocate the build directory into 
+# libdir; reference correct libtool; fix EXTRA_INCLUDES
 sed -e "s|%{contentdir}/build|%{_libdir}/httpd/build|g" \
     -e "/AP_LIBS/d" -e "/abs_srcdir/d" \
-    -e "/^LIBTOOL/s|/[^ ]*/libtool|%{_bindir}/libtool|" \
-    -e "s|^EXTRA_INCLUDES.*$|EXTRA_INCLUDES = -I\$(includedir) -I%{_includedir}/openssl|g" \
+    -e "/^LIBTOOL/s|/bin/sh /[^ ]*/libtool|`apr-config --apr-libtool`|" \
+    -e "s|^EXTRA_INCLUDES.*$|EXTRA_INCLUDES = -I\$(includedir) -I\$(APR_INCLUDEDIR) -I%{_includedir}/openssl|g" \
   < prefork/build/config_vars.mk \
   > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
 install -m 644 build/special.mk \
@@ -335,10 +306,15 @@ echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
 install -m 644 $RPM_SOURCE_DIR/index.html \
 	$RPM_BUILD_ROOT%{contentdir}/error/noindex.html
-rm -r $RPM_BUILD_ROOT%{contentdir}/manual/style
-rm $RPM_BUILD_ROOT%{contentdir}/manual/*/*.xml
+
+# remove manual sources
+find $RPM_BUILD_ROOT%{contentdir}/manual \( \
+    -name \*.xml -o -name \*.xml.* -o -name \*.ent -o -name \*.xsl -o -name \*.dtd \
+    \) -print0 | xargs -0 rm -f
 
 install -m 644 $RPM_SOURCE_DIR/powered_by.gif \
+	$RPM_BUILD_ROOT%{contentdir}/icons
+install -m 644 $RPM_SOURCE_DIR/powered_by_fedora.png \
 	$RPM_BUILD_ROOT%{contentdir}/icons
 
 # logs
@@ -374,14 +350,16 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
 
 # Remove unpackaged files
-rm -f $RPM_BUILD_ROOT%{_libdir}/libapr{,util}.{a,la} \
-      $RPM_BUILD_ROOT%{_libdir}/APRVARS $RPM_BUILD_ROOT%{_libdir}/*.exp \
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.exp \
       $RPM_BUILD_ROOT/etc/httpd/conf/mime.types \
       $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.exp \
       $RPM_BUILD_ROOT%{_bindir}/ap?-config \
       $RPM_BUILD_ROOT%{_sbindir}/{checkgid,dbmmanage,envvars*} \
       $RPM_BUILD_ROOT%{contentdir}/htdocs/* \
       $RPM_BUILD_ROOT%{contentdir}/cgi-bin/* 
+
+# Remove headers which needn't be public
+rm -f $RPM_BUILD_ROOT%{_includedir}/httpd/{mpm*.h,ssl_expr_parse.h,ssl_util_table.h}
 
 %pre
 # Add the "apache" user
@@ -426,13 +404,20 @@ root@${FQDN}
 EOF
 fi
 
+%check
+# Check the built modules are all PIC
+if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
+   : modules contain non-relocatable code
+   exit 1
+fi
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
 
-%doc ABOUT_APACHE README CHANGES ROADMAP LICENSE
+%doc ABOUT_APACHE README CHANGES LICENSE VERSIONING
 %doc migration.html migration.css
 
 %dir %{_sysconfdir}/httpd
@@ -441,9 +426,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/httpd/run
 %dir %{_sysconfdir}/httpd/conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/*.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/welcome.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/magic
 
-%config %{_sysconfdir}/logrotate.d/httpd
+%config(noreplace) %{_sysconfdir}/logrotate.d/httpd
 %config %{_sysconfdir}/rc.d/init.d/httpd
 
 %dir %{_sysconfdir}/httpd/conf.d
@@ -457,9 +443,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
 %attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
-
-%{_libdir}/libapr.so.*
-%{_libdir}/libaprutil.so.*
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -477,12 +460,12 @@ rm -rf $RPM_BUILD_ROOT
 %{contentdir}/icons/*
 %{contentdir}/error/README
 %{contentdir}/error/noindex.html
-%config(noreplace) %{contentdir}/error/*.var
-%config(noreplace) %{contentdir}/error/include/*.html
+%config %{contentdir}/error/*.var
+%config %{contentdir}/error/include/*.html
 
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
-
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
+%attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
 
 %{_mandir}/man1/*
 
@@ -509,8 +492,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root)
-%{_libdir}/libapr.so
-%{_libdir}/libaprutil.so
 %{_includedir}/httpd
 %{_sysconfdir}/httpd/build
 %{_sbindir}/apxs
@@ -518,44 +499,114 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
 %{_libdir}/httpd/build/instdso.sh
-%{_libdir}/httpd/build/libtool
 
 %changelog
-* Thu Mar 25 2004 Joe Orton <jorton@redhat.com> 2.0.40-21.11
-- add security fix for CVE CAN-2004-0113
-- add fix for slow graceful restarts in prefork
-- mod_deflate: update to recent version (#115280)
-- mod_ssl: misc bug fixes
-- core: add EnableSendfile directive (#78224)
+* Thu Oct 23 2003 Joe Orton <jorton@redhat.com> 2.0.47-10
+- httpd.conf: configure test page in welcome.conf, load suexec, 
+ don't use custom error docs by default, sync with upstream.
+- add "Powered by Fedora" icon (Garrett LeSage)
+- migration guide updates
+- drop mod_cgid
+- enable SSL_EXPERIMENTAL_ENGINE (#106858)
+- drop minimum suexec gid to 100 (#74753, #107083)
+- speed up graceful restarts in prefork (#105725)
+- mod_ssl fixes
 
-* Wed Feb 25 2004 Joe Orton <jorton@redhat.com> 2.0.40-21.10
-- remove test that accept returns fd < FD_SETSIZE (#116576)
+* Wed Oct 22 2003 Joe Orton <jorton@redhat.com> 2.0.47-9
+- updated index.html (Matt Wilson, #107378)
+- change server version string comment to "(Fedora)"
 
-* Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.9
-- add security fixes for CVE CAN-2003-0542, CAN-2003-0789
-- return test page for "/+" in default httpd.conf
-- add bug fixes for #103049, #105725, #106454
-- further fixes for CGI regressions in -21.5 (#103744)
+* Wed Oct  8 2003 Joe Orton <jorton@redhat.com> 2.0.47-8
+- use -fPIE not -fpie to fix s390x (Florian La Roche)
+- include VERSIONING in docdir
 
-* Thu Sep 11 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.6
-- fix for streaming CGIs (#103744)
+* Mon Oct  6 2003 Joe Orton <jorton@redhat.com> 2.0.47-7
+- enable PIE support
+- include bug fix for #78019
 
-* Thu Jul 31 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.5
-- fix EXTRA_INCLUDES for #92313
+* Mon Sep  8 2003 Joe Orton <jorton@redhat.com> 2.0.47-6
+- update httpd.conf for manual changes (alietss@yahoo.com, #101015)
+- use anonymous shm for LDAP auth cache (#103566)
+
+* Sun Sep  7 2003 Joe Orton <jorton@redhat.com> 2.0.47-5
+- include unixd.h again
+- fix EXTRA_INCLUDES
+
+* Mon Jul 28 2003 Joe Orton <jorton@redhat.com> 2.0.47-4
 - add mod_include fixes from upstream
+- httpd.conf updates: wording fixes from upstream; load
+  mod_deflate by default, update AddLanguage section (#98455)
+- don't add eNULL cipher in default ssl.conf (#98401)
+- only bind to IPv4 addresses in default config (#98916)
 
-* Wed Jul  9 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.4
-- add security fixes for CVE CAN-2003-0192, CAN-2003-0253, 
-  CAN-2003-0254, CERT VU#379828
-- add bug fixes for #78019, #82985, #85022, #97111, #98545, #98653
-- install special.mk, fix apxs -q LIBTOOL (#92313)
+* Thu Jul 24 2003 Joe Orton <jorton@redhat.com> 2.0.47-3
+- fix for segfaults in php-snmp init (#97207)
 
-* Tue May 20 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.3
-- add security fix for CAN-2003-0189
+* Wed Jul 23 2003 Joe Orton <jorton@redhat.com> 2.0.47-2
+- fix apxs -c again
 
-* Mon May 12 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.2
-- add security fix for CAN-2003-0245
-- add bug fixes for #88575, #89086, #89170, #89179
+* Mon Jul 14 2003 Joe Orton <jorton@redhat.com> 2.0.47-1
+- update to 2.0.47
+- add mod_logio (#100436)
+- remove Vendor tag
+
+* Thu Jul 10 2003 Joe Orton <jorton@redhat.com> 2.0.45-14
+- use libtool script included in apr
+- fix apxs -q LIBTOOL (more #92313)
+
+* Tue Jul  8 2003 Joe Orton <jorton@redhat.com> 2.0.45-13
+- use system pcre library
+
+* Thu Jul  3 2003 Joe Orton <jorton@redhat.com> 2.0.45-12
+- remove some installed headers
+- fix for use of libtool 1.5
+
+* Wed Jun 5 2003 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Thu Jun  5 2003 Joe Orton <jorton@redhat.com> 2.0.45-10
+- fix apxs -g (#92313)
+
+* Sat May 31 2003 Joe Orton <jorton@redhat.com> 2.0.45-9
+- trim manual sources properly
+- remove ExcludeArch
+
+* Thu May 29 2003 Joe Orton <jorton@redhat.com> 2.0.45-8
+- rebuild
+
+* Mon May 19 2003 Joe Orton <jorton@redhat.com> 2.0.45-6
+- don't load /usr/sbin/envvars from apxs
+- add fix for mod_dav_fs namespace handling
+- add fix for mod_dav If header etag comparison
+- remove irrelevant warning from mod_proxy
+- don't conflict with thttpd (#91422)
+
+* Sun May 18 2003 Joe Orton <jorton@redhat.com> 2.0.45-5
+- don't package any XML sources in httpd-manual
+- fix examples in default httpd.conf for enabling caching
+
+* Sun May 18 2003 Joe Orton <jorton@redhat.com> 2.0.45-4
+- change default charset to UTF-8 (#88964)
+
+* Thu May 15 2003 Joe Orton <jorton@redhat.com> 2.0.45-3
+- update httpd.conf for changes from default in 2.0.45
+- include conf.d/*.conf after loading standard modules
+- include LDAP and cache modules (#75370, #88277)
+- run buildconf in %%build not %%prep
+
+* Tue May 13 2003 Joe Orton <jorton@redhat.com> 2.0.45-2
+- have apxs always use /usr/bin/libtool
+
+* Mon May 5 2003 Joe Orton <jorton@redhat.com> 2.0.45-1
+- update to 2.0.45 (#82227)
+- use separate apr, apr-util packages (#74951)
+- mark logrotate file as noreplace (#85654)
+- mark all of /var/www/error as %%config-not-noreplace
+- remove dates from error pages (#86474)
+- don't enable mod_cgid for worker MPM (#88819)
+
+* Wed Apr 30 2003 Elliot Lee <sopwith@redhat.com> 2.0.40-22
+- headusage patch to fix build on ppc64 etc.
 
 * Tue Apr  1 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.1
 - add security fixes for CAN-2003-0020, CAN-2003-0132, CAN-2003-0083
