@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.50
-Release: 1
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -69,6 +69,7 @@ Patch85: httpd-2.0.48-sslvars2.patch
 Patch86: httpd-2.0.48-rewritessl.patch
 Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
+Patch91: httpd-2.0.49-suexecmsg.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -153,7 +154,7 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch23 -p1 -b .shmcb
 %patch24 -p1 -b .sslmutex
 %patch25 -p1 -b .md5dig
-## %patch26 -p1 -b .proxy11 ### NEEDS MERGE
+%patch26 -p1 -b .proxy11
 %patch27 -p1 -b .sslpphrase
 %patch28 -p1 -b .worker
 %patch29 -p1 -b .workerhup
@@ -179,6 +180,7 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch86 -p1 -b .rewritessl
 %patch89 -p1 -b .headerssl
 %patch90 -p1 -b .workerstack
+%patch91 -p1 -b .suexecmsg
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -576,6 +578,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Tue Jun 29 2004 Joe Orton <jorton@redhat.com> 2.0.50-3
+- update -proxy11 patch
+- explain where suexec went if SuexecUserGroup is used but
+  /usr/sbin/suexec is not found
+
 * Tue Jun 29 2004 Joe Orton <jorton@redhat.com> 2.0.50-1
 - update to 2.0.50
 
