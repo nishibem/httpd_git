@@ -2,7 +2,7 @@
 There is no need to "suck in" the apr/apr-util symbols when using
 a shared libapr{,util}, it just bloats the symbol table; so don't.
 
-Upstream-HEAD: 
+Upstream-HEAD: needed
 Upstream-2.0: omit
 Upstream-Status: EXPORT_DIRS change is conditional on using shared apr
 

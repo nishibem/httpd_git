@@ -7,7 +7,14 @@ for f in $*; do
   s_HEAD=`grep ^Upstream-HEAD $f | sed 's/Upstream-HEAD: //'`
   s_20=`grep ^Upstream-2.0: $f | sed 's/Upstream-2.0: //'`
   s_Com=`grep ^Upstream-Status: $f | sed 's/Upstream-Status: //'`
-  printf '<patch name="%s" status-head="%s" status-2.0="%s" status-comment="%s"/>\n' \
-      $n "$s_HEAD" "$s_20" "$s_Com"
+  s_PR=`grep ^Upstream-PR: $f | sed 's/Upstream-PR: //'`
+  printf ' <patch name="%s">\n' $n
+  printf '  <status branch="HEAD">%s</status>\n' "$s_HEAD"
+  printf '  <status branch="2.0">%s</status>\n' "$s_20"
+  printf '  <comment>%s</comment>\n' "$s_Com"
+  if [ -n "$s_PR" ]; then
+    printf '  <bug pr="%s"/>\n' "$s_PR"
+  fi
+  printf ' </patch>\n'
 done
 echo '</patches>'
