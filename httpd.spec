@@ -68,6 +68,8 @@ Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
 Patch91: httpd-2.0.46-testhook.patch
 Patch92: httpd-2.0.46-dumpcerts.patch
+# Security fixes
+Patch120: httpd-2.0.52-CAN-2004-0885.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -177,6 +179,8 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch90 -p1 -b .workerstack
 %patch91 -p1 -b .testhook
 %patch92 -p1 -b .dumpcerts
+
+%patch120 -p1 -b .can0885
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -577,6 +581,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Thu Sep 28 2004 Joe Orton <jorton@redhat.com> 2.0.52-3
 - add dummy connection address fixes from HEAD
+- mod_ssl: add security fix for CAN-2004-0885
 
 * Tue Sep 28 2004 Joe Orton <jorton@redhat.com> 2.0.52-2
 - update to 2.0.52

@@ -2,7 +2,7 @@
 echo '<?xml version="1.0" encoding="UTF-8"?>'
 echo '<patches>'
 for f in $*; do
-  n=${f//httpd-[0-9.]*-/}
+  n=${f//httpd-2\.0\.[0-9]*-/}
   n=${n//.patch/}
   s_HEAD=`grep ^Upstream-HEAD $f | sed 's/Upstream-HEAD: //'`
   s_20=`grep ^Upstream-2.0: $f | sed 's/Upstream-2.0: //'`
