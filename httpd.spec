@@ -5,7 +5,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 8
+Release: 11
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -24,11 +24,16 @@ Source14: mod_ssl-Makefile.crl
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
 Patch3: httpd-2.0.36-sslink.patch
+# Bug fixes
+Patch20: httpd-2.0.40-davsegv.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
 Patch42: httpd-2.0.40-xfsz.patch
 Patch43: httpd-2.0.40-pod.patch
+# Security fixes
+Patch60: httpd-2.0.40-CAN-2002-0840.patch
+Patch61: httpd-2.0.40-CAN-2002-0843.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -89,10 +94,15 @@ Security (TLS) protocols.
 %patch2 -p0 -b .apxs
 %patch3 -p0 -b .sslink
 
+%patch20 -p1 -b .davsegv
+
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
 %patch42 -p0 -b .xfsz
 %patch43 -p0 -b .pod
+
+%patch60 -p1 -b .can0840
+%patch61 -p1 -b .can0843
 
 # copy across the migration guide and sed it's location into apachectl
 cp $RPM_SOURCE_DIR/migration.{html,css} .
@@ -367,6 +377,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Wed Oct  9 2002 Joe Orton <jorton@redhat.com> 2.0.40-11
+- correct SERVER_NAME encoding in i18n error pages (thanks to Andre Malo)
+
+* Wed Oct  9 2002 Joe Orton <jorton@redhat.com> 2.0.40-10
+- fix patch for CAN-2002-0840 to also cover i18n error pages
+
+* Wed Oct  2 2002 Joe Orton <jorton@redhat.com> 2.0.40-9
+- security fixes for CAN-2002-0840 and CAN-2002-0843
+- fix for possible mod_dav segfault for certain requests
+
+* Tue Sep 24 2002 Gary Benson <gbenson@redhat.com>
+- updates to the migration guide
+
 * Wed Sep  4 2002 Nalin Dahyabhai <nalin@redhat.com> 2.0.40-8
 - link httpd with libssl to avoid library loading/unloading weirdness
 
