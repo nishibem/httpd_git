@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.52
-Release: 2
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -48,7 +48,6 @@ Patch27: httpd-2.0.48-sslpphrase.patch
 Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
-Patch37: httpd-2.0.46-autoindex.patch
 Patch39: httpd-2.0.50-reclaim.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
@@ -576,6 +575,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Thu Sep 28 2004 Joe Orton <jorton@redhat.com> 2.0.52-3
+- add dummy connection address fixes from HEAD
+
 * Tue Sep 28 2004 Joe Orton <jorton@redhat.com> 2.0.52-2
 - update to 2.0.52
 
