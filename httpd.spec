@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.51
-Release: 3
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -231,13 +231,8 @@ xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
 CFLAGS=$RPM_OPT_FLAGS
-CPPFLAGS="-DSSL_EXPERIMENTAL_ENGINE"
-if pkg-config openssl; then
-	# configure -C barfs with trailing spaces in CFLAGS
-	CPPFLAGS="$CPPFLAGS `pkg-config --cflags openssl | sed 's/ *$//'`"
-	SSL_LIBS="`pkg-config --libs openssl`"
-fi
-export CFLAGS CPPFLAGS SSL_LIBS
+CPPFLAGS="-DSSL_EXPERIMENTAL_ENGINE -I/usr/include/pcre"
+export CFLAGS CPPFLAGS
 
 function mpmbuild()
 {
@@ -583,6 +578,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Thu Sep 16 2004 Joe Orton <jorton@redhat.com> 2.0.51-4
+- fix pcre includes
+
 * Thu Sep 16 2004 Joe Orton <jorton@redhat.com> 2.0.51-3
 - update to 2.0.51
 
