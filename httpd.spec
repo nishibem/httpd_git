@@ -5,7 +5,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 11
+Release: 11.3
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -26,6 +26,8 @@ Patch2: httpd-2.0.36-apxs.patch
 Patch3: httpd-2.0.36-sslink.patch
 # Bug fixes
 Patch20: httpd-2.0.40-davsegv.patch
+Patch21: httpd-2.0.40-leaks.patch
+Patch22: httpd-2.0.40-nphcgi.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
@@ -34,6 +36,10 @@ Patch43: httpd-2.0.40-pod.patch
 # Security fixes
 Patch60: httpd-2.0.40-CAN-2002-0840.patch
 Patch61: httpd-2.0.40-CAN-2002-0843.patch
+Patch62: httpd-2.0.40-CAN-2003-0132.patch
+Patch63: httpd-2.0.40-CAN-2003-0020.patch
+Patch64: httpd-2.0.40-fdleak.patch
+Patch65: httpd-2.0.40-CAN-2003-0083.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -95,6 +101,8 @@ Security (TLS) protocols.
 %patch3 -p0 -b .sslink
 
 %patch20 -p1 -b .davsegv
+%patch21 -p0 -b .leaks
+%patch22 -p1 -b .nphcgi
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
@@ -103,6 +111,10 @@ Security (TLS) protocols.
 
 %patch60 -p1 -b .can0840
 %patch61 -p1 -b .can0843
+%patch62 -p1 -b .can0132
+%patch63 -p1 -b .can0020
+%patch64 -p1 -b .fdleak
+%patch65 -p1 -b .can0083
 
 # copy across the migration guide and sed it's location into apachectl
 cp $RPM_SOURCE_DIR/migration.{html,css} .
@@ -137,7 +149,7 @@ AP_LIBS="-lssl -lcrypto" \
 	--enable-deflate \
 	--enable-proxy --enable-proxy-connect \
 	--enable-proxy-http --enable-proxy-ftp
-make
+make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -191,9 +203,14 @@ mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
 mv $RPM_BUILD_ROOT%{contentdir}/build $RPM_BUILD_ROOT%{_libdir}/httpd/build
 rm $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtool
 ln -s ../../../..%{_bindir}/libtool $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtool
-# fix up config_vars file
-sed -e "s|/var/www/build|%{_libdir}/httpd/build|g" \
-    -e "/AP_LIBS/d" -e "/abs_srcdir/d" < build/config_vars.mk \
+
+# fix up config_vars file: relocate the build directory into libdir;
+# reference correct libtool; remove references to RPM build root.
+sed -e "s|%{contentdir}/build|%{_libdir}/httpd/build|g" \
+    -e "/AP_LIBS/d" -e "/abs_srcdir/d" \
+    -e "/^LIBTOOL/s|/[^ ]*/libtool|%{_bindir}/libtool|" \
+    -e "/^EXTRA_INCLUDES/s|-I$RPM_BUILD_DIR[^ ]* ||g" \
+  < build/config_vars.mk \
   > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
 
 # Make the MMN accessible to module packages
@@ -374,9 +391,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/apxs.8*
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
+%{_libdir}/httpd/build/instdso.sh
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Tue Apr  1 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.3
+- add security fixes for CAN-2003-0020, CAN-2003-0132, CAN-2003-0083
+- add security fix for file descriptor leaks, #82142
+- add bug fixes for #73428, #82587, #86254
+
 * Wed Oct  9 2002 Joe Orton <jorton@redhat.com> 2.0.40-11
 - correct SERVER_NAME encoding in i18n error pages (thanks to Andre Malo)
 
