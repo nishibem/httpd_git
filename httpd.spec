@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.53
-Release: 5
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -23,13 +23,11 @@ Source12: welcome.conf
 Source13: manual.conf
 Source14: mod_ssl-Makefile.crt
 Source15: mod_ssl-Makefile.crl
-Source16: htsslpass.c
 # Documentation
 Source30: migration.xml
 Source31: migration.css
 Source32: html.xsl
 Source33: README.confd
-Source34: htsslpass.xml
 # build/scripts patches
 Patch1: httpd-2.0.40-apctl.patch
 Patch2: httpd-2.0.36-apxs.patch
@@ -52,6 +50,8 @@ Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
 Patch39: httpd-2.0.50-reclaim.patch
+Patch40: httpd-2.0.52-htdigperms.patch
+Patch41: httpd-2.0.52-ssluser.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -165,6 +165,8 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch29 -p1 -b .workerhup
 %patch30 -p1 -b .davmisc
 %patch39 -p1 -b .reclaim
+%patch40 -p1 -b .htdigperms
+%patch41 -p1 -b .ssluser
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -233,13 +235,6 @@ sed 's/@DISTRO@/%{distro}/' < $RPM_SOURCE_DIR/migration.xml > migration.xml
 xmlto -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
-# Build the htsslpass man page
-xmlto man $RPM_SOURCE_DIR/htsslpass.xml
-
-# Build htsslpass
-cp $RPM_SOURCE_DIR/htsslpass.c . || exit 1
-gcc $RPM_OPT_FLAGS -Wall -Werror htsslpass.c -o htsslpass
-
 CFLAGS=$RPM_OPT_FLAGS
 CPPFLAGS="-DSSL_EXPERIMENTAL_ENGINE"
 export CFLAGS CPPFLAGS
@@ -304,10 +299,6 @@ install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
 
 # link to system pcreposix.h
 ln -s ../pcreposix.h $RPM_BUILD_ROOT%{_includedir}/httpd/pcreposix.h
-
-# install htsslpass(1) and man page
-install -m 755 htsslpass $RPM_BUILD_ROOT%{_bindir}/htsslpass
-install -m 644 htsslpass.1 $RPM_BUILD_ROOT%{_mandir}/man1/htsslpass.1
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -532,7 +523,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/httpd.worker
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-%exclude %{_bindir}/htsslpass
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -558,7 +548,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man?/*
 %exclude %{_mandir}/man8/apxs.8*
 %exclude %{_mandir}/man8/suexec.8*
-%exclude %{_mandir}/man1/htsslpass.1*
 
 %files manual
 %defattr(-,root,root)
@@ -567,8 +556,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n mod_ssl
 %defattr(-,root,root)
-%{_bindir}/htsslpass
-%{_mandir}/man1/htsslpass.1*
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,root,root) %dir %{_sysconfdir}/httpd/conf/ssl.*
@@ -596,6 +583,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Tue Mar 29 2005 Joe Orton <jorton@redhat.com> 2.0.53-6
+- update default httpd.conf:
+ * clarify the comments on AddDefaultCharset usage (#135821)
+ * remove all the AddCharset default extensions
+ * don't load mod_imap by default
+ * synch with upstream 2.0.53 httpd-std.conf
+- mod_ssl: set user from SSLUserName in access hook (upstream #31418)
+- htdigest: fix permissions of created files (upstream #33765)
+- remove htsslpass
+
 * Wed Mar  2 2005 Joe Orton <jorton@redhat.com> 2.0.53-5
 - apachectl: restore use of $OPTIONS again
 
