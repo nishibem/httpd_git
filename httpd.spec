@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Fedora
-%define distro Fedora Core
+%define vstring Red Hat
+%define distro Red Hat Enterprise Linux
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.50
-Release: 7
+Release: 7.ent
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
