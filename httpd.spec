@@ -5,7 +5,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 7
+Release: 8
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -104,6 +104,7 @@ cp $RPM_SOURCE_DIR/migration.{html,css} .
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" \
+AP_LIBS="-lssl -lcrypto" \
 ./configure \
  	--prefix=%{_sysconfdir}/httpd \
  	--exec-prefix=%{_prefix} \
@@ -140,7 +141,7 @@ rm docs/man/logresolve.8
 make DESTDIR=$RPM_BUILD_ROOT install
 
 ### remove this
-strip -g $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so
+# strip -g $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -366,10 +367,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Wed Sep  4 2002 Nalin Dahyabhai <nalin@redhat.com> 2.0.40-8
+- link httpd with libssl to avoid library loading/unloading weirdness
+
 * Tue Sep  3 2002 Joe Orton <jorton@redhat.com> 2.0.40-7
 - add LoadModule lines for proxy modules in httpd.conf (#73349)
 - fix permissions of conf/ssl.*/ directories; add Makefiles for
- certificate management (#73352)
+  certificate management (#73352)
 
 * Mon Sep  2 2002 Joe Orton <jorton@redhat.com> 2.0.40-6
 - provide "httpd-mmn" to manage module ABI compatibility
