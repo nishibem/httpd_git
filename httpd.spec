@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.50
-Release: 8
+Version: 2.0.51
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -41,7 +41,7 @@ Patch8: httpd-2.0.48-vpathinc.patch
 Patch20: httpd-2.0.45-encode.patch
 Patch21: httpd-2.0.45-davetag.patch
 Patch22: httpd-2.0.47-ldapshm.patch
-Patch23: httpd-2.0.46-shmcb.patch
+Patch23: httpd-2.0.48-vhost.patch
 Patch24: httpd-2.0.46-sslmutex.patch
 Patch25: httpd-2.0.46-md5dig.patch
 Patch26: httpd-2.0.48-proxy11.patch
@@ -49,10 +49,7 @@ Patch27: httpd-2.0.48-sslpphrase.patch
 Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
-Patch32: httpd-2.0.48-vhost.patch
-Patch35: httpd-2.0.49-eocbucket.patch
 Patch37: httpd-2.0.46-autoindex.patch
-Patch38: httpd-2.0.50-userdir.patch
 Patch39: httpd-2.0.50-reclaim.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
@@ -67,10 +64,8 @@ Patch78: httpd-2.0.48-corelimit.patch
 Patch80: httpd-2.0.48-distcache.patch
 Patch81: httpd-2.0.48-debuglog.patch
 Patch82: httpd-2.0.48-abench.patch
-Patch83: httpd-2.0.48-fdsetsize.patch
 Patch84: httpd-2.0.48-sslheader.patch
 Patch85: httpd-2.0.48-sslvars2.patch
-Patch86: httpd-2.0.48-rewritessl.patch
 Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
 Patch91: httpd-2.0.46-testhook.patch
@@ -158,7 +153,7 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch20 -p1
 %patch21 -p1 -b .davetag
 %patch22 -p1 -b .ldapshm
-%patch23 -p1 -b .shmcb
+%patch23 -p1 -b .vhost
 %patch24 -p1 -b .sslmutex
 %patch25 -p1 -b .md5dig
 %patch26 -p1 -b .proxy11
@@ -166,10 +161,6 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch28 -p1 -b .worker
 %patch29 -p1 -b .workerhup
 %patch30 -p1 -b .davmisc
-%patch32 -p1 -b .vhost
-%patch35 -p1 -b .eocbucket
-%patch37 -p1 -b .autoindex
-%patch38 -p1 -b .userdir
 %patch39 -p1 -b .reclaim
 
 %patch71 -p0 -b .xfsz
@@ -183,10 +174,8 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch80 -p1 -b .distcache
 %patch81 -p1 -b .debuglog
 %patch82 -p1 -b .abench
-%patch83 -p1 -b .fdsetsize
 %patch84 -p1 -b .sslheader
 %patch85 -p1 -b .sslvars2
-%patch86 -p1 -b .rewritessl
 %patch89 -p1 -b .headerssl
 %patch90 -p1 -b .workerstack
 %patch91 -p1 -b .testhook
@@ -594,6 +583,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Thu Sep 16 2004 Joe Orton <jorton@redhat.com> 2.0.51-3
+- update to 2.0.51
+
 * Tue Sep 14 2004 Joe Orton <jorton@redhat.com> 2.0.50-8
 - add improved child reclaim timing logic (#119128/#132360)
 - add BuildRequire zlib-devel for mod_deflate

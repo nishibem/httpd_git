@@ -1,7 +1,3 @@
-
-Change the server version string appropriately, without changing
-the PLATFORM macro throughout the cod.
-
 --- httpd-2.0.48/server/core.c.release
 +++ httpd-2.0.48/server/core.c
 @@ -2386,7 +2386,7 @@
