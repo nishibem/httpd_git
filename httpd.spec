@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.52
-Release: 6
+Release: 7
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -604,6 +604,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Mon Feb  7 2005 Joe Orton <jorton@redhat.com> 2.0.52-7
+- fix cosmetic issues in "service httpd reload"
+- move User/Group higher in httpd.conf (#146793)
+- load mod_logio by default in httpd.conf
+- apachectl: update for correct libselinux tools locations
+
 * Tue Nov 16 2004 Joe Orton <jorton@redhat.com> 2.0.52-6
 - add security fix for CVE CAN-2004-0942 (memory consumption DoS)
 - SELinux: run httpd -t under runcon in configtest (Steven Smalley)
