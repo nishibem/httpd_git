@@ -5,7 +5,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 11.7
+Release: 11.9
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -35,6 +35,8 @@ Patch28: httpd-2.0.40-stream.patch
 Patch29: httpd-2.0.40-subreq.patch
 Patch30: httpd-2.0.40-sslexcl.patch
 Patch31: httpd-2.0.40-include.patch
+Patch32: httpd-2.0.46-graceful.patch
+Patch33: httpd-2.0.40-rand.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
@@ -53,6 +55,7 @@ Patch68: httpd-2.0.40-CAN-2003-0192.patch
 Patch69: httpd-2.0.40-CAN-2003-0253.patch
 Patch70: httpd-2.0.40-CAN-2003-0254.patch
 Patch71: httpd-2.0.40-VU379828.patch
+Patch72: httpd-2.0.40-CAN-2003-0542.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -124,6 +127,8 @@ Security (TLS) protocols.
 %patch29 -p1 -b .subreq
 %patch30 -p1 -b .sslexcl
 %patch31 -p1 -b .include
+%patch32 -p1 -b .graceful
+%patch33 -p1 -b .rand
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
@@ -142,6 +147,7 @@ Security (TLS) protocols.
 %patch69 -p1 -b .can0253
 %patch70 -p1 -b .can0254
 %patch71 -p1 -b .vu379828
+%patch72 -p1 -b .can0542
 
 # copy across the migration guide and sed it's location into apachectl
 cp $RPM_SOURCE_DIR/migration.{html,css} .
@@ -174,6 +180,7 @@ AP_LIBS="-lssl -lcrypto" \
 	--with-suexec-logfile=%{_localstatedir}/log/httpd/suexec.log \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-uidmin=500 --with-suexec-gidmin=500 \
+        --with-devrandom=/dev/urandom \
 	--enable-ssl --with-ssl \
 	--enable-deflate \
 	--enable-proxy --enable-proxy-connect \
@@ -426,6 +433,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.8
+- add security fixes for CVE CAN-2003-0542
+- return test page for "/+" in default httpd.conf
+- add bug fixes for #103049, #105725, #106454
+- add fixes for CGI regressions in -21.5 (#103744)
+
 * Wed Jul  9 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.7
 - add security fixes for CVE CAN-2003-0192, CAN-2003-0253, 
   CAN-2003-0254, CERT VU#379828
