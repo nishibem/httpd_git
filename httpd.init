@@ -76,7 +76,8 @@ reload() {
     echo -n $"Reloading $prog: "
     if ! LANG=$HTTPD_LANG $httpd $OPTIONS -t >&/dev/null; then
         RETVAL=$?
-        failure $"not reloading $httpd due to configuration syntax error"
+        echo $"not reloading due to configuration syntax error"
+        failure $"Not reloading $httpd due to configuration syntax errors"
     else
         killproc $httpd -HUP
         RETVAL=$?

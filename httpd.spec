@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.53
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -38,6 +38,7 @@ Patch4: httpd-2.0.45-deplibs.patch
 Patch5: httpd-2.0.47-pie.patch
 Patch6: httpd-2.0.45-syspcre.patch
 Patch8: httpd-2.0.48-vpathinc.patch
+Patch9: httpd-2.0.52-apctlopts.patch
 # Bug fixes
 Patch20: httpd-2.0.45-encode.patch
 Patch21: httpd-2.0.45-davetag.patch
@@ -149,6 +150,7 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch4 -p1 -b .deplibs
 %patch6 -p1 -b .syspcre
 %patch8 -p1 -b .vpathinc
+%patch9 -p1 -b .apctlopts
 
 # no -b to prevent droplets in install root
 %patch20 -p1
@@ -594,6 +596,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Wed Mar  2 2005 Joe Orton <jorton@redhat.com> 2.0.53-5
+- apachectl: restore use of $OPTIONS again
+
 * Wed Feb  9 2005 Joe Orton <jorton@redhat.com> 2.0.53-4
 - update to 2.0.53
 - move prefork/worker modules comparison to %%check
