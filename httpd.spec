@@ -5,9 +5,8 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 11.5
+Release: 11.7
 URL: http://httpd.apache.org/
-Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
@@ -30,6 +29,12 @@ Patch21: httpd-2.0.40-leaks.patch
 Patch22: httpd-2.0.40-nphcgi.patch
 Patch23: httpd-2.0.40-proxy.patch
 Patch24: httpd-2.0.40-range.patch
+Patch26: httpd-2.0.40-pipelog.patch
+Patch27: httpd-2.0.40-rwmap.patch
+Patch28: httpd-2.0.40-stream.patch
+Patch29: httpd-2.0.40-subreq.patch
+Patch30: httpd-2.0.40-sslexcl.patch
+Patch31: httpd-2.0.40-include.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
@@ -44,6 +49,10 @@ Patch63: httpd-2.0.40-CAN-2003-0020.patch
 Patch64: httpd-2.0.40-fdleak.patch
 Patch65: httpd-2.0.40-CAN-2003-0083.patch
 Patch66: httpd-2.0.40-CAN-2003-0245.patch
+Patch68: httpd-2.0.40-CAN-2003-0192.patch
+Patch69: httpd-2.0.40-CAN-2003-0253.patch
+Patch70: httpd-2.0.40-CAN-2003-0254.patch
+Patch71: httpd-2.0.40-VU379828.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -101,7 +110,7 @@ Security (TLS) protocols.
 %prep
 %setup -q
 %patch1 -p0 -b .apctl
-%patch2 -p0 -b .apxs
+%patch2 -p1 -b .apxs
 %patch3 -p0 -b .sslink
 
 %patch20 -p1 -b .davsegv
@@ -109,6 +118,12 @@ Security (TLS) protocols.
 %patch22 -p1 -b .nphcgi
 %patch23 -p1 -b .proxy
 %patch24 -p1 -b .range
+%patch26 -p1 -b .pipelog
+%patch27 -p1 -b .rwmap
+%patch28 -p1 -b .stream
+%patch29 -p1 -b .subreq
+%patch30 -p1 -b .sslexcl
+%patch31 -p1 -b .include
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
@@ -123,16 +138,22 @@ Security (TLS) protocols.
 %patch64 -p1 -b .fdleak
 %patch65 -p1 -b .can0083
 %patch66 -p1 -b .can0245
+%patch68 -p1 -b .can0192
+%patch69 -p1 -b .can0253
+%patch70 -p1 -b .can0254
+%patch71 -p1 -b .vu379828
 
 # copy across the migration guide and sed it's location into apachectl
 cp $RPM_SOURCE_DIR/migration.{html,css} .
-%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
-	support/apachectl.in
 
 # regenerate configure scripts
 ./buildconf
 
 %build
+# Fix version in apachectl
+%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
+	support/apachectl.in
+
 CFLAGS="$RPM_OPT_FLAGS" \
 AP_LIBS="-lssl -lcrypto" \
 ./configure \
@@ -217,9 +238,11 @@ ln -s ../../../..%{_bindir}/libtool $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtoo
 sed -e "s|%{contentdir}/build|%{_libdir}/httpd/build|g" \
     -e "/AP_LIBS/d" -e "/abs_srcdir/d" \
     -e "/^LIBTOOL/s|/[^ ]*/libtool|%{_bindir}/libtool|" \
-    -e "/^EXTRA_INCLUDES/s|-I$RPM_BUILD_DIR[^ ]* ||g" \
+    -e "s|^EXTRA_INCLUDES.*$|EXTRA_INCLUDES = -I\$(includedir) -I%{_includedir}/openssl|g" \
   < build/config_vars.mk \
   > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
+install -m 644 build/special.mk \
+    $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
 
 # Make the MMN accessible to module packages
 echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
@@ -403,6 +426,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Wed Jul  9 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.7
+- add security fixes for CVE CAN-2003-0192, CAN-2003-0253, 
+  CAN-2003-0254, CERT VU#379828
+- add bug fixes for #78019, #82985, #85022, #97111, #98545, #98653
+- install special.mk, fix apxs -q LIBTOOL (#92313)
+- add mod_include fixes from upstream
+
+* Tue May 27 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.6
+- add mod_ssl renegotiation fix
+
 * Thu May 22 2003 Joe Orton <jorton@redhat.com> 2.0.40-11.5
 - rebuild
 
