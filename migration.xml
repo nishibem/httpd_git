@@ -1,6 +1,6 @@
 <?xml version='1.0'?> <!-- -*- text -*- -->
 
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 
 <!ENTITY httpd "<literal>httpd</literal>">
@@ -25,7 +25,7 @@
 
 <article>
 
-<artheader>
+<articleinfo>
 <title>Apache Migration HOWTO</title>
 
 <abstract>
@@ -37,7 +37,7 @@ and describes the process required to migrate your server's
 configuration from 1.3 to 2.0.</para>
 
 </abstract>
-</artheader>
+</articleinfo>
 
 <sect1>
 <title>Naming and filesystem changes</title>
@@ -175,11 +175,11 @@ ServerName www.example.com<emphasis role="bold">:123</emphasis>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/mpm_common.html#listen"><literal>Listen</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/mpm_common.html#listen"><literal>Listen</literal></ulink></simpara></listitem>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/core.html#servername"><literal>ServerName</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/core.html#servername"><literal>ServerName</literal></ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -213,9 +213,9 @@ to the file <filename>/etc/sysconfig/httpd</filename>.</para>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
+<listitem><simpara><ulink
 url="http://httpd.apache.org/docs-2.0/mpm.html">Apache
-Multi-Processing Modules</ulink></listitem>
+Multi-Processing Modules</ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -249,27 +249,27 @@ stock Apache 2.0 configuration should note the following:</para>
 
 <itemizedlist>
 
-<listitem><para>The <literal>AddModule</literal> and
+<listitem><simpara>The <literal>AddModule</literal> and
 <literal>ClearModuleList</literal> directives no longer exist. These
 directives where used to ensure that modules could be enabled in the
 correct order. The new Apache 2.0 API allows modules to explicitly
 specify their ordering, eliminating the need for these
-directives.</para></listitem>
+directives.</simpara></listitem>
 
-<listitem><para>The order of the <literal>LoadModule</literal> lines
-is thus no longer relevant.</para></listitem>
+<listitem><simpara>The order of the <literal>LoadModule</literal> lines
+is thus no longer relevant.</simpara></listitem>
 
-<listitem><para>Many modules have been added, removed, renamed, split
-up, or incorporated with each other.</para></listitem>
+<listitem><simpara>Many modules have been added, removed, renamed, split
+up, or incorporated with each other.</simpara></listitem>
 
-<listitem><para><literal>LoadModule</literal> lines for modules
+<listitem><simpara><literal>LoadModule</literal> lines for modules
 packaged in their own RPMs (&mod_ssl;, <literal>php</literal>,
 &mod_perl; and the like) are no longer necessary as they can be found
 in the relevant file in the directory
-<filename>/etc/httpd/conf.d</filename>.</para></listitem>
+<filename>/etc/httpd/conf.d</filename>.</simpara></listitem>
 
-<listitem><para>The various <literal>HAVE_XXX</literal> definitions
-are no longer defined.</para></listitem>
+<listitem><simpara>The various <literal>HAVE_XXX</literal> definitions
+are no longer defined.</simpara></listitem>
 
 </itemizedlist>
 
@@ -346,8 +346,8 @@ in <filename>/etc/httpd/conf/httpd.conf</filename>.</para>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/mod_userdir.html#userdir"><literal>UserDir</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/mod_userdir.html#userdir"><literal>UserDir</literal></ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -364,11 +364,11 @@ directives.</para>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/mod_log_config.html#customlog"><literal>CustomLog</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/mod_log_config.html#customlog"><literal>CustomLog</literal></ulink></simpara></listitem>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/mod_log_config.html#logformat"><literal>LogFormat</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/mod_log_config.html#logformat"><literal>LogFormat</literal></ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -396,14 +396,14 @@ version numbers to be sorted in the natural way, so that
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/mod_autoindex.html#indexoptions"><literal>IndexOptions</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/mod_autoindex.html#indexoptions"><literal>IndexOptions</literal></ulink></simpara></listitem>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/mod_autoindex.html#readmename"><literal>ReadmeName</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/mod_autoindex.html#readmename"><literal>ReadmeName</literal></ulink></simpara></listitem>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/mod_autoindex.html#headername"><literal>HeaderName</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/mod_autoindex.html#headername"><literal>HeaderName</literal></ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -419,8 +419,8 @@ the argument: on or off. Existing instances of
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/mod_negotiation.html#cachenegotiateddocs"><literal>CacheNegotiatedDocs</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/mod_negotiation.html#cachenegotiateddocs"><literal>CacheNegotiatedDocs</literal></ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -451,8 +451,8 @@ ErrorDocument 404 "The document was not found<emphasis role="bold">&quot;</empha
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/core.html#errordocument"><literal>ErrorDocument</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/core.html#errordocument"><literal>ErrorDocument</literal></ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -499,8 +499,8 @@ the SSL virtual host context has been moved into the file
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink url="http://httpd.apache.org/docs-2.0/vhosts/">Apache
-Virtual Host Documentation</ulink></listitem>
+<listitem><simpara><ulink url="http://httpd.apache.org/docs-2.0/vhosts/">Apache
+Virtual Host Documentation</ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect2>
@@ -545,15 +545,15 @@ AcceptPathInfo on
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/mod/core.html#acceptpathinfo"><literal>AcceptPathInfo</literal></ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/mod/core.html#acceptpathinfo"><literal>AcceptPathInfo</literal></ulink></simpara></listitem>
 
-<listitem><ulink
+<listitem><simpara><ulink
 url="http://httpd.apache.org/docs-2.0/handler.html">Apache's
-Handler Use</ulink></listitem>
+Handler Use</ulink></simpara></listitem>
 
-<listitem><ulink
-url="http://httpd.apache.org/docs-2.0/filter.html">Filters</ulink></listitem>
+<listitem><simpara><ulink
+url="http://httpd.apache.org/docs-2.0/filter.html">Filters</ulink></simpara></listitem>
 
 </itemizedlist></para>
 
@@ -601,12 +601,12 @@ must explicitly specify the port number:</para>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
+<listitem><simpara><ulink
 url="http://httpd.apache.org/docs-2.0/mod/mod_ssl.html">Apache
-Module mod_ssl</ulink></listitem>
+Module mod_ssl</ulink></simpara></listitem>
 
-<listitem><ulink url="http://httpd.apache.org/docs-2.0/vhosts/">Apache
-Virtual Host Documentation</ulink></listitem>
+<listitem><simpara><ulink url="http://httpd.apache.org/docs-2.0/vhosts/">Apache
+Virtual Host Documentation</ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -627,9 +627,9 @@ although these generally use the same or similar directives as the old
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
+<listitem><simpara><ulink
 url="http://httpd.apache.org/docs-2.0/mod/mod_proxy.html">Apache
-Module mod_proxy</ulink></listitem>
+Module mod_proxy</ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -662,9 +662,9 @@ required.</para>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
+<listitem><simpara><ulink
 url="http://httpd.apache.org/docs-2.0/mod/mod_include.html">Apache
-Module mod_include</ulink></listitem>
+Module mod_include</ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -729,7 +729,7 @@ migrate from using &dbmmanage; on a DBM-format database with Apache
 
 <title>Migrating from &dbmmanage; to &htdbm;</title>
 
-<tgroup cols="3" frame="none">
+<tgroup cols="3">
 
 <thead><row>
 <entry>Action</entry>
@@ -782,9 +782,9 @@ used.</para>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
+<listitem><simpara><ulink
 url="http://httpd.apache.org/docs-2.0/mod/mod_auth_dbm.html">Apache
-Module mod_auth_dbm</ulink></listitem>
+Module mod_auth_dbm</ulink></simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -845,9 +845,9 @@ directives.</para>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
+<listitem><simpara><ulink
 url="http://www.php.net/release_4_1_0.php">PHP 4.1.0 Release
-Announcement</ulink> for details of the global scope changes</listitem>
+Announcement</ulink> for details of the global scope changes</simpara></listitem>
 
 </itemizedlist></para>
 </sect3>
@@ -896,8 +896,8 @@ possibly require minor Makefile modifications.</para>
 <para>See also:
 <itemizedlist>
 
-<listitem><ulink
-url="XXX_not_on_the_web">mod_perl: porting from 1.x</ulink></listitem>
+<listitem><simpara><ulink
+url="XXX_not_on_the_web">mod_perl: porting from 1.x</ulink></simpara></listitem>
 
 </itemizedlist></para>
 -->
@@ -949,26 +949,26 @@ have the statement <literal>Include conf.d/*.conf</literal> in your
 
 <itemizedlist>
 
-<listitem><para>The <literal>apache</literal>,
+<listitem><simpara>The <literal>apache</literal>,
 <literal>apache-devel</literal> and <literal>apache-manual</literal>
 packages have been renamed as &httpd;, <literal>httpd-devel</literal>
-and <literal>httpd-manual</literal>.</para></listitem>
+and <literal>httpd-manual</literal>.</simpara></listitem>
 
-<listitem><para>The <literal>mod_dav</literal> package has been
-incorporated into the &httpd; package.</para></listitem>
+<listitem><simpara>The <literal>mod_dav</literal> package has been
+incorporated into the &httpd; package.</simpara></listitem>
 
-<listitem><para>The <literal>mod_put</literal> and
+<listitem><simpara>The <literal>mod_put</literal> and
 <literal>mod_roaming</literal> packages have been removed, since their
 functionality is a subset of that provided by
-<literal>mod_dav</literal>.</para></listitem>
+<literal>mod_dav</literal>.</simpara></listitem>
 
-<listitem><para>The <literal>mod_auth_any</literal> and
+<listitem><simpara>The <literal>mod_auth_any</literal> and
 <literal>mod_bandwidth</literal> packages have been
-removed.</para></listitem>
+removed.</simpara></listitem>
 
-<listitem><para>&mod_ssl;'s version is now synchronised with &httpd;,
+<listitem><simpara>&mod_ssl;'s version is now synchronised with &httpd;,
 which means that the &mod_ssl; package for Apache 2.0 has a lower
-version than &mod_ssl; package for 1.3.</para></listitem>
+version than &mod_ssl; package for 1.3.</simpara></listitem>
 
 </itemizedlist>
 
