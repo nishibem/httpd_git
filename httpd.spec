@@ -4,7 +4,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 3
+Release: 4
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -25,6 +25,7 @@ Patch3: httpd-2.0.36-sslink.patch
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
 Patch42: httpd-2.0.40-xfsz.patch
+Patch43: httpd-2.0.40-pod.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -88,6 +89,7 @@ Security (TLS) protocols.
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
 %patch42 -p0 -b .xfsz
+%patch43 -p0 -b .pod
 
 # copy across the migration guide and sed it's location into apachectl
 cp $RPM_SOURCE_DIR/migration.{html,css} .
@@ -342,6 +344,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Mon Aug 26 2002 Joe Orton <jorton@redhat.com> 2.0.40-4
+- set SIGXFSZ disposition to "ignored" (#69520)
+- make dummy connections to the first listener in config (#72692)
+
 * Mon Aug 26 2002 Joe Orton <jorton@redhat.com> 2.0.40-3
 - allow "apachectl configtest" on a 1.3 httpd.conf
 - add mod_deflate
