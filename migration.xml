@@ -725,7 +725,7 @@ use for a particular command.  <xref linkend="htdbm"/> shows how to
 migrate from using &dbmmanage; on a DBM-format database with Apache
 1.3, to &htdbm; in 2.0.</para>
 
-<table id="htdbm">
+<table id="htdbm" frame="all">
 
 <title>Migrating from &dbmmanage; to &htdbm;</title>
 
@@ -798,28 +798,6 @@ file to be loaded, and hence for PHP to work, you must have the
 statement <literal>Include conf.d/*.conf</literal> in your &httpdconf;
 as described in <xref linkend="dsosupport"/>.</para>
 
-<para>PHP is now implemented as a <link
-linkend="modules">filter</link> and must therefore be enabled
-differently:</para>
-
-<example>
-<title>Apache 1.3 PHP configuration</title>
-<programlisting>
-AddType application/x-httpd-php .php
-AddType application/x-httpd-php-source .phps
-</programlisting>
-</example>
-
-<example>
-<title>Equivalent Apache 2.0 PHP configuration</title>
-<programlisting>
-&lt;Files *.php&gt;
-    SetOutputFilter PHP
-    SetInputFilter PHP
-&lt;/Files&gt;
-</programlisting>
-</example>
-
 <para>In PHP 4.2.0 and later the default set of predefined variables
 which are available in the global scope has changed. Individual input
 and server variables are by default no longer placed directly into the
@@ -831,16 +809,17 @@ file <filename>/etc/php.ini</filename> or more selectivly by using
 <literal>php_value register_globals 1</literal> in your &httpdconf; or
 in <filename>.htaccess</filename> files.</para>
 
-<para>Another change is that short open tags are now disabled to make
-it easier to develop PHP applications that serve XML or XHTML, so
-scripts must use <literal>&lt;?php</literal> or <literal>&lt;script
-language="php"&gt;</literal> rather than <literal>&lt;?</literal> to
-denote PHP code.  This change may cause scripts to break, and you may
-revert to the old behaviour globally by setting
-<literal>short_open_tag</literal> to <literal>On</literal> in the file
-<filename>/etc/php.ini</filename>.  Due to a bug in PHP it is not
-possible to set this more selectivly with <literal>php_value</literal>
-directives.</para>
+<para>As of the <literal>php-4.3.6-5</literal> package, the default
+<filename>/etc/php.ini</filename> has also changed: it is now based on
+the <filename>php.ini-recommended</filename> defaults included in PHP
+releases, rather than the <filename>php.ini-dist</filename> defaults
+as used previously.  Notable differences are that:
+
+<itemizedlist>
+<listitem><simpara>display_errors is now <emphasis>Off</emphasis></simpara></listitem>
+<listitem><simpara>log_errors now <emphasis>On</emphasis></simpara></listitem>
+<listitem><simpara>magic_quotes_gpc is now <emphasis>Off</emphasis></simpara></listitem>
+</itemizedlist></para>
 
 <para>See also:
 <itemizedlist>
