@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.49
-Release: 7.ent
+Release: 8
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -104,7 +104,7 @@ Internet.
 Group: Development/Libraries
 Summary: Development tools for the Apache HTTP server.
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
-Requires: apr-devel, apr-util-devel, httpd = %{version}
+Requires: apr-devel, apr-util-devel, httpd = %{version}, pcre-devel
 
 %description devel
 The httpd-devel package contains the APXS binary and other files
@@ -137,6 +137,16 @@ Obsoletes: stronghold-mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
+
+%package suexec
+Group: System Environment/Daemons
+Summary: suexec binary for the Apache HTTP server
+Requires: httpd = %{version}-%{release}
+
+%description suexec
+This package includes the /usr/sbin/suexec binary which can be installed
+to allow the Apache HTTP server to run CGI programs (and any programs
+executed by SSI pages) as a user other than the 'apache' user.
 
 %prep
 %setup -q
@@ -317,6 +327,9 @@ make DESTDIR=$RPM_BUILD_ROOT install
 popd
 # install worker binary
 install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
+
+# link to system pcreposix.h
+ln -s ../pcre/pcreposix.h $RPM_BUILD_ROOT%{_includedir}/httpd/pcreposix.h
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -503,7 +516,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 
-%doc ABOUT_APACHE README CHANGES LICENSE VERSIONING
+%doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
 %doc migration.html migration.css
 
 %dir %{_sysconfdir}/httpd
@@ -528,7 +541,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/httpd.worker
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-%attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -553,6 +565,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_mandir}/man?/*
 %exclude %{_mandir}/man8/apxs.8*
+%exclude %{_mandir}/man8/suexec.8*
 
 %files manual
 %defattr(-,root,root)
@@ -581,7 +594,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/instdso.sh
 %{_libdir}/httpd/build/libtool
 
+%files suexec
+%defattr(-,root,root)
+%attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
+%{_mandir}/man8/suexec.8*
+
 %changelog
+* Mon Jun 21 2004 Joe Orton <jorton@redhat.com> 2.0.49-8
+- split out suexec into httpd-suexec package (#77972)
+- link to system pcreposix.h to fix including httpd.h
+
 * Wed Jun 16 2004 Joe Orton <jorton@redhat.com> 2.0.49-7
 - don't install or use bundled pcreposix.h
 - bump default MaxClients to 256
