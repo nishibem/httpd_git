@@ -7,12 +7,13 @@
 %define debug_package %{nil}
 %endif
 
+ExcludeArch: s390x
+
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 21
+Release: 21.5
 URL: http://httpd.apache.org/
-Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
@@ -34,17 +35,36 @@ Patch3: httpd-2.0.36-sslink.patch
 # Bug fixes
 Patch20: httpd-2.0.40-davsegv.patch
 Patch21: httpd-2.0.40-glibc23.patch
+Patch22: httpd-2.0.40-nphcgi.patch
+Patch23: httpd-2.0.40-leaks.patch
+Patch24: httpd-2.0.40-proxy.patch
+Patch25: httpd-2.0.40-range.patch
+Patch26: httpd-2.0.40-pipelog.patch
+Patch27: httpd-2.0.40-rwmap.patch
+Patch28: httpd-2.0.40-stream.patch
+Patch29: httpd-2.0.40-subreq.patch
+Patch30: httpd-2.0.40-sslexcl.patch
+Patch31: httpd-2.0.40-include.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
 Patch42: httpd-2.0.40-xfsz.patch
 Patch43: httpd-2.0.40-pod.patch
 Patch44: httpd-2.0.40-noshmht.patch
-Patch45: httpd-2.0.40-leaks.patch
+Patch45: httpd-2.0.40-prctl.patch
 # Security fixes
 Patch60: httpd-2.0.40-CAN-2002-0840.patch
 Patch61: httpd-2.0.40-CAN-2002-0843.patch
 Patch62: httpd-2.0.40-CAN-2003-0020.patch
+Patch63: httpd-2.0.40-CAN-2003-0083.patch
+Patch64: httpd-2.0.40-CAN-2003-0132.patch
+Patch65: httpd-2.0.40-fdleak.patch
+Patch66: httpd-2.0.40-CAN-2003-0245.patch
+Patch67: httpd-2.0.40-CAN-2003-0189.patch
+Patch68: httpd-2.0.40-CAN-2003-0192.patch
+Patch69: httpd-2.0.40-CAN-2003-0253.patch
+Patch70: httpd-2.0.40-CAN-2003-0254.patch
+Patch71: httpd-2.0.40-VU379828.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -101,24 +121,43 @@ Security (TLS) protocols.
 
 %prep
 %setup -q
-%patch1 -p0 -b .apctl
-%patch2 -p0 -b .apxs
+%patch1 -p1 -b .apctl
+%patch2 -p1 -b .apxs
 %patch3 -p0 -b .sslink
 
 %patch20 -p1 -b .davsegv
 %patch21 -p1 -b .glibc23
+%patch22 -p1 -b .nphcgi
+%patch23 -p0 -b .leaks
+%patch24 -p1 -b .proxy
+%patch25 -p1 -b .range
+%patch26 -p1 -b .pipelog
+%patch27 -p1 -b .rwmap
+%patch28 -p1 -b .stream
+%patch29 -p1 -b .subreq
+%patch30 -p1 -b .sslexcl
+%patch31 -p1 -b .include
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
 %patch42 -p0 -b .xfsz
 %patch43 -p0 -b .pod
 %patch44 -p0 -b .noshmht
-%patch45 -p0 -b .leaks
+%patch45 -p1 -b .prctl
 
 # no -b to prevent droplets in install root.
 %patch60 -p1
 %patch61 -p1 -b .can0843
 %patch62 -p1 -b .can0020
+%patch63 -p1 -b .can0083
+%patch64 -p1 -b .can0132
+%patch65 -p1 -b .fdleak
+%patch66 -p1 -b .can0245
+%patch67 -p1 -b .can0189
+%patch68 -p1 -b .can0192
+%patch69 -p1 -b .can0253
+%patch70 -p1 -b .can0254
+%patch71 -p1 -b .vu379828
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include \`pwd\`/include/ap_mmn.h | grep -v '#'`
@@ -128,6 +167,7 @@ if test "x${vmmn}" != "x%{mmn}"; then
    exit 1
 fi
 
+%build
 # update location of migration guide in apachectl
 %{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
 	support/apachectl.in
@@ -139,7 +179,6 @@ fi
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
 	support/apxs.in
 
-%build
 # build the migration guide
 xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks $RPM_SOURCE_DIR/migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
@@ -265,9 +304,11 @@ ln -s ../../../..%{_bindir}/libtool $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtoo
 sed -e "s|%{contentdir}/build|%{_libdir}/httpd/build|g" \
     -e "/AP_LIBS/d" -e "/abs_srcdir/d" \
     -e "/^LIBTOOL/s|/[^ ]*/libtool|%{_bindir}/libtool|" \
-    -e "/^EXTRA_INCLUDES/s|-I$RPM_BUILD_DIR[^ ]* ||g" \
+    -e "s|^EXTRA_INCLUDES.*$|EXTRA_INCLUDES = -I\$(includedir) -I%{_includedir}/openssl|g" \
   < prefork/build/config_vars.mk \
   > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
+install -m 644 build/special.mk \
+    $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
 
 # Make the MMN accessible to module packages
 echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
@@ -462,6 +503,28 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu Jul 31 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.5
+- fix EXTRA_INCLUDES for #92313
+- add mod_include fixes from upstream
+
+* Wed Jul  9 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.4
+- add security fixes for CVE CAN-2003-0192, CAN-2003-0253, 
+  CAN-2003-0254, CERT VU#379828
+- add bug fixes for #78019, #82985, #85022, #97111, #98545, #98653
+- install special.mk, fix apxs -q LIBTOOL (#92313)
+
+* Tue May 20 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.3
+- add security fix for CAN-2003-0189
+
+* Mon May 12 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.2
+- add security fix for CAN-2003-0245
+- add bug fixes for #88575, #89086, #89170, #89179
+
+* Tue Apr  1 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.1
+- add security fixes for CAN-2003-0020, CAN-2003-0132, CAN-2003-0083
+- add security fix for file descriptor leaks, #82142
+- add bug fix for #82587
+
 * Mon Feb 24 2003 Joe Orton <jorton@redhat.com> 2.0.40-21
 - add security fix for CAN-2003-0020; replace non-printable characters
   with '!' when printing to error log.

@@ -882,22 +882,6 @@ have the statement <literal>Include conf.d/*.conf</literal> in your
 </sect2>
 </sect1>
 
-<!--
-
-<sect1>
-<title>Troubleshooting</title>
-
-<para>XXX</para>
-
-- help, I'm a dim bastard and neither read this document nor put the
-  Include directive in, and now mod_perl and php don't work - waaaaa!
-
-- help, I didn't read the bit about PATH_INFO and now my CGI/SSI/PHP
-  stuff chokes - waaaaa!
-
-</sect1>
--->
-
 <appendix id="pkgchanges">
 <title>Packaging Changes</title>
 
