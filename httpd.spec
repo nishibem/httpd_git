@@ -4,7 +4,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -30,7 +30,6 @@ License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildPrereq: db4-devel, expat-devel, findutils, perl
-BuildPrereq: openldap-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
@@ -122,8 +121,7 @@ CFLAGS="$RPM_OPT_FLAGS" \
 	--enable-ssl --with-ssl \
 	--enable-deflate \
 	--enable-proxy --enable-proxy-connect \
-	--enable-proxy-http --enable-proxy-ftp \
-	--with-ldap-include=%{_includedir}/openldap --with-ldap
+	--enable-proxy-http --enable-proxy-ftp
 make
 
 %install
@@ -158,6 +156,10 @@ done
 
 # for holding mod_dav lock database
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
+
+# create a prototype session cache
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_ssl
+touch $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_ssl/scache.{dir,pag,sem}
 
 # move utilities to /usr/bin
 mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
@@ -330,6 +332,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %dir %{_sysconfdir}/httpd/conf/ssl.*
+%attr(0700,apache,root) %dir %{_localstatedir}/cache/mod_ssl
+%attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.dir
+%attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.pag
+%attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.sem
 
 %files devel
 %defattr(-,root,root)
@@ -344,6 +350,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Sun Sep  1 2002 Joe Orton <jorton@redhat.com> 2.0.40-5
+- fix SSL session cache (#69699)
+- revert addition of LDAP support to apr-util
+
 * Mon Aug 26 2002 Joe Orton <jorton@redhat.com> 2.0.40-4
 - set SIGXFSZ disposition to "ignored" (#69520)
 - make dummy connections to the first listener in config (#72692)
