@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.49
-Release: 8.ent
+Version: 2.0.50
+Release: 1
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -47,16 +47,9 @@ Patch27: httpd-2.0.48-sslpphrase.patch
 Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
-Patch31: httpd-2.0.48-limitxml.patch
 Patch32: httpd-2.0.48-vhost.patch
-Patch33: httpd-2.0.46-sslscache.patch
-Patch34: httpd-2.0.49-sslcleanup.patch
 Patch35: httpd-2.0.49-eocbucket.patch
-Patch36: httpd-2.0.49-nolcrash.patch
 Patch37: httpd-2.0.46-autoindex.patch
-Patch38: httpd-2.0.46-deflate2.patch
-Patch39: httpd-2.0.49-suexecsuid.patch
-Patch40: httpd-2.0.49-vhostaddr.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -67,7 +60,6 @@ Patch75: httpd-2.0.48-dynlimit.patch
 Patch76: httpd-2.0.48-dynamic.patch
 Patch77: httpd-2.0.48-sslstatus.patch
 Patch78: httpd-2.0.48-corelimit.patch
-Patch79: httpd-2.0.46-rolog.patch
 Patch80: httpd-2.0.48-distcache.patch
 Patch81: httpd-2.0.48-debuglog.patch
 Patch82: httpd-2.0.48-abench.patch
@@ -75,12 +67,8 @@ Patch83: httpd-2.0.48-fdsetsize.patch
 Patch84: httpd-2.0.48-sslheader.patch
 Patch85: httpd-2.0.48-sslvars2.patch
 Patch86: httpd-2.0.48-rewritessl.patch
-Patch87: httpd-2.0.49-largefile.patch
-Patch88: httpd-2.0.46-cgibucket.patch
 Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
-# Security fixes
-Patch200: httpd-2.0.46-CAN-2004-0488.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -170,16 +158,9 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch28 -p1 -b .worker
 %patch29 -p1 -b .workerhup
 %patch30 -p1 -b .davmisc
-%patch31 -p1 -b .limitxml
 %patch32 -p1 -b .vhost
-%patch33 -p1 -b .sslscache
-%patch34 -p1 -b .sslcleanup
 %patch35 -p1 -b .eocbucket
-%patch36 -p1 -b .nolcrash
 %patch37 -p1 -b .autoindex
-%patch38 -p1 -b .deflate2
-%patch39 -p1 -b .suexecsuid
-%patch40 -p1 -b .vhostaddr
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -189,7 +170,6 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch76 -p1 -b .dynamic
 %patch77 -p1 -b .sslstatus
 %patch78 -p1 -b .corelimit
-%patch79 -p1 -b .rolog
 %patch80 -p1 -b .distcache
 %patch81 -p1 -b .debuglog
 %patch82 -p1 -b .abench
@@ -197,12 +177,8 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch84 -p1 -b .sslheader
 %patch85 -p1 -b .sslvars2
 %patch86 -p1 -b .rewritessl
-%patch87 -p1 -b .largefile
-%patch88 -p1 -b .cgibucket
 %patch89 -p1 -b .headerssl
 %patch90 -p1 -b .workerstack
-
-%patch200 -p1 -b .can0488
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -600,6 +576,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Tue Jun 29 2004 Joe Orton <jorton@redhat.com> 2.0.50-1
+- update to 2.0.50
+
 * Mon Jun 21 2004 Joe Orton <jorton@redhat.com> 2.0.49-8
 - split out suexec into httpd-suexec package (#77972)
 - link to system pcreposix.h to fix including httpd.h
