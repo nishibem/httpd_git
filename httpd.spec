@@ -10,7 +10,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 21.8
+Release: 21.9
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -189,7 +189,7 @@ fi
 xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks $RPM_SOURCE_DIR/migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
-CFLAGS="$RPM_OPT_FLAGS -DSSL_EXPERIMENTAL_ENGINE"
+CFLAGS="$RPM_OPT_FLAGS"
 if pkg-config openssl ; then
 	# configure -C barfs with trailing spaces in CFLAGS
 	CFLAGS="$CFLAGS `pkg-config --cflags openssl | sed 's/ *$//'`"
@@ -509,10 +509,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
-* Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.8
+* Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.9
 - add security fixes for CVE CAN-2003-0542, CAN-2003-0789
 - return test page for "/+" in default httpd.conf
-- add bug fixes for #103049, #105725, #106454, #106858
+- add bug fixes for #103049, #105725, #106454
 - further fixes for CGI regressions in -21.5 (#103744)
 
 * Thu Sep 11 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.6
