@@ -4,8 +4,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.47
-Release: 10
+Version: 2.0.48
+Release: 1.2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -37,19 +37,19 @@ Patch21: httpd-2.0.45-davfs.patch
 Patch22: httpd-2.0.45-davetag.patch
 Patch23: httpd-headusage.patch
 Patch24: httpd-2.0.47-sslcleanup.patch
-Patch25: httpd-2.0.47-include.patch
 Patch26: httpd-2.0.47-ldapshm.patch
 Patch27: httpd-2.0.46-shmcb.patch
 Patch32: httpd-2.0.46-sslmutex.patch
 Patch34: httpd-2.0.46-sslio.patch
 Patch36: httpd-2.0.46-graceful.patch
 # features/functional changes
-Patch40: httpd-2.0.45-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
 Patch42: httpd-2.0.40-xfsz.patch
 Patch43: httpd-2.0.40-pod.patch
 Patch44: httpd-2.0.40-noshmht.patch
 Patch45: httpd-2.0.45-proxy.patch
+# Ugly hacks which should never see the light of day
+Patch60: httpd-2.0.48-ssl47to48.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -124,19 +124,19 @@ fi
 %patch22 -p1 -b .davetag
 %patch23 -p1 -b .head
 %patch24 -p1 -b .sslcleanup
-%patch25 -p1 -b .include
 %patch26 -p1 -b .ldapshm
 %patch27 -p1 -b .shmcb
 %patch32 -p1 -b .sslmutex
 %patch34 -p1 -b .sslio
 %patch36 -p1 -b .graceful
 
-%patch40 -p1 -b .cnfdir
 %patch41 -p0 -b .redhat
 %patch42 -p0 -b .xfsz
 %patch43 -p0 -b .pod
 %patch44 -p1 -b .noshmht
 %patch45 -p1 -b .proxy
+
+%patch60 -p1 -b .ssl47to48
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include \`pwd\`/include/ap_mmn.h | grep -v '#'`
@@ -156,6 +156,9 @@ fi
 # update location of migration guide in apachectl
 %{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
 	support/apachectl.in
+
+# forcibly prevent use of bundled apr, apr-util
+rm -rf srclib/{apr,apr-util}
 
 # build the migration guide
 xmlto --skip-validation -x $RPM_SOURCE_DIR/html.xsl html-nochunks $RPM_SOURCE_DIR/migration.xml
@@ -286,13 +289,16 @@ mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
 
 # move builddir to the right place
 mv $RPM_BUILD_ROOT%{contentdir}/build $RPM_BUILD_ROOT%{_libdir}/httpd/build
-ln -s ../../../..%{_bindir}/libtool $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtool
+
+# point to the correct libtool
+apr_libtool=`apr-config --apr-libtool | sed -e 's|/bin/sh ||'`
+ln -s ../../../..${apr_libtool} $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtool
 
 # Install and sanitize config_vars file: relocate the build directory into 
 # libdir; reference correct libtool; fix EXTRA_INCLUDES
 sed -e "s|%{contentdir}/build|%{_libdir}/httpd/build|g" \
     -e "/AP_LIBS/d" -e "/abs_srcdir/d" \
-    -e "/^LIBTOOL/s|/bin/sh /[^ ]*/libtool|`apr-config --apr-libtool`|" \
+    -e "/^LIBTOOL/s|/bin/sh /[^ ]*/libtool|/bin/sh ${apr_libtool}|" \
     -e "s|^EXTRA_INCLUDES.*$|EXTRA_INCLUDES = -I\$(includedir) -I\$(APR_INCLUDEDIR) -I%{_includedir}/openssl|g" \
   < prefork/build/config_vars.mk \
   > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
@@ -353,13 +359,14 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.exp \
       $RPM_BUILD_ROOT/etc/httpd/conf/mime.types \
       $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.exp \
+      $RPM_BUILD_ROOT%{_libdir}/httpd/build/config.nice \
       $RPM_BUILD_ROOT%{_bindir}/ap?-config \
       $RPM_BUILD_ROOT%{_sbindir}/{checkgid,dbmmanage,envvars*} \
       $RPM_BUILD_ROOT%{contentdir}/htdocs/* \
       $RPM_BUILD_ROOT%{contentdir}/cgi-bin/* 
 
 # Remove headers which needn't be public
-rm -f $RPM_BUILD_ROOT%{_includedir}/httpd/{mpm*.h,ssl_expr_parse.h,ssl_util_table.h}
+rm -f $RPM_BUILD_ROOT%{_includedir}/httpd/{ssl_expr_parse.h,ssl_util_table.h}
 
 %pre
 # Add the "apache" user
@@ -501,6 +508,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/instdso.sh
 
 %changelog
+* Wed Nov 19 2003 Joe Orton <jorton@redhat.com> 2.0.48-1.2
+- bug fix for #110184
+
+* Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.48-1.1
+- update to 2.0.48 (#108608, thanks to Robert Scheck)
+- includes security fix for CVE CAN-2003-0542
+- reinstate mpm_common.h (#108080)
+
 * Thu Oct 23 2003 Joe Orton <jorton@redhat.com> 2.0.47-10
 - httpd.conf: configure test page in welcome.conf, load suexec, 
  don't use custom error docs by default, sync with upstream.
