@@ -10,7 +10,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 21.9
+Release: 21.11
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -45,6 +45,9 @@ Patch30: httpd-2.0.40-sslexcl.patch
 Patch31: httpd-2.0.40-include.patch
 Patch32: httpd-2.0.46-graceful.patch
 Patch33: httpd-2.0.40-rand.patch
+Patch34: httpd-2.0.40-deflate.patch
+Patch35: httpd-2.0.46-metharray.patch
+Patch36: httpd-2.0.46-miscfix.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
@@ -52,6 +55,8 @@ Patch42: httpd-2.0.40-xfsz.patch
 Patch43: httpd-2.0.40-pod.patch
 Patch44: httpd-2.0.40-noshmht.patch
 Patch45: httpd-2.0.40-prctl.patch
+Patch46: httpd-2.0.48-fdsetsize.patch
+Patch47: httpd-2.0.40-sendfile.patch
 # Security fixes
 Patch60: httpd-2.0.40-CAN-2002-0840.patch
 Patch61: httpd-2.0.40-CAN-2002-0843.patch
@@ -67,6 +72,7 @@ Patch70: httpd-2.0.40-CAN-2003-0254.patch
 Patch71: httpd-2.0.40-VU379828.patch
 Patch72: httpd-2.0.40-CAN-2003-0542.patch
 Patch73: httpd-2.0.40-CAN-2003-0789.patch
+Patch74: httpd-2.0.40-CAN-2004-0113.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -141,13 +147,18 @@ Security (TLS) protocols.
 %patch31 -p1 -b .include
 %patch32 -p1 -b .graceful
 %patch33 -p1 -b .rand
+%patch34 -p1 -b .deflate
+%patch35 -p1 -b .metharray
+%patch36 -p1 -b .miscfix
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
 %patch42 -p0 -b .xfsz
-%patch43 -p0 -b .pod
+%patch43 -p1 -b .pod
 %patch44 -p0 -b .noshmht
 %patch45 -p1 -b .prctl
+%patch46 -p1 -b .fdsetsize
+%patch47 -p1 -b .sendfile
 
 # no -b to prevent droplets in install root.
 %patch60 -p1
@@ -164,6 +175,7 @@ Security (TLS) protocols.
 %patch71 -p1 -b .vu379828
 %patch72 -p1 -b .can0542
 %patch73 -p1 -b .can0789
+%patch74 -p1 -b .can0113
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include \`pwd\`/include/ap_mmn.h | grep -v '#'`
@@ -509,6 +521,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu Mar 25 2004 Joe Orton <jorton@redhat.com> 2.0.40-21.11
+- add security fix for CVE CAN-2004-0113
+- add fix for slow graceful restarts in prefork
+- mod_deflate: update to recent version (#115280)
+- mod_ssl: misc bug fixes
+- core: add EnableSendfile directive (#78224)
+
+* Wed Feb 25 2004 Joe Orton <jorton@redhat.com> 2.0.40-21.10
+- remove test that accept returns fd < FD_SETSIZE (#116576)
+
 * Tue Oct 28 2003 Joe Orton <jorton@redhat.com> 2.0.40-21.9
 - add security fixes for CVE CAN-2003-0542, CAN-2003-0789
 - return test page for "/+" in default httpd.conf
