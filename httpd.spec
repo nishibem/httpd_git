@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.52
-Release: 7
+Version: 2.0.53
+Release: 1
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -51,8 +51,6 @@ Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
 Patch39: httpd-2.0.50-reclaim.patch
-Patch40: httpd-2.0.52-sslauth.patch
-Patch41: httpd-2.0.52-savebrigade.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -72,9 +70,6 @@ Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
 Patch91: httpd-2.0.46-testhook.patch
 Patch92: httpd-2.0.46-dumpcerts.patch
-# Security fixes
-Patch120: httpd-2.0.52-CAN-2004-0885.patch
-Patch121: httpd-2.0.52-CAN-2004-0942.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -168,8 +163,6 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch29 -p1 -b .workerhup
 %patch30 -p1 -b .davmisc
 %patch39 -p1 -b .reclaim
-%patch40 -p1 -b .sslauth
-%patch41 -p1 -b .savebrigade
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -188,9 +181,6 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch90 -p1 -b .workerstack
 %patch91 -p1 -b .testhook
 %patch92 -p1 -b .dumpcerts
-
-%patch120 -p1 -b .can0885
-%patch121 -p1 -b .can0942
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -296,14 +286,6 @@ mpmbuild prefork --enable-mods-shared=all \
 # To prevent most modules being built statically into httpd.worker, 
 # easiest way seems to be enable them shared.
 mpmbuild worker --enable-mods-shared=all
-
-# Verify that the same modules were built into the two httpd binaries
-./prefork/httpd -l | grep -v prefork > prefork.mods
-./worker/httpd -l | grep -v worker > worker.mods
-if ! diff -u prefork.mods worker.mods; then
-  : Different modules built into httpd binaries, will not proceed
-  exit 1
-fi
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -507,6 +489,14 @@ if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
    exit 1
 fi
 
+# Verify that the same modules were built into the two httpd binaries
+./prefork/httpd -l | grep -v prefork > prefork.mods
+./worker/httpd -l | grep -v worker > worker.mods
+if ! diff -u prefork.mods worker.mods; then
+  : Different modules built into httpd binaries, will not proceed
+  exit 1
+fi
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -604,6 +594,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Wed Feb  9 2005 Joe Orton <jorton@redhat.com> 2.0.53-4
+- update to 2.0.53
+- move prefork/worker modules comparison to %%check
+
 * Mon Feb  7 2005 Joe Orton <jorton@redhat.com> 2.0.52-7
 - fix cosmetic issues in "service httpd reload"
 - move User/Group higher in httpd.conf (#146793)
