@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.52
-Release: 3
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -118,7 +118,7 @@ also be found at http://httpd.apache.org/docs-2.0/.
 %package -n mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP server
-Serial: 1
+Epoch: 1
 BuildRequires: openssl-devel, distcache-devel
 Prereq: openssl, dev, /bin/cat
 Requires: httpd = %{version}-%{release}, make, httpd-mmn = %{mmn}
@@ -579,6 +579,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Thu Nov 11 2004 Jeff Johnson <jbj@jbj.org> 2.0.52-4
+- rebuild against db-4.3-21.
+
 * Thu Sep 28 2004 Joe Orton <jorton@redhat.com> 2.0.52-3
 - add dummy connection address fixes from HEAD
 - mod_ssl: add security fix for CAN-2004-0885
