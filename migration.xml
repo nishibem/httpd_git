@@ -456,6 +456,35 @@ url="http://httpd.apache.org/docs-2.0/mod/core.html#errordocument"><literal>Erro
 
 </itemizedlist></para>
 </sect3>
+
+<sect3>
+<title>Default Character Set</title>
+
+<para>The default character set which will be sent in a
+<literal>Content-Type</literal> header has changed from previous
+versions.  By default, the configuration in &distro; uses a UTF-8
+locale, the default character set used in &httpdconf; is now
+<literal>utf-8</literal>, rather than the previous default of
+<literal>ISO-8859-1</literal>.</para>
+
+<para>To configure the server to use a default character set of
+ISO-8859-1 if migrating non-UTF-8 content, change:
+
+<informalexample>
+<programlisting>
+AddDefaultCharset utf-8
+</programlisting>
+</informalexample> 
+
+to
+
+<informalexample>
+<programlisting>
+AddDefaultCharset <emphasis role="bold">ISO-8859-1</emphasis>
+</programlisting>
+</informalexample></para>
+
+</sect3>
 </sect2>
 
 <sect2>

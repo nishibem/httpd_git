@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.50
-Release: 4.ent
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -19,6 +19,7 @@ Source8: powered_by_rh.png
 Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
+Source13: manual.conf
 Source14: mod_ssl-Makefile.crt
 Source15: mod_ssl-Makefile.crl
 # Documentation
@@ -70,13 +71,15 @@ Patch85: httpd-2.0.48-sslvars2.patch
 Patch86: httpd-2.0.48-rewritessl.patch
 Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
-Patch91: httpd-2.0.49-suexecmsg.patch
+Patch91: httpd-2.0.46-testhook.patch
+Patch92: httpd-2.0.46-dumpcerts.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
-BuildRequires: apr-devel >= 0.9.4-15, apr-util-devel, pcre-devel
+BuildRequires: apr-devel >= 0.9.4-20, apr-util-devel, pcre-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
+Requires: httpd-suexec
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
 Provides: webserver
@@ -107,6 +110,7 @@ to install this package.
 %package manual
 Group: Documentation
 Summary: Documentation for the Apache HTTP server.
+Requires: httpd = %{version}-%{release}
 Obsoletes: secureweb-manual, apache-manual
 
 %description manual
@@ -182,7 +186,8 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch86 -p1 -b .rewritessl
 %patch89 -p1 -b .headerssl
 %patch90 -p1 -b .workerstack
-%patch91 -p1 -b .suexecmsg
+%patch91 -p1 -b .testhook
+%patch92 -p1 -b .dumpcerts
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -314,11 +319,10 @@ ln -s ../pcre/pcreposix.h $RPM_BUILD_ROOT%{_includedir}/httpd/pcreposix.h
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
-   $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
-install -m 644 $RPM_SOURCE_DIR/ssl.conf \
-   $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/ssl.conf
-install -m 644 $RPM_SOURCE_DIR/welcome.conf \
-   $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/welcome.conf
+    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
+for f in ssl.conf welcome.conf manual.conf; do
+  install -m 644 $RPM_SOURCE_DIR/$f $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
+done
 
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/*.conf
 install -m 644 $RPM_SOURCE_DIR/httpd.conf \
@@ -550,6 +554,7 @@ rm -rf $RPM_BUILD_ROOT
 %files manual
 %defattr(-,root,root)
 %{contentdir}/manual
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %files -n mod_ssl
 %defattr(-,root,root)
@@ -580,6 +585,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Wed Sep  1 2004 Joe Orton <jorton@redhat.com> 2.0.50-5
+- move manual configuration into conf.d/manual.conf (#131208)
+- add test_hook from HEAD, -t -DDUMP_CERTS for mod_ssl
+- document AddDefaultCharset change since 1.3 in migration.html
+
 * Tue Aug 17 2004 Joe Orton <jorton@redhat.com> 2.0.50-4
 - start httpd in the C locale by default (#128002)
 - fix CustomLog comments in default httpd.conf (#43223)
