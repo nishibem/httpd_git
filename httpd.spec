@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.49
-Release: 2.ent
+Release: 4.ent
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -52,6 +52,7 @@ Patch47: httpd-2.0.48-vhost.patch
 Patch48: httpd-2.0.49-sslcache.patch
 Patch49: httpd-2.0.49-sslcleanup.patch
 Patch50: httpd-2.0.49-eocbucket.patch
+Patch51: httpd-2.0.49-nolcrash.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -71,6 +72,7 @@ Patch86: httpd-2.0.48-sslheader.patch
 Patch87: httpd-2.0.48-sslvars2.patch
 Patch88: httpd-2.0.48-rewritessl.patch
 Patch89: httpd-2.0.49-largefile.patch
+Patch90: httpd-2.0.46-cgibucket.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -83,6 +85,7 @@ Provides: webserver
 Provides: httpd-mmn = %{mmn}
 Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache, stronghold-htdocs
 Obsoletes: mod_put, mod_roaming
+Conflicts: pcre < 4.0
 
 %description
 Apache is a powerful, full-featured, efficient, and freely-available
@@ -129,7 +132,7 @@ Security (TLS) protocols.
 
 %prep
 %setup -q
-%patch1 -p0 -b .apctl
+%patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .linkmods
 %patch5 -p1 -b .deplibs
@@ -154,6 +157,7 @@ Security (TLS) protocols.
 %patch48 -p1 -b .sslcache
 %patch49 -p1 -b .sslcleanup
 %patch50 -p1 -b .eocbucket
+%patch51 -p1 -b .nolcrash
 
 %patch71 -p0 -b .xfsz
 %patch72 -p0 -b .pod
@@ -172,6 +176,7 @@ Security (TLS) protocols.
 %patch87 -p1 -b .sslvars2
 %patch88 -p1 -b .rewritessl
 %patch89 -p1 -b .largefile
+%patch90 -p1 -b .cgibucket
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -204,8 +209,7 @@ fi
 ./buildconf
 
 # Limit size of CHANGES to recent history
-sed '/Changes with Apache MPM/,$d' < CHANGES > CHANGES.new
-mv -f CHANGES.new CHANGES
+echo '1,/Changes with Apache MPM/wq' | ed CHANGES
 
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
@@ -267,7 +271,6 @@ mpmbuild prefork --enable-mods-shared=all \
 	--enable-deflate \
 	--enable-proxy --enable-proxy-connect \
 	--enable-proxy-http --enable-proxy-ftp \
-        --disable-ext-filter \
         --enable-cache --enable-mem-cache \
         --enable-file-cache --enable-disk-cache \
         --enable-ldap --enable-auth-ldap \
@@ -562,6 +565,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu May  6 2004 Joe Orton <jorton@redhat.com> 2.0.49-4
+- make "noindex" page valid XHTML 1.1 (Pascal Volk, #122020)
+- fix SEGV with no Listen directives (Michael Corcoran)
+- mod_cgi: synch with 2.0 backport proposed upstream
+
+* Thu Apr 22 2004 Joe Orton <jorton@redhat.com> 2.0.49-3
+- conflict with older pcre (#121531)
+- include mod_ext_filter
+- mod_cgi: handle concurrent stderr/stdout from script
+
 * Fri Mar 26 2004 Joe Orton <jorton@redhat.com> 2.0.49-2
 - mod_ssl: fix session cache memory leak (Madhu Mathihalli)
 - mod_ssl: fix SEGV when trying to shutdown during pool cleanup
@@ -590,8 +603,8 @@ rm -rf $RPM_BUILD_ROOT
 - mod_ssl: install only minimal mod_ssl.h
 - worker: fix potential hang at restart
 
-* Tue Mar 02 2004 Elliot Lee <sopwith@redhat.com> 2.0.48-16.1
-- rebuilt
+* Tue Mar  2 2004 Elliot Lee <sopwith@redhat.com> 2.0.48-16.1
+- Rebuilt.
 
 * Mon Feb 23 2004 Joe Orton <jorton@redhat.com> 2.0.48-16
 - fix apxs -q installbuilddir
@@ -599,7 +612,7 @@ rm -rf $RPM_BUILD_ROOT
 - remove check that accept() returns an fd < FD_SETSIZE 
 
 * Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com> 2.0.48-15
-- rebuilt
+- Rebuilt.
 
 * Tue Feb  3 2004 Joe Orton <jorton@redhat.com> 2.0.48-14
 - mod_dav: fix 401 on destination and reject unescaped fragment in URI
@@ -746,7 +759,7 @@ rm -rf $RPM_BUILD_ROOT
 - fix for use of libtool 1.5
 
 * Wed Jun 5 2003 Elliot Lee <sopwith@redhat.com>
-- rebuilt
+- Rebuilt.
 
 * Thu Jun  5 2003 Joe Orton <jorton@redhat.com> 2.0.45-10
 - fix apxs -g (#92313)
@@ -810,7 +823,7 @@ rm -rf $RPM_BUILD_ROOT
 - fix apr_strerror on glibc2.3
 
 * Wed Jan 22 2003 Tim Powers <timp@redhat.com> 2.0.40-18
-- rebuilt
+- Rebuilt.
 
 * Thu Jan 16 2003 Joe Orton <jorton@redhat.com> 2.0.40-17
 - add mod_cgid and httpd binary built with worker MPM (#75496)
