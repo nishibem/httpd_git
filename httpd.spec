@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.51
-Release: 6
+Version: 2.0.52
+Release: 2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -35,7 +35,6 @@ Patch3: httpd-2.0.48-linkmods.patch
 Patch4: httpd-2.0.45-deplibs.patch
 Patch5: httpd-2.0.47-pie.patch
 Patch6: httpd-2.0.45-syspcre.patch
-Patch7: httpd-2.0.48-suexeclibs.patch
 Patch8: httpd-2.0.48-vpathinc.patch
 # Bug fixes
 Patch20: httpd-2.0.45-encode.patch
@@ -70,8 +69,6 @@ Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
 Patch91: httpd-2.0.46-testhook.patch
 Patch92: httpd-2.0.46-dumpcerts.patch
-# Security fixes
-Patch150: httpd-2.0.51-CAN-2004-0811.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -148,7 +145,6 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch3 -p1 -b .linkmods
 %patch4 -p1 -b .deplibs
 %patch6 -p1 -b .syspcre
-%patch7 -p1 -b .suexeclibs
 %patch8 -p1 -b .vpathinc
 
 # no -b to prevent droplets in install root
@@ -182,8 +178,6 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch90 -p1 -b .workerstack
 %patch91 -p1 -b .testhook
 %patch92 -p1 -b .dumpcerts
-
-%patch150 -p1 -b .can0811
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -582,6 +576,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Tue Sep 28 2004 Joe Orton <jorton@redhat.com> 2.0.52-2
+- update to 2.0.52
+
 * Tue Sep 21 2004 Joe Orton <jorton@redhat.com> 2.0.51-6
 - fix 2.0.51 regression in Satisfy merging (CAN-2004-0811)
 
