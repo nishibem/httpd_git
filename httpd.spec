@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20020903
-%define vstring Red Hat
-%define distro Red Hat Enterprise Linux
+%define vstring Fedora
+%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.49
-Release: 5.ent
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -579,6 +579,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
 * Thu Jun 10 2004 Joe Orton <jorton@redhat.com> 2.0.49-5
 - remove comments about ScoreBoardFile in httpd.conf
 - avoid redundant name lookup in pod code
