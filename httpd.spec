@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.51
-Release: 5
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -70,6 +70,8 @@ Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
 Patch91: httpd-2.0.46-testhook.patch
 Patch92: httpd-2.0.46-dumpcerts.patch
+# Security fixes
+Patch150: httpd-2.0.51-CAN-2004-0811.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -180,6 +182,8 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch90 -p1 -b .workerstack
 %patch91 -p1 -b .testhook
 %patch92 -p1 -b .dumpcerts
+
+%patch150 -p1 -b .can0811
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -578,6 +582,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Tue Sep 21 2004 Joe Orton <jorton@redhat.com> 2.0.51-6
+- fix 2.0.51 regression in Satisfy merging (CAN-2004-0811)
+
 * Sat Sep 18 2004 Joe Orton <jorton@redhat.com> 2.0.51-5
 - switch to Jeff Trawick's child reclaim timing logic patch
 - migration guide updates
