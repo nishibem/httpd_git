@@ -4,7 +4,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.40
-Release: 2
+Release: 3
 URL: http://httpd.apache.org/
 Vendor: Red Hat, Inc.
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -24,10 +24,12 @@ Patch3: httpd-2.0.36-sslink.patch
 # features/functional changes
 Patch40: httpd-2.0.36-cnfdir.patch
 Patch41: httpd-2.0.36-redhat.patch
+Patch42: httpd-2.0.40-xfsz.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildPrereq: db4-devel, expat-devel, findutils, perl
+BuildPrereq: openldap-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
@@ -85,6 +87,7 @@ Security (TLS) protocols.
 
 %patch40 -p0 -b .cnfdir
 %patch41 -p0 -b .redhat
+%patch42 -p0 -b .xfsz
 
 # copy across the migration guide and sed it's location into apachectl
 cp $RPM_SOURCE_DIR/migration.{html,css} .
@@ -95,6 +98,7 @@ cp $RPM_SOURCE_DIR/migration.{html,css} .
 ./buildconf
 
 %build
+CFLAGS="$RPM_OPT_FLAGS" \
 ./configure \
  	--prefix=%{_sysconfdir}/httpd \
  	--exec-prefix=%{_prefix} \
@@ -114,8 +118,10 @@ cp $RPM_SOURCE_DIR/migration.{html,css} .
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-uidmin=500 --with-suexec-gidmin=500 \
 	--enable-ssl --with-ssl \
+	--enable-deflate \
 	--enable-proxy --enable-proxy-connect \
-	--enable-proxy-http --enable-proxy-ftp
+	--enable-proxy-http --enable-proxy-ftp \
+	--with-ldap-include=%{_includedir}/openldap --with-ldap
 make
 
 %install
@@ -294,8 +300,13 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{contentdir}/cgi-bin
 %dir %{contentdir}/html
 %dir %{contentdir}/icons
+%dir %{contentdir}/error
+%dir %{contentdir}/error/include
 %{contentdir}/icons/*
-%config(noreplace) %{contentdir}/error
+%{contentdir}/error/README
+%{contentdir}/error/noindex.html
+%config(noreplace) %{contentdir}/error/*.var
+%config(noreplace) %{contentdir}/error/include/*.html
 
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 
@@ -331,6 +342,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Mon Aug 26 2002 Joe Orton <jorton@redhat.com> 2.0.40-3
+- allow "apachectl configtest" on a 1.3 httpd.conf
+- add mod_deflate
+- enable LDAP support in apr-util
+- don't package everything in /var/www/error as config(noreplace)
+
 * Wed Aug 21 2002 Bill Nottingham <notting@redhat.com> 2.0.40-2
 - add trigger (#68657)
 
