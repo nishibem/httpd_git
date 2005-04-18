@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 3
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -132,7 +132,7 @@ Security (TLS) protocols.
 %package suexec
 Group: System Environment/Daemons
 Summary: suexec binary for the Apache HTTP server
-PreReq: httpd = %{version}-%{release}
+Requires(pre): httpd = %{version}-%{release}
 
 %description suexec
 This package includes the /usr/sbin/suexec binary which can be installed
@@ -577,6 +577,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Mon Apr 18 2005 Joe Orton <jorton@redhat.com> 2.0.54-4
+- replace PreReq with Requires(pre) 
+
 * Mon Apr 18 2005 Joe Orton <jorton@redhat.com> 2.0.54-3
 - update to 2.0.54
 
