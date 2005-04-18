@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.53
-Release: 6
+Version: 2.0.54
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -49,9 +49,6 @@ Patch27: httpd-2.0.48-sslpphrase.patch
 Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
-Patch39: httpd-2.0.50-reclaim.patch
-Patch40: httpd-2.0.52-htdigperms.patch
-Patch41: httpd-2.0.52-ssluser.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -164,9 +161,6 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch28 -p1 -b .worker
 %patch29 -p1 -b .workerhup
 %patch30 -p1 -b .davmisc
-%patch39 -p1 -b .reclaim
-%patch40 -p1 -b .htdigperms
-%patch41 -p1 -b .ssluser
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -278,7 +272,7 @@ mpmbuild prefork --enable-mods-shared=all \
         --enable-cache --enable-mem-cache \
         --enable-file-cache --enable-disk-cache \
         --enable-ldap --enable-auth-ldap \
-        --enable-logio
+        --enable-logio --enable-cgid
 
 # To prevent most modules being built statically into httpd.worker, 
 # easiest way seems to be enable them shared.
@@ -583,6 +577,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/suexec.8*
 
 %changelog
+* Mon Apr 18 2005 Joe Orton <jorton@redhat.com> 2.0.54-3
+- update to 2.0.54
+
 * Tue Mar 29 2005 Joe Orton <jorton@redhat.com> 2.0.53-6
 - update default httpd.conf:
  * clarify the comments on AddDefaultCharset usage (#135821)
