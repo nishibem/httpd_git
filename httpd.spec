@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -21,8 +21,6 @@ Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
 Source13: manual.conf
-Source14: mod_ssl-Makefile.crt
-Source15: mod_ssl-Makefile.crl
 # Documentation
 Source30: migration.xml
 Source31: migration.css
@@ -49,6 +47,7 @@ Patch27: httpd-2.0.48-sslpphrase.patch
 Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
+Patch31: httpd-2.0.54-ssltrans.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -75,7 +74,7 @@ BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.
 BuildRequires: apr-devel >= 0.9.4-20, apr-util-devel, pcre-devel >= 5.0, 
 BuildRequires: zlib-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
-Requires: httpd-suexec
+Obsoletes: httpd-suexec
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
 Provides: webserver
@@ -120,7 +119,7 @@ Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP server
 Epoch: 1
 BuildRequires: openssl-devel, distcache-devel
-Prereq: openssl, dev, /bin/cat
+Requires(pre): openssl >= 0.9.7f-4, dev, /bin/cat
 Requires: httpd = %{version}-%{release}, make, httpd-mmn = %{mmn}
 Obsoletes: stronghold-mod_ssl
 
@@ -129,22 +128,13 @@ The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
-%package suexec
-Group: System Environment/Daemons
-Summary: suexec binary for the Apache HTTP server
-Requires(pre): httpd = %{version}-%{release}
-
-%description suexec
-This package includes the /usr/sbin/suexec binary which can be installed
-to allow the Apache HTTP server to run CGI programs (and any programs
-executed by SSI pages) as a user other than the 'apache' user.
-
 %prep
 %setup -q
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .linkmods
 %patch4 -p1 -b .deplibs
+%patch5 -p1 -b .pie
 %patch6 -p1 -b .syspcre
 %patch8 -p1 -b .vpathinc
 %patch9 -p1 -b .apctlopts
@@ -161,6 +151,7 @@ executed by SSI pages) as a user other than the 'apache' user.
 %patch28 -p1 -b .worker
 %patch29 -p1 -b .workerhup
 %patch30 -p1 -b .davmisc
+%patch31 -p1 -b .ssltrans
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -194,15 +185,6 @@ if test "x${vmmn}" != "x%{mmn}"; then
    exit 1
 fi
 
-# Conditionally enable PIE support
-if echo 'static int foo[30000]; int main () { return 0; }' | 
-   gcc -pie -fpie -O2 -xc - -o pietest && 
-   ./pietest; then
-%patch5 -p1 -b .pie
-  : PIE support enabled
-else
-  : WARNING: PIE support not enabled
-fi
 
 : Building for '%{distro}' with MMN %{mmn} and vendor string '%{vstring}'
 
@@ -310,16 +292,7 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 install -m 644 $RPM_SOURCE_DIR/httpd.sysconf \
    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/httpd
 
-# mod_ssl bits
-for suffix in crl crt csr key prm; do
-   mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/ssl.${suffix}
-done
-
 # Makefiles for certificate management
-for ext in crt crl; do 
-  install -m 644 $RPM_SOURCE_DIR/mod_ssl-Makefile.${ext} \
-	$RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/ssl.${ext}/Makefile.${ext}
-done
 ln -s ../../../usr/share/ssl/certs/Makefile $RPM_BUILD_ROOT/etc/httpd/conf
 
 # for holding mod_dav lock database
@@ -445,11 +418,14 @@ if [ $1 = 0 ]; then
 	/sbin/chkconfig --del httpd
 fi
 
+%define certdir %{_sysconfdir}/pki/ssl/certs
+%define keydir %{_sysconfdir}/pki/ssl/private
+
 %post -n mod_ssl
 umask 077
 
-if [ ! -f %{_sysconfdir}/httpd/conf/ssl.key/server.key ] ; then
-%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{_sysconfdir}/httpd/conf/ssl.key/server.key 2> /dev/null
+if [ ! -f %{keydir}/localhost.key ] ; then
+%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{keydir}/localhost.key 2> /dev/null
 fi
 
 FQDN=`hostname`
@@ -457,8 +433,10 @@ if [ "x${FQDN}" = "x" ]; then
    FQDN=localhost.localdomain
 fi
 
-if [ ! -f %{_sysconfdir}/httpd/conf/ssl.crt/server.crt ] ; then
-cat << EOF | %{_bindir}/openssl req -new -key %{_sysconfdir}/httpd/conf/ssl.key/server.key -x509 -days 365 -out %{_sysconfdir}/httpd/conf/ssl.crt/server.crt 2>/dev/null
+if [ ! -f %{certdir}/localhost.crt ] ; then
+cat << EOF | %{_bindir}/openssl req -new -key %{keydir}/localhost.key \
+         -x509 -days 365 -set_serial $RANDOM \
+         -out %{certdir}/localhost.crt 2>/dev/null
 --
 SomeState
 SomeCity
@@ -517,6 +495,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/httpd.worker
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
+%attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -541,7 +520,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_mandir}/man?/*
 %exclude %{_mandir}/man8/apxs.8*
-%exclude %{_mandir}/man8/suexec.8*
 
 %files manual
 %defattr(-,root,root)
@@ -552,9 +530,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
-%attr(0700,root,root) %dir %{_sysconfdir}/httpd/conf/ssl.*
-%config %{_sysconfdir}/httpd/conf/Makefile
-%config %{_sysconfdir}/httpd/conf/ssl.*/*
 %attr(0700,apache,root) %dir %{_localstatedir}/cache/mod_ssl
 %attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.dir
 %attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.pag
@@ -571,12 +546,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/instdso.sh
 %{_libdir}/httpd/build/libtool
 
-%files suexec
-%defattr(-,root,root)
-%attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
-%{_mandir}/man8/suexec.8*
-
 %changelog
+* Mon Apr 25 2005 Joe Orton <jorton@redhat.com> 2.0.54-5
+- create default dummy cert in /etc/pki/tls
+- use a pseudo-random serial number on the dummy cert
+- change default ssl.conf to point at /etc/pki/tls
+- merge back -suexec subpackage; SELinux policy can now be
+  used to persistently disable suexec (#155716)
+- drop /etc/httpd/conf/ssl.* directories and Makefiles
+- unconditionally enable PIE support
+- mod_ssl: fix for picking up -shutdown options (upstream #34452)
+
 * Mon Apr 18 2005 Joe Orton <jorton@redhat.com> 2.0.54-4
 - replace PreReq with Requires(pre) 
 
