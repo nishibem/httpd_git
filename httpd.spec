@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 5
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -418,14 +418,14 @@ if [ $1 = 0 ]; then
 	/sbin/chkconfig --del httpd
 fi
 
-%define certdir %{_sysconfdir}/pki/ssl/certs
-%define keydir %{_sysconfdir}/pki/ssl/private
+%define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
+%define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
 
 %post -n mod_ssl
 umask 077
 
-if [ ! -f %{keydir}/localhost.key ] ; then
-%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{keydir}/localhost.key 2> /dev/null
+if [ ! -f %{sslkey} ] ; then
+%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{sslkey} 2> /dev/null
 fi
 
 FQDN=`hostname`
@@ -433,10 +433,10 @@ if [ "x${FQDN}" = "x" ]; then
    FQDN=localhost.localdomain
 fi
 
-if [ ! -f %{certdir}/localhost.crt ] ; then
-cat << EOF | %{_bindir}/openssl req -new -key %{keydir}/localhost.key \
+if [ ! -f %{sslcert} ] ; then
+cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
          -x509 -days 365 -set_serial $RANDOM \
-         -out %{certdir}/localhost.crt 2>/dev/null
+         -out %{sslcert} 2>/dev/null
 --
 SomeState
 SomeCity
@@ -547,6 +547,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Tue Apr 26 2005 Joe Orton <jorton@redhat.com> 2.0.54-6
+- fix key/cert locations in post script
+
 * Mon Apr 25 2005 Joe Orton <jorton@redhat.com> 2.0.54-5
 - create default dummy cert in /etc/pki/tls
 - use a pseudo-random serial number on the dummy cert
