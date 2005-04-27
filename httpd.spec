@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 7
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -33,10 +33,8 @@ Patch3: httpd-2.0.48-linkmods.patch
 Patch4: httpd-2.0.45-deplibs.patch
 Patch5: httpd-2.0.47-pie.patch
 Patch6: httpd-2.0.45-syspcre.patch
-Patch7: httpd-2.0.54-layout.patch
 Patch8: httpd-2.0.48-vpathinc.patch
 Patch9: httpd-2.0.52-apctlopts.patch
-Patch10: httpd-2.0.54-cgid.patch
 # Bug fixes
 Patch20: httpd-2.0.45-encode.patch
 Patch21: httpd-2.0.45-davetag.patch
@@ -138,10 +136,8 @@ Security (TLS) protocols.
 %patch4 -p1 -b .deplibs
 %patch5 -p1 -b .pie
 %patch6 -p1 -b .syspcre
-%patch7 -p1 -b .layout
 %patch8 -p1 -b .vpathinc
 %patch9 -p1 -b .apctlopts
-%patch10 -p1 -b .cgid
 
 # no -b to prevent droplets in install root
 %patch20 -p1
@@ -301,9 +297,6 @@ ln -s ../../../usr/share/ssl/certs/Makefile $RPM_BUILD_ROOT/etc/httpd/conf
 
 # for holding mod_dav lock database
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
-
-# for holding transient run-time state
-mkdir $RPM_BUILD_ROOT%{_localstatedir}/run/httpd
 
 # create a prototype session cache
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_ssl
@@ -521,8 +514,6 @@ rm -rf $RPM_BUILD_ROOT
 %config %{contentdir}/error/*.var
 %config %{contentdir}/error/include/*.html
 
-%attr(0700,apache,apache) %dir %{_localstatedir}/run/httpd
-
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
@@ -556,9 +547,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
-* Wed Apr 27 2005 Joe Orton <jorton@redhat.com> 2.0.54-7
-- enable cgid in default config for worker
-
 * Tue Apr 26 2005 Joe Orton <jorton@redhat.com> 2.0.54-6
 - fix key/cert locations in post script
 
