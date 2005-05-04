@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 6
+Release: 7
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -48,6 +48,8 @@ Patch28: httpd-2.0.48-worker.patch
 Patch29: httpd-2.0.48-workerhup.patch
 Patch30: httpd-2.0.48-davmisc.patch
 Patch31: httpd-2.0.54-ssltrans.patch
+Patch32: httpd-2.0.54-userdir.patch
+Patch33: httpd-2.0.54-ldapconn.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -152,6 +154,8 @@ Security (TLS) protocols.
 %patch29 -p1 -b .workerhup
 %patch30 -p1 -b .davmisc
 %patch31 -p1 -b .ssltrans
+%patch32 -p1 -b .userdir
+%patch33 -p1 -b .ldapconn
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -547,6 +551,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Wed May  4 2005 Joe Orton <jorton@redhat.com> 2.0.54-7
+- mod_userdir: fix memory allocation issue (upstream #34588)
+- mod_ldap: fix memory corruption issue (Brad Nicholes, upstream #34618)
+
 * Tue Apr 26 2005 Joe Orton <jorton@redhat.com> 2.0.54-6
 - fix key/cert locations in post script
 
