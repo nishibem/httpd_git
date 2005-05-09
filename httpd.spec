@@ -7,16 +7,14 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 7
+Release: 8
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
 Source5: httpd.sysconf
-Source6: powered_by.gif
 Source7: powered_by_fedora.png
-Source8: powered_by_rh.png
 Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
@@ -345,11 +343,7 @@ find $RPM_BUILD_ROOT%{contentdir}/manual \( \
     -name \*.xml -o -name \*.xml.* -o -name \*.ent -o -name \*.xsl -o -name \*.dtd \
     \) -print0 | xargs -0 rm -f
 
-install -m 644 $RPM_SOURCE_DIR/powered_by.gif \
-	$RPM_BUILD_ROOT%{contentdir}/icons
 install -m 644 $RPM_SOURCE_DIR/powered_by_fedora.png \
-	$RPM_BUILD_ROOT%{contentdir}/icons
-install -m 644 $RPM_SOURCE_DIR/powered_by_rh.png \
 	$RPM_BUILD_ROOT%{contentdir}/icons
 
 # logs
@@ -551,6 +545,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Mon May  9 2005 Joe Orton <jorton@redhat.com> 2.0.54-8
+- drop old "powered by Red Hat" logos
+
 * Wed May  4 2005 Joe Orton <jorton@redhat.com> 2.0.54-7
 - mod_userdir: fix memory allocation issue (upstream #34588)
 - mod_ldap: fix memory corruption issue (Brad Nicholes, upstream #34618)
