@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 8
+Release: 9
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -48,6 +48,8 @@ Patch30: httpd-2.0.48-davmisc.patch
 Patch31: httpd-2.0.54-ssltrans.patch
 Patch32: httpd-2.0.54-userdir.patch
 Patch33: httpd-2.0.54-ldapconn.patch
+Patch34: httpd-2.0.52-pipedlog1.patch
+Patch35: httpd-2.0.52-pipedlog2.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -154,6 +156,8 @@ Security (TLS) protocols.
 %patch31 -p1 -b .ssltrans
 %patch32 -p1 -b .userdir
 %patch33 -p1 -b .ldapconn
+%patch34 -p1 -b .pipedlog1
+%patch35 -p1 -b .pipedlog2
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -545,6 +549,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Wed May 18 2005 Joe Orton <jorton@redhat.com> 2.0.54-9
+- add piped logger fixes (w/Jeff Trawick)
+
 * Mon May  9 2005 Joe Orton <jorton@redhat.com> 2.0.54-8
 - drop old "powered by Red Hat" logos
 
