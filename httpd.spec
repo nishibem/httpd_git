@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 9
+Release: 10
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -298,9 +298,6 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 install -m 644 $RPM_SOURCE_DIR/httpd.sysconf \
    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/httpd
 
-# Makefiles for certificate management
-ln -s ../../../usr/share/ssl/certs/Makefile $RPM_BUILD_ROOT/etc/httpd/conf
-
 # for holding mod_dav lock database
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
 
@@ -549,6 +546,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Mon May 23 2005 Joe Orton <jorton@redhat.com> 2.0.54-10
+- remove broken symlink (Robert Scheck, #158404)
+
 * Wed May 18 2005 Joe Orton <jorton@redhat.com> 2.0.54-9
 - add piped logger fixes (w/Jeff Trawick)
 
