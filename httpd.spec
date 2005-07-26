@@ -94,7 +94,8 @@ most popular Web server on the Internet.
 Group: Development/Libraries
 Summary: Development tools for the Apache HTTP server.
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
-Requires: apr-devel, apr-util-devel, httpd = %{version}, pcre-devel >= 5.0
+Requires: apr-devel, apr-util-devel, pcre-devel >= 0:5.0
+Requires: httpd = %{epoch}:%{version}-%{release}
 
 %description devel
 The httpd-devel package contains the APXS binary and other files
@@ -108,7 +109,7 @@ to install this package.
 %package manual
 Group: Documentation
 Summary: Documentation for the Apache HTTP server.
-Requires: httpd = %{version}-%{release}
+Requires: httpd = %{epoch}:%{version}-%{release}
 Obsoletes: secureweb-manual, apache-manual
 
 %description manual
@@ -121,8 +122,8 @@ Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP server
 Epoch: 1
 BuildRequires: openssl-devel, distcache-devel
-Requires(pre): openssl >= 0.9.7f-4, dev, /bin/cat
-Requires: httpd = %{version}-%{release}, make, httpd-mmn = %{mmn}
+Requires(post): openssl >= 0.9.7f-4, /bin/cat
+Requires: httpd = %{epoch}:%{version}-%{release}, httpd-mmn = %{mmn}
 Obsoletes: stronghold-mod_ssl
 
 %description -n mod_ssl
@@ -546,6 +547,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu Jun 30 2005 Joe Orton <jorton@redhat.com> 2.0.54-11
+- mod_dav_fs: fix uninitialized variable (#162144)
+- add epoch to dependencies as appropriate
+- mod_ssl: drop dependencies on dev, make
+- mod_ssl: mark post script dependencies as such
+
 * Mon May 23 2005 Joe Orton <jorton@redhat.com> 2.0.54-10
 - remove broken symlink (Robert Scheck, #158404)
 
