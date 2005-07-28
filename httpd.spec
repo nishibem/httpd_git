@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 11
+Release: 12
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -95,7 +95,7 @@ Group: Development/Libraries
 Summary: Development tools for the Apache HTTP server.
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
 Requires: apr-devel, apr-util-devel, pcre-devel >= 0:5.0
-Requires: httpd = %{epoch}:%{version}-%{release}
+Requires: httpd = %{version}-%{release}
 
 %description devel
 The httpd-devel package contains the APXS binary and other files
@@ -109,7 +109,7 @@ to install this package.
 %package manual
 Group: Documentation
 Summary: Documentation for the Apache HTTP server.
-Requires: httpd = %{epoch}:%{version}-%{release}
+Requires: httpd = %{version}-%{release}
 Obsoletes: secureweb-manual, apache-manual
 
 %description manual
@@ -123,7 +123,7 @@ Summary: SSL/TLS module for the Apache HTTP server
 Epoch: 1
 BuildRequires: openssl-devel, distcache-devel
 Requires(post): openssl >= 0.9.7f-4, /bin/cat
-Requires: httpd = %{epoch}:%{version}-%{release}, httpd-mmn = %{mmn}
+Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmn}
 Obsoletes: stronghold-mod_ssl
 
 %description -n mod_ssl
@@ -181,9 +181,6 @@ Security (TLS) protocols.
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
 
-# Touch mod_ssl expression parser sources to prevent regenerating it
-touch modules/ssl/ssl_expr_*.[chyl]
-
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
 if test "x${vmmn}" != "x%{mmn}"; then
@@ -191,7 +188,6 @@ if test "x${vmmn}" != "x%{mmn}"; then
    : Update the mmn macro and rebuild.
    exit 1
 fi
-
 
 : Building for '%{distro}' with MMN %{mmn} and vendor string '%{vstring}'
 
@@ -547,6 +543,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu Jul 28 2005 Joe Orton <jorton@redhat.com> 2.0.54-12
+- drop broken epoch deps
+
 * Thu Jun 30 2005 Joe Orton <jorton@redhat.com> 2.0.54-11
 - mod_dav_fs: fix uninitialized variable (#162144)
 - add epoch to dependencies as appropriate
