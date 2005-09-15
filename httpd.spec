@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 12
+Release: 13
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -86,9 +86,8 @@ Obsoletes: mod_put, mod_roaming
 Conflicts: pcre < 4.0
 
 %description
-The Apache HTTP Server is a powerful, full-featured, efficient, and
-freely-available Web server. The Apache HTTP Server is also the
-most popular Web server on the Internet.
+The Apache HTTP Server is a powerful, efficient, and extensible
+web server.
 
 %package devel
 Group: Development/Libraries
@@ -543,6 +542,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Sat Aug 13 2005 Joe Orton <jorton@redhat.com> 2.0.54-13
+- don't load by default: mod_cern_meta, mod_asis
+- do load by default: mod_ext_filter (#165893)
+
 * Thu Jul 28 2005 Joe Orton <jorton@redhat.com> 2.0.54-12
 - drop broken epoch deps
 
