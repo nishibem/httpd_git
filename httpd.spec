@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 13
+Release: 14
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -50,6 +50,12 @@ Patch32: httpd-2.0.54-userdir.patch
 Patch33: httpd-2.0.54-ldapconn.patch
 Patch34: httpd-2.0.52-pipedlog1.patch
 Patch35: httpd-2.0.52-pipedlog2.patch
+Patch36: httpd-2.0.52-sslbuff.patch
+Patch37: httpd-2.0.54-include.patch
+Patch38: httpd-2.0.54-digest.patch
+Patch39: httpd-2.0.54-ldap.patch
+Patch40: httpd-2.0.54-sslnbio.patch
+Patch41: httpd-2.0.54-sslreneg.patch
 # Features/functional changes
 Patch70: httpd-2.0.48-release.patch
 Patch71: httpd-2.0.40-xfsz.patch
@@ -69,6 +75,11 @@ Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
 Patch91: httpd-2.0.46-testhook.patch
 Patch92: httpd-2.0.46-dumpcerts.patch
+# Security fixes
+Patch110: httpd-2.0.52-CAN-2005-1268.patch
+Patch111: httpd-2.0.52-CAN-2005-2088.patch
+Patch112: httpd-2.0.52-CAN-2005-2700.patch
+Patch113: httpd-2.0.52-CAN-2005-2728.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -158,6 +169,11 @@ Security (TLS) protocols.
 %patch33 -p1 -b .ldapconn
 %patch34 -p1 -b .pipedlog1
 %patch35 -p1 -b .pipedlog2
+%patch36 -p1 -b .sslbuff
+%patch37 -p1 -b .include
+%patch38 -p1 -b .digest
+%patch39 -p1 -b .ldap
+%patch40 -p1 -b .sslnbio
 
 %patch71 -p0 -b .xfsz
 %patch72 -p1 -b .pod
@@ -176,6 +192,13 @@ Security (TLS) protocols.
 %patch90 -p1 -b .workerstack
 %patch91 -p1 -b .testhook
 %patch92 -p1 -b .dumpcerts
+
+%patch41 -p1 -b .sslreneg
+
+%patch110 -p1 -b .can1268
+%patch111 -p1 -b .can2088
+%patch112 -p1 -b .can2700
+%patch113 -p1 -b .can2728
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
@@ -542,6 +565,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu Oct 20 2005 Joe Orton <jorton@redhat.com> 2.0.54-14
+- mod_ssl: add security fix for SSLVerifyClient (CVE-2005-2700)
+- add security fix for byterange filter DoS (CVE-2005-2728)
+- add security fix for C-L vs T-E handling (CVE-2005-2088)
+- mod_ssl: add security fix for CRL overflow (CVE-2005-1268)
+- mod_ldap/mod_auth_ldap: add fixes from 2.0.x branch (upstream #34209 etc)
+- add fix for dummy connection handling (#167425)
+- mod_auth_digest: fix hostinfo comparison in CONNECT requests
+- mod_include: fix variable corruption in nested includes (upstream #12655)
+- mod_ssl: add fix for handling non-blocking reads
+- mod_ssl: fix to enable output buffering (upstream #35279)
+- mod_ssl: buffer request bodies for per-location renegotiation (upstream #12355)
+
 * Sat Aug 13 2005 Joe Orton <jorton@redhat.com> 2.0.54-13
 - don't load by default: mod_cern_meta, mod_asis
 - do load by default: mod_ext_filter (#165893)
