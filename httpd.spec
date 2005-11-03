@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 14
+Release: 15
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -75,6 +75,7 @@ Patch89: httpd-2.0.49-headerssl.patch
 Patch90: httpd-2.0.49-workerstack.patch
 Patch91: httpd-2.0.46-testhook.patch
 Patch92: httpd-2.0.46-dumpcerts.patch
+Patch93: httpd-2.0.54-selinux.patch
 # Security fixes
 Patch110: httpd-2.0.52-CAN-2005-1268.patch
 Patch111: httpd-2.0.52-CAN-2005-2088.patch
@@ -85,7 +86,7 @@ Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
 BuildRequires: apr-devel >= 0.9.4-20, apr-util-devel, pcre-devel >= 5.0, 
-BuildRequires: zlib-devel
+BuildRequires: zlib-devel, libselinux-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Obsoletes: httpd-suexec
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
@@ -192,6 +193,7 @@ Security (TLS) protocols.
 %patch90 -p1 -b .workerstack
 %patch91 -p1 -b .testhook
 %patch92 -p1 -b .dumpcerts
+%patch93 -p1 -b .selinux
 
 %patch41 -p1 -b .sslreneg
 
@@ -565,6 +567,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Thu Nov  3 2005 Joe Orton <jorton@redhat.com> 2.0.54-15
+- log notice giving SELinux context at startup if enabled
+- drop SSLv2 and restrict default cipher suite in default
+ SSL configuration
+
 * Thu Oct 20 2005 Joe Orton <jorton@redhat.com> 2.0.54-14
 - mod_ssl: add security fix for SSLVerifyClient (CVE-2005-2700)
 - add security fix for byterange filter DoS (CVE-2005-2728)
