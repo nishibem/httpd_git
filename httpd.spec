@@ -76,6 +76,7 @@ Patch90: httpd-2.0.49-workerstack.patch
 Patch91: httpd-2.0.46-testhook.patch
 Patch92: httpd-2.0.46-dumpcerts.patch
 Patch93: httpd-2.0.54-selinux.patch
+Patch94: httpd-2.0.54-openssl-098.patch
 # Security fixes
 Patch110: httpd-2.0.52-CAN-2005-1268.patch
 Patch111: httpd-2.0.52-CAN-2005-2088.patch
@@ -194,6 +195,7 @@ Security (TLS) protocols.
 %patch91 -p1 -b .testhook
 %patch92 -p1 -b .dumpcerts
 %patch93 -p1 -b .selinux
+%patch94 -p1 -b .openssl-098
 
 %patch41 -p1 -b .sslreneg
 
