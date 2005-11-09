@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.0.54
-Release: 15
+Release: 16
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -567,6 +567,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/libtool
 
 %changelog
+* Wed Nov  9 2005 Tomas Mraz <tmraz@redhat.com> 2.0.54-16
+- rebuilt against new openssl
+
 * Thu Nov  3 2005 Joe Orton <jorton@redhat.com> 2.0.54-15
 - log notice giving SELinux context at startup if enabled
 - drop SSLv2 and restrict default cipher suite in default
