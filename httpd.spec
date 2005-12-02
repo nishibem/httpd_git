@@ -1,13 +1,13 @@
 %define contentdir /var/www
 %define suexec_caller apache
-%define mmn 20020903
+%define mmn 20051115
 %define vstring Fedora
 %define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.0.54
-Release: 16
+Version: 2.2.0
+Release: 1
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -25,68 +25,25 @@ Source31: migration.css
 Source32: html.xsl
 Source33: README.confd
 # build/scripts patches
-Patch1: httpd-2.0.40-apctl.patch
-Patch2: httpd-2.0.36-apxs.patch
-Patch3: httpd-2.0.48-linkmods.patch
-Patch4: httpd-2.0.45-deplibs.patch
-Patch5: httpd-2.0.47-pie.patch
-Patch6: httpd-2.0.45-syspcre.patch
-Patch8: httpd-2.0.48-vpathinc.patch
-Patch9: httpd-2.0.52-apctlopts.patch
-# Bug fixes
-Patch20: httpd-2.0.45-encode.patch
-Patch21: httpd-2.0.45-davetag.patch
-Patch22: httpd-2.0.47-ldapshm.patch
-Patch23: httpd-2.0.48-vhost.patch
-Patch24: httpd-2.0.46-sslmutex.patch
-Patch25: httpd-2.0.46-md5dig.patch
-Patch26: httpd-2.0.48-proxy11.patch
-Patch27: httpd-2.0.48-sslpphrase.patch
-Patch28: httpd-2.0.48-worker.patch
-Patch29: httpd-2.0.48-workerhup.patch
-Patch30: httpd-2.0.48-davmisc.patch
-Patch31: httpd-2.0.54-ssltrans.patch
-Patch32: httpd-2.0.54-userdir.patch
-Patch33: httpd-2.0.54-ldapconn.patch
-Patch34: httpd-2.0.52-pipedlog1.patch
-Patch35: httpd-2.0.52-pipedlog2.patch
-Patch36: httpd-2.0.52-sslbuff.patch
-Patch37: httpd-2.0.54-include.patch
-Patch38: httpd-2.0.54-digest.patch
-Patch39: httpd-2.0.54-ldap.patch
-Patch40: httpd-2.0.54-sslnbio.patch
-Patch41: httpd-2.0.54-sslreneg.patch
+Patch1: httpd-2.1.10-apctl.patch
+Patch2: httpd-2.1.10-apxs.patch
+Patch3: httpd-2.0.45-deplibs.patch
+Patch4: httpd-2.1.10-disablemods.patch
+Patch5: httpd-2.1.10-layout.patch
 # Features/functional changes
-Patch70: httpd-2.0.48-release.patch
-Patch71: httpd-2.0.40-xfsz.patch
-Patch72: httpd-2.0.40-pod.patch
-Patch73: httpd-2.0.40-noshmht.patch
-Patch74: httpd-2.0.45-export.patch
-Patch75: httpd-2.0.48-dynlimit.patch
-Patch76: httpd-2.0.48-dynamic.patch
-Patch77: httpd-2.0.48-sslstatus.patch
-Patch78: httpd-2.0.48-corelimit.patch
-Patch80: httpd-2.0.48-distcache.patch
-Patch81: httpd-2.0.48-debuglog.patch
-Patch82: httpd-2.0.48-abench.patch
-Patch84: httpd-2.0.48-sslheader.patch
-Patch85: httpd-2.0.48-sslvars2.patch
-Patch89: httpd-2.0.49-headerssl.patch
-Patch90: httpd-2.0.49-workerstack.patch
-Patch91: httpd-2.0.46-testhook.patch
-Patch92: httpd-2.0.46-dumpcerts.patch
-Patch93: httpd-2.0.54-selinux.patch
-Patch94: httpd-2.0.54-openssl-098.patch
-# Security fixes
-Patch110: httpd-2.0.52-CAN-2005-1268.patch
-Patch111: httpd-2.0.52-CAN-2005-2088.patch
-Patch112: httpd-2.0.52-CAN-2005-2700.patch
-Patch113: httpd-2.0.52-CAN-2005-2728.patch
+Patch20: httpd-2.0.48-release.patch
+Patch21: httpd-2.0.40-xfsz.patch
+Patch22: httpd-2.1.10-pod.patch
+Patch23: httpd-2.0.45-export.patch
+Patch24: httpd-2.0.48-corelimit.patch
+Patch25: httpd-2.0.54-selinux.patch
+# Bug fixes
+Patch50: httpd-2.0.45-encode.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
 BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
-BuildRequires: apr-devel >= 0.9.4-20, apr-util-devel, pcre-devel >= 5.0, 
+BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0, 
 BuildRequires: zlib-devel, libselinux-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Obsoletes: httpd-suexec
@@ -106,7 +63,7 @@ web server.
 Group: Development/Libraries
 Summary: Development tools for the Apache HTTP server.
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
-Requires: apr-devel, apr-util-devel, pcre-devel >= 0:5.0
+Requires: apr-devel, apr-util-devel
 Requires: httpd = %{version}-%{release}
 
 %description devel
@@ -147,65 +104,21 @@ Security (TLS) protocols.
 %setup -q
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
-%patch3 -p1 -b .linkmods
-%patch4 -p1 -b .deplibs
-%patch5 -p1 -b .pie
-%patch6 -p1 -b .syspcre
-%patch8 -p1 -b .vpathinc
-%patch9 -p1 -b .apctlopts
+%patch3 -p1 -b .deplibs
+%patch4 -p1 -b .disablemods
+%patch5 -p1 -b .layout
+
+%patch21 -p0 -b .xfsz
+%patch22 -p1 -b .pod
+%patch23 -p1 -b .export
+%patch24 -p1 -b .corelimit
+%patch25 -p1 -b .selinux
 
 # no -b to prevent droplets in install root
-%patch20 -p1
-%patch21 -p1 -b .davetag
-%patch22 -p1 -b .ldapshm
-%patch23 -p1 -b .vhost
-%patch24 -p1 -b .sslmutex
-%patch25 -p1 -b .md5dig
-%patch26 -p1 -b .proxy11
-%patch27 -p1 -b .sslpphrase
-%patch28 -p1 -b .worker
-%patch29 -p1 -b .workerhup
-%patch30 -p1 -b .davmisc
-%patch31 -p1 -b .ssltrans
-%patch32 -p1 -b .userdir
-%patch33 -p1 -b .ldapconn
-%patch34 -p1 -b .pipedlog1
-%patch35 -p1 -b .pipedlog2
-%patch36 -p1 -b .sslbuff
-%patch37 -p1 -b .include
-%patch38 -p1 -b .digest
-%patch39 -p1 -b .ldap
-%patch40 -p1 -b .sslnbio
-
-%patch71 -p0 -b .xfsz
-%patch72 -p1 -b .pod
-%patch73 -p1 -b .noshmht
-%patch74 -p1 -b .export
-%patch75 -p1 -b .dynlimit
-%patch76 -p1 -b .dynamic
-%patch77 -p1 -b .sslstatus
-%patch78 -p1 -b .corelimit
-%patch80 -p1 -b .distcache
-%patch81 -p1 -b .debuglog
-%patch82 -p1 -b .abench
-%patch84 -p1 -b .sslheader
-%patch85 -p1 -b .sslvars2
-%patch89 -p1 -b .headerssl
-%patch90 -p1 -b .workerstack
-%patch91 -p1 -b .testhook
-%patch92 -p1 -b .dumpcerts
-%patch93 -p1 -b .selinux
-%patch94 -p1 -b .openssl-098
-
-%patch41 -p1 -b .sslreneg
-
-%patch110 -p1 -b .can1268
-%patch111 -p1 -b .can2088
-%patch112 -p1 -b .can2700
-%patch113 -p1 -b .can2728
+%patch50 -p1
 
 # Patch in vendor/release string
-sed "s/@RELEASE@/%{vstring}/" < %{PATCH70} | patch -p1
+sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
@@ -220,7 +133,6 @@ fi
 %build
 # forcibly prevent use of bundled apr, apr-util, pcre
 rm -rf srclib/{apr,apr-util,pcre}
-rm -f include/pcreposix.h
 
 # regenerate configure scripts
 autoheader && autoconf || exit 1
@@ -241,8 +153,7 @@ xmlto -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
 CFLAGS=$RPM_OPT_FLAGS
-CPPFLAGS="-DSSL_EXPERIMENTAL_ENGINE"
-export CFLAGS CPPFLAGS
+export CFLAGS
 
 function mpmbuild()
 {
@@ -268,26 +179,28 @@ mkdir $mpm; pushd $mpm
 	--with-suexec-logfile=%{_localstatedir}/log/httpd/suexec.log \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+        --enable-pie \
+        --with-pcre \
 	$*
 
 make %{?_smp_mflags}
 popd
 }
 
-# Only bother enabling optional modules for main build.
-mpmbuild prefork --enable-mods-shared=all \
+# Build everything and the kitchen sink with the prefork build
+mpmbuild prefork \
+        --enable-mods-shared=all \
 	--enable-ssl --with-ssl --enable-distcache \
-	--enable-deflate \
-	--enable-proxy --enable-proxy-connect \
-	--enable-proxy-http --enable-proxy-ftp \
+	--enable-proxy \
         --enable-cache --enable-mem-cache \
         --enable-file-cache --enable-disk-cache \
-        --enable-ldap --enable-auth-ldap \
-        --enable-logio --enable-cgid
+        --enable-ldap --enable-authnz-ldap \
+        --enable-cgid \
+        --enable-authn-anon --enable-authn-alias
 
-# To prevent most modules being built statically into httpd.worker, 
-# easiest way seems to be enable them shared.
-mpmbuild worker --enable-mods-shared=all
+# For the other MPMs, just build httpd and no optional modules
+mpmbuild worker --enable-modules=none
+#mpmbuild event --enable-modules=none
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -299,11 +212,10 @@ mv docs/man/logresolve.8 docs/man/logresolve.1
 pushd prefork
 make DESTDIR=$RPM_BUILD_ROOT install
 popd
-# install worker binary
-install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
 
-# link to system pcreposix.h
-ln -s ../pcreposix.h $RPM_BUILD_ROOT%{_includedir}/httpd/pcreposix.h
+# install alternative MPMs
+install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
+#install -m 755 event/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.event
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -336,23 +248,7 @@ mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
    $RPM_BUILD_ROOT%{_bindir}
 
 # move builddir to the right place
-mv $RPM_BUILD_ROOT%{contentdir}/build $RPM_BUILD_ROOT%{_libdir}/httpd/build
-
-# point to the correct libtool
-apr_libtool=`apr-config --apr-libtool | sed -e 's|/bin/sh ||'`
-ln -s ../../../..${apr_libtool} $RPM_BUILD_ROOT%{_libdir}/httpd/build/libtool
-
-# Install and sanitize config_vars file: relocate the build directory into 
-# libdir; reference correct libtool; fix EXTRA_INCLUDES
-sed -e "s|%{contentdir}/build|%{_libdir}/httpd/build|g" \
-    -e "/AP_LIBS/d" -e "/abs_srcdir/d" \
-    -e "/^LIBTOOL/s|/bin/sh /[^ ]*/libtool|/bin/sh ${apr_libtool}|" \
-    -e "/^installbuilddir/s| = .*$| = /etc/httpd/build|" \
-    -e "s|^EXTRA_INCLUDES.*$|EXTRA_INCLUDES = -I\$(includedir) -I\$(APR_INCLUDEDIR) -I%{_includedir}/openssl|g" \
-  < prefork/build/config_vars.mk \
-  > $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
-install -m 644 build/special.mk \
-    $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
+#mv $RPM_BUILD_ROOT%{contentdir}/build $RPM_BUILD_ROOT%{_libdir}/httpd/build
 
 # Make the MMN accessible to module packages
 echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
@@ -412,6 +308,8 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.exp \
       $RPM_BUILD_ROOT%{contentdir}/htdocs/* \
       $RPM_BUILD_ROOT%{_mandir}/man1/dbmmanage.* \
       $RPM_BUILD_ROOT%{contentdir}/cgi-bin/*
+
+rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
 # Make suexec a+rw so it can be stripped.  %%files lists real permissions
 chmod 755 $RPM_BUILD_ROOT%{_sbindir}/suexec
@@ -476,13 +374,15 @@ if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
    exit 1
 fi
 
-# Verify that the same modules were built into the two httpd binaries
+# Verify that the same modules were built into the httpd binaries
 ./prefork/httpd -l | grep -v prefork > prefork.mods
-./worker/httpd -l | grep -v worker > worker.mods
-if ! diff -u prefork.mods worker.mods; then
-  : Different modules built into httpd binaries, will not proceed
-  exit 1
-fi
+for mpm in worker; do
+  ./${mpm}/httpd -l | grep -v ${mpm} > ${mpm}.mods
+  if ! diff -u prefork.mods ${mpm}.mods; then
+    : Different modules built into httpd binaries, will not proceed
+    exit 1
+  fi
+done
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -498,7 +398,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/httpd/logs
 %{_sysconfdir}/httpd/run
 %dir %{_sysconfdir}/httpd/conf
-%config(noreplace) %{_sysconfdir}/httpd/conf/*.conf
+%config %{_sysconfdir}/httpd/conf/httpd.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/welcome.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/magic
 
@@ -510,11 +410,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %config(noreplace) %{_sysconfdir}/sysconfig/httpd
 
-%{_bindir}/ab
-%{_bindir}/ht*
-%{_bindir}/logresolve
-%{_sbindir}/httpd
-%{_sbindir}/httpd.worker
+%{_bindir}/*
+%{_sbindir}/ht*
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
 %attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
@@ -565,10 +462,20 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/apxs.8*
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
-%{_libdir}/httpd/build/instdso.sh
-%{_libdir}/httpd/build/libtool
+%{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Dec  2 2005 Joe Orton <jorton@redhat.com> 2.2.0-1
+- update to 2.2.0
+
+* Wed Nov 30 2005 Joe Orton <jorton@redhat.com> 2.1.10-2
+- enable mod_authn_alias, mod_authn_anon
+- update default httpd.conf
+
+* Fri Nov 25 2005 Joe Orton <jorton@redhat.com> 2.1.10-1
+- update to 2.1.10
+- require apr >= 1.2.0, apr-util >= 1.2.0
+
 * Wed Nov  9 2005 Tomas Mraz <tmraz@redhat.com> 2.0.54-16
 - rebuilt against new openssl
 

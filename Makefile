@@ -1,5 +1,5 @@
 # Makefile for source rpm: httpd
-# $Id: Makefile,v 1.6 2004/11/18 11:59:52 jorton Exp $
+# $Id: Makefile,v 1.2 2005/11/30 12:50:30 jorton Exp $
 NAME := httpd
 SPECFILE = $(firstword $(wildcard *.spec))
 UPSTREAM_CHECKS = asc
