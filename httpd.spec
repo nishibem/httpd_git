@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.0
-Release: 1
+Release: 2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -19,6 +19,7 @@ Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
 Source13: manual.conf
+Source14: proxy_ajp.conf
 # Documentation
 Source30: migration.xml
 Source31: migration.css
@@ -39,6 +40,7 @@ Patch24: httpd-2.0.48-corelimit.patch
 Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch50: httpd-2.0.45-encode.patch
+Patch51: httpd-2.2.0-headclength.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -52,7 +54,7 @@ Prereq: sh-utils, textutils, /usr/sbin/useradd
 Provides: webserver
 Provides: httpd-mmn = %{mmn}
 Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache, stronghold-htdocs
-Obsoletes: mod_put, mod_roaming
+Obsoletes: mod_put, mod_roaming, mod_jk
 Conflicts: pcre < 4.0
 
 %description
@@ -84,7 +86,7 @@ Obsoletes: secureweb-manual, apache-manual
 %description manual
 The httpd-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
-also be found at http://httpd.apache.org/docs-2.0/.
+also be found at http://httpd.apache.org/docs/2.2/.
 
 %package -n mod_ssl
 Group: System Environment/Daemons
@@ -116,6 +118,7 @@ Security (TLS) protocols.
 
 # no -b to prevent droplets in install root
 %patch50 -p1
+%patch51 -p1 -b .headclength
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -221,7 +224,7 @@ install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
-for f in ssl.conf welcome.conf manual.conf; do
+for f in ssl.conf welcome.conf manual.conf proxy_ajp.conf; do
   install -m 644 $RPM_SOURCE_DIR/$f $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
 
@@ -400,6 +403,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/httpd/conf
 %config %{_sysconfdir}/httpd/conf/httpd.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/welcome.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/proxy_ajp.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/magic
 
 %config(noreplace) %{_sysconfdir}/logrotate.d/httpd
@@ -465,6 +469,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Dec  5 2005 Joe Orton <jorton@redhat.com> 2.2.0-2
+- don't strip C-L from HEAD responses (Greg Ames, #110552)
+- load mod_proxy_balancer by default
+- add proxy_ajp.conf to load/configure mod_proxy_ajp
+- Obsolete mod_jk
+- update docs URLs in httpd.conf/ssl.conf
+
 * Fri Dec  2 2005 Joe Orton <jorton@redhat.com> 2.2.0-1
 - update to 2.2.0
 
