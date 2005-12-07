@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.0
-Release: 2
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -266,6 +266,16 @@ find $RPM_BUILD_ROOT%{contentdir}/manual \( \
     -name \*.xml -o -name \*.xml.* -o -name \*.ent -o -name \*.xsl -o -name \*.dtd \
     \) -print0 | xargs -0 rm -f
 
+# Strip the manual down just to English and replace the typemaps with flat files:
+set +x
+for f in `find $RPM_BUILD_ROOT%{contentdir}/manual -name \*.html -type f`; do
+   if test -f ${f}.en; then
+      cp ${f}.en ${f}
+      rm ${f}.*
+   fi
+done
+set -x
+
 install -m 644 $RPM_SOURCE_DIR/powered_by_fedora.png \
 	$RPM_BUILD_ROOT%{contentdir}/icons
 
@@ -469,6 +479,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Dec  7 2005 Joe Orton <jorton@redhat.com> 2.2.0-3
+- strip manual to just English content
+
 * Mon Dec  5 2005 Joe Orton <jorton@redhat.com> 2.2.0-2
 - don't strip C-L from HEAD responses (Greg Ames, #110552)
 - load mod_proxy_balancer by default
