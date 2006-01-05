@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.0
-Release: 3.1
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -41,6 +41,7 @@ Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch50: httpd-2.0.45-encode.patch
 Patch51: httpd-2.2.0-headclength.patch
+patch52: httpd-2.2.0-ajpcookie.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -119,6 +120,7 @@ Security (TLS) protocols.
 # no -b to prevent droplets in install root
 %patch50 -p1
 %patch51 -p1 -b .headclength
+%patch52 -p1 -b .ajpcookie
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -457,7 +459,7 @@ rm -rf $RPM_BUILD_ROOT
 %files manual
 %defattr(-,root,root)
 %{contentdir}/manual
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
+%config %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %files -n mod_ssl
 %defattr(-,root,root)
@@ -479,6 +481,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Jan  5 2006 Joe Orton <jorton@redhat.com> 2.2.0-4
+- mod_proxy_ajp: fix Cookie handling (Mladen Turk, r358769)
+
 * Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
 - rebuilt
 
