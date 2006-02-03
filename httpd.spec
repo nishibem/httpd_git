@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.0
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -41,7 +41,11 @@ Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch50: httpd-2.0.45-encode.patch
 Patch51: httpd-2.2.0-headclength.patch
-patch52: httpd-2.2.0-ajpcookie.patch
+Patch52: httpd-2.2.0-ajpcookie.patch
+Patch53: httpd-2.2.0-cppheader.patch
+# Security fixes
+Patch200: httpd-2.2.0-CVE-2005-3352.patch
+Patch201: httpd-2.2.0-CVE-2005-3357.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -121,6 +125,10 @@ Security (TLS) protocols.
 %patch50 -p1
 %patch51 -p1 -b .headclength
 %patch52 -p1 -b .ajpcookie
+%patch53 -p1 -b .cppheader
+
+%patch200 -p1 -b .cve3352
+%patch201 -p1 -b .cve3352
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -481,6 +489,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Feb  3 2006 Joe Orton <jorton@redhat.com> 2.2.0-5
+- mod_ssl: add security fix for CVE-2005-3357 (#177914)
+- mod_imagemap: add security fix for CVE-2005-3352 (#177913)
+- add fix for AP_INIT_* designated initializers with C++ compilers
+- httpd.conf: enable HTMLTable in default IndexOptions
+- httpd.conf: add more "redirect-carefully" matches for DAV clients
+
 * Thu Jan  5 2006 Joe Orton <jorton@redhat.com> 2.2.0-4
 - mod_proxy_ajp: fix Cookie handling (Mladen Turk, r358769)
 
