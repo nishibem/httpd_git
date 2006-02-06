@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.0
-Release: 5
+Release: 5.1
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -43,6 +43,7 @@ Patch50: httpd-2.0.45-encode.patch
 Patch51: httpd-2.2.0-headclength.patch
 Patch52: httpd-2.2.0-ajpcookie.patch
 Patch53: httpd-2.2.0-cppheader.patch
+Patch54: httpd-2.2.0-authnoprov.patch
 # Security fixes
 Patch200: httpd-2.2.0-CVE-2005-3352.patch
 Patch201: httpd-2.2.0-CVE-2005-3357.patch
@@ -126,6 +127,7 @@ Security (TLS) protocols.
 %patch51 -p1 -b .headclength
 %patch52 -p1 -b .ajpcookie
 %patch53 -p1 -b .cppheader
+%patch54 -p1 -b .authnoprov
 
 %patch200 -p1 -b .cve3352
 %patch201 -p1 -b .cve3352
@@ -489,6 +491,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Feb  6 2006 Joe Orton <jorton@redhat.com> 2.2.0-5.1
+- mod_auth_basic/mod_authn_file: if no provider is configured,
+  and AuthUserFile is not configured, decline to handle authn
+  silently rather than failing noisily.
+
 * Fri Feb  3 2006 Joe Orton <jorton@redhat.com> 2.2.0-5
 - mod_ssl: add security fix for CVE-2005-3357 (#177914)
 - mod_imagemap: add security fix for CVE-2005-3352 (#177913)
