@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.0
-Release: 5.1
+Release: 5.1.1
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -491,6 +491,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - (none):2.2.0-5.1.1
+- rebuilt for new gcc4.1 snapshot and glibc changes
+
 * Mon Feb  6 2006 Joe Orton <jorton@redhat.com> 2.2.0-5.1
 - mod_auth_basic/mod_authn_file: if no provider is configured,
   and AuthUserFile is not configured, decline to handle authn
