@@ -6,15 +6,14 @@ Upstream-HEAD: needed
 Upstream-2.0: omit
 Upstream-Status: EXPORT_DIRS change is conditional on using shared apr
 
---- httpd-2.0.53/server/Makefile.in.export
-+++ httpd-2.0.53/server/Makefile.in
-@@ -59,10 +59,6 @@
+--- httpd-2.2.2/server/Makefile.in.export
++++ httpd-2.2.2/server/Makefile.in
+@@ -58,9 +58,6 @@
  	for dir in $(EXPORT_DIRS); do \
  	    ls $$dir/*.h >> $$tmp; \
  	done; \
 -	for dir in $(EXPORT_DIRS_APR); do \
--	    ls $$dir/ap[ru].h >> $$tmp; \
--	    ls $$dir/ap[ru]_*.h >> $$tmp; \
+-	    (ls $$dir/ap[ru].h $$dir/ap[ru]_*.h >> $$tmp 2>/dev/null); \
 -	done; \
  	sort -u $$tmp > $@; \
  	rm -f $$tmp

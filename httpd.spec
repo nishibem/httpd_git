@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.0
-Release: 6
+Version: 2.2.2
+Release: 2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -40,13 +40,7 @@ Patch24: httpd-2.0.48-corelimit.patch
 Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch50: httpd-2.0.45-encode.patch
-Patch51: httpd-2.2.0-headclength.patch
-Patch52: httpd-2.2.0-ajpcookie.patch
-Patch53: httpd-2.2.0-cppheader.patch
 Patch54: httpd-2.2.0-authnoprov.patch
-# Security fixes
-Patch200: httpd-2.2.0-CVE-2005-3352.patch
-Patch201: httpd-2.2.0-CVE-2005-3357.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
@@ -124,13 +118,7 @@ Security (TLS) protocols.
 
 # no -b to prevent droplets in install root
 %patch50 -p1
-%patch51 -p1 -b .headclength
-%patch52 -p1 -b .ajpcookie
-%patch53 -p1 -b .cppheader
 %patch54 -p1 -b .authnoprov
-
-%patch200 -p1 -b .cve3352
-%patch201 -p1 -b .cve3352
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -491,6 +479,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed May  3 2006 Joe Orton <jorton@redhat.com> 2.2.2-2
+- update to 2.2.2
+
 * Thu Apr  6 2006 Joe Orton <jorton@redhat.com> 2.2.0-6
 - rebuild to pick up apr-util LDAP interface fix (#188073)
 
