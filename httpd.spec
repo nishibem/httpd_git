@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.2
-Release: 2
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -156,7 +156,8 @@ xmlto -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
 cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
 CFLAGS=$RPM_OPT_FLAGS
-export CFLAGS
+SH_LDFLAGS="-Wl,-z,relro"
+export CFLAGS SH_LDFLAGS
 
 function mpmbuild()
 {
@@ -479,6 +480,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu May 11 2006 Joe Orton <jorton@redhat.com> 2.2.2-3
+- build DSOs using -z relro linker flag
+
 * Wed May  3 2006 Joe Orton <jorton@redhat.com> 2.2.2-2
 - update to 2.2.2
 
