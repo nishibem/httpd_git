@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.2
-Release: 3
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -251,9 +251,6 @@ mkdir $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_proxy
 mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
    $RPM_BUILD_ROOT%{_bindir}
 
-# move builddir to the right place
-#mv $RPM_BUILD_ROOT%{contentdir}/build $RPM_BUILD_ROOT%{_libdir}/httpd/build
-
 # Make the MMN accessible to module packages
 echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 
@@ -288,7 +285,6 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
 ln -s ../..%{_localstatedir}/run $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
-ln -s ../..%{_libdir}/httpd/build $RPM_BUILD_ROOT/etc/httpd/build
 
 # install SYSV init stuff
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
@@ -311,6 +307,10 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
+
+# Make ap_config_layout.h libdir-agnostic
+sed -i '/.*DEFAULT_..._LIBEXECDIR/d;/DEFAULT_..._INSTALLBUILDDIR/d' \
+    $RPM_BUILD_ROOT%{_includedir}/httpd/ap_config_layout.h
 
 # Remove unpackaged files
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.exp \
@@ -472,7 +472,6 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root)
 %{_includedir}/httpd
-%{_sysconfdir}/httpd/build
 %{_sbindir}/apxs
 %{_mandir}/man8/apxs.8*
 %dir %{_libdir}/httpd/build
@@ -480,6 +479,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Jun  2 2006 Joe Orton <jorton@redhat.com> 2.2.2-4
+- make -devel package multilib-safe (#192686)
+
 * Thu May 11 2006 Joe Orton <jorton@redhat.com> 2.2.2-3
 - build DSOs using -z relro linker flag
 
