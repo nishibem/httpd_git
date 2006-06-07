@@ -44,9 +44,9 @@ Patch54: httpd-2.2.0-authnoprov.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-root
-BuildRequires: db4-devel, expat-devel, findutils, perl, pkgconfig, xmlto >= 0.0.11
+BuildRequires: autoconf, perl, pkgconfig, xmlto >= 0.0.11, findutils
+BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
 BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0, 
-BuildRequires: zlib-devel, libselinux-devel
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Obsoletes: httpd-suexec
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
@@ -482,6 +482,7 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Jun  7 2006 Joe Orton <jorton@redhat.com> 2.2.2-5
 - require pkgconfig for -devel (#194152)
 - fixes for installed support makefiles (special.mk et al)
+- BR autoconf
 
 * Fri Jun  2 2006 Joe Orton <jorton@redhat.com> 2.2.2-4
 - make -devel package multilib-safe (#192686)
