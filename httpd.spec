@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.2
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -65,7 +65,7 @@ web server.
 Group: Development/Libraries
 Summary: Development tools for the Apache HTTP server.
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
-Requires: apr-devel, apr-util-devel
+Requires: apr-devel, apr-util-devel, pkgconfig
 Requires: httpd = %{version}-%{release}
 
 %description devel
@@ -479,6 +479,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Jun  7 2006 Joe Orton <jorton@redhat.com> 2.2.2-5
+- require pkgconfig for -devel (#194152)
+- fixes for installed support makefiles (special.mk et al)
+
 * Fri Jun  2 2006 Joe Orton <jorton@redhat.com> 2.2.2-4
 - make -devel package multilib-safe (#192686)
 
