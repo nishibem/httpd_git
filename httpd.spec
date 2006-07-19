@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.2
-Release: 5.1
+Release: 7
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -31,6 +31,7 @@ Patch2: httpd-2.1.10-apxs.patch
 Patch3: httpd-2.0.45-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
+Patch6: httpd-2.2.2-ac260.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
 Patch21: httpd-2.0.40-xfsz.patch
@@ -109,6 +110,7 @@ Security (TLS) protocols.
 %patch3 -p1 -b .deplibs
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
+%patch6 -p1 -b .ac260
 
 %patch21 -p0 -b .xfsz
 %patch22 -p1 -b .pod
@@ -479,7 +481,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
-* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - (none):2.2.2-5.1
+* Wed Jul 19 2006 Joe Orton <jorton@redhat.com> 2.2.2-7
+- fix "apxs -g"-generated Makefile
+- fix buildconf with autoconf 2.60
+
+* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 2.2.2-5.1
 - rebuild
 
 * Wed Jun  7 2006 Joe Orton <jorton@redhat.com> 2.2.2-5

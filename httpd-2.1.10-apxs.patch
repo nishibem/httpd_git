@@ -88,7 +88,7 @@
 -top_builddir=%PREFIX%
 -include %INSTALLBUILDDIR%/special.mk
 +top_builddir=%LIBDIR%/httpd
-+include %LIBDIR%/httpd/special.mk
++include %LIBDIR%/httpd/build/special.mk
  
  #   the used tools
  APXS=apxs
