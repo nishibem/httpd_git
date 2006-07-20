@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.2
-Release: 7
+Release: 8
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -481,6 +481,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Jul 20 2006 Joe Orton <jorton@redhat.com> 2.2.2-8
+- fix segfault on dummy connection failure at graceful restart (#199429)
+
 * Wed Jul 19 2006 Joe Orton <jorton@redhat.com> 2.2.2-7
 - fix "apxs -g"-generated Makefile
 - fix buildconf with autoconf 2.60

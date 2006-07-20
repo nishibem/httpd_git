@@ -43,7 +43,7 @@ that was actually initialized properly by mod_ssl.
  
          ap_log_error(APLOG_MARK, log_level, rv, ap_server_conf,
 -                     "connect to listener on %pI", ap_listeners->bind_addr);
-+                     "connect to listener on %pI", lr);
++                     "connect to listener on %pI", lr->bind_addr);
      }
  
      /* Create the request string. We include a User-Agent so that
