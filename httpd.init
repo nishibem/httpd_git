@@ -65,9 +65,13 @@ start() {
         [ $RETVAL = 0 ] && touch ${lockfile}
         return $RETVAL
 }
+
+# When stopping httpd a delay of >10 second is required before SIGKILLing the
+# httpd parent; this gives enough time for the httpd parent to SIGKILL any
+# errant children.
 stop() {
 	echo -n $"Stopping $prog: "
-	killproc $httpd
+	killproc -d 10 $httpd
 	RETVAL=$?
 	echo
 	[ $RETVAL = 0 ] && rm -f ${lockfile} ${pidfile}

@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.3
-Release: 2
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -49,6 +49,7 @@ BuildRequires: autoconf, perl, pkgconfig, xmlto >= 0.0.11, findutils
 BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
 BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0, 
 Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
+Requires: initscripts >= 8.36
 Obsoletes: httpd-suexec
 Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
 Prereq: sh-utils, textutils, /usr/sbin/useradd
@@ -481,6 +482,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Aug  3 2006 Joe Orton <jorton@redhat.com> 2.2.3-3
+- init: use killproc() delay to avoid race killing parent
+
 * Fri Jul 28 2006 Joe Orton <jorton@redhat.com> 2.2.3-2
 - update to 2.2.3
 - trim %%changelog to >=2.0.52
