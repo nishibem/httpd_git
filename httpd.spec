@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.3
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -482,6 +482,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Sep 11 2006 Joe Orton <jorton@redhat.com> 2.2.3-5
+- updated "powered by Fedora" logo (#205573, Diana Fong)
+- tweak welcome page wording slightly (#205880)
+
 * Fri Aug 18 2006 Jesse Keating <jkeating@redhat.com> - 2.2.3-4
 - rebuilt with latest binutils to pick up 64K -z commonpagesize on ppc*
   (#203001)
