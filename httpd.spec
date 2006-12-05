@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.3
-Release: 6
+Release: 7
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -482,6 +482,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Dec  5 2006 Joe Orton <jorton@redhat.com> 2.2.3-7
+- rebuild for libpq soname bump
+
 * Sat Nov 11 2006 Joe Orton <jorton@redhat.com> 2.2.3-6
 - rebuild for BDB soname bump
 
