@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.3
-Release: 7
+Release: 8
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -162,6 +162,9 @@ CFLAGS=$RPM_OPT_FLAGS
 SH_LDFLAGS="-Wl,-z,relro"
 export CFLAGS SH_LDFLAGS
 
+# Hard-code path to links to avoid unnecessary builddep
+export LYNX_PATH=/usr/bin/links
+
 function mpmbuild()
 {
 mpm=$1; shift
@@ -314,6 +317,10 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
 # Make ap_config_layout.h libdir-agnostic
 sed -i '/.*DEFAULT_..._LIBEXECDIR/d;/DEFAULT_..._INSTALLBUILDDIR/d' \
     $RPM_BUILD_ROOT%{_includedir}/httpd/ap_config_layout.h
+
+# Fix path to instdso in special.mk
+sed -i '/instdso/s,top_srcdir,top_builddir,' \
+    $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
 
 # Remove unpackaged files
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.exp \
@@ -482,6 +489,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Dec  7 2006 Joe Orton <jorton@redhat.com> 2.2.3-8
+- fix path to instdso.sh in special.mk (#217677)
+- fix detection of links in "apachectl fullstatus"
+
 * Tue Dec  5 2006 Joe Orton <jorton@redhat.com> 2.2.3-7
 - rebuild for libpq soname bump
 
