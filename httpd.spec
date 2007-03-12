@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.3
-Release: 8
+Version: 2.2.4
+Release: 2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -21,9 +21,6 @@ Source12: welcome.conf
 Source13: manual.conf
 Source14: proxy_ajp.conf
 # Documentation
-Source30: migration.xml
-Source31: migration.css
-Source32: html.xsl
 Source33: README.confd
 # build/scripts patches
 Patch1: httpd-2.1.10-apctl.patch
@@ -31,7 +28,6 @@ Patch2: httpd-2.1.10-apxs.patch
 Patch3: httpd-2.0.45-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
-Patch6: httpd-2.2.2-ac260.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
 Patch21: httpd-2.0.40-xfsz.patch
@@ -40,7 +36,6 @@ Patch23: httpd-2.0.45-export.patch
 Patch24: httpd-2.0.48-corelimit.patch
 Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
-Patch50: httpd-2.0.45-encode.patch
 Patch54: httpd-2.2.0-authnoprov.patch
 License: Apache Software License
 Group: System Environment/Daemons
@@ -111,7 +106,6 @@ Security (TLS) protocols.
 %patch3 -p1 -b .deplibs
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
-%patch6 -p1 -b .ac260
 
 %patch21 -p0 -b .xfsz
 %patch22 -p1 -b .pod
@@ -119,8 +113,6 @@ Security (TLS) protocols.
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 
-# no -b to prevent droplets in install root
-%patch50 -p1
 %patch54 -p1 -b .authnoprov
 
 # Patch in vendor/release string
@@ -149,14 +141,6 @@ echo '1,/Changes with Apache MPM/wq' | ed CHANGES
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
 	support/apxs.in
-# update location of migration guide in apachectl
-%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
-	support/apachectl.in
-
-# Build the migration guide
-sed 's/@DISTRO@/%{distro}/' < $RPM_SOURCE_DIR/migration.xml > migration.xml
-xmlto -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
-cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
 
 CFLAGS=$RPM_OPT_FLAGS
 SH_LDFLAGS="-Wl,-z,relro"
@@ -415,7 +399,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
-%doc migration.html migration.css
 
 %dir %{_sysconfdir}/httpd
 %{_sysconfdir}/httpd/modules
@@ -489,6 +472,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Mar 12 2007 Joe Orton <jorton@redhat.com> 2.2.4-2
+- update to 2.2.4
+- drop the migration guide (#223605)
+
 * Thu Dec  7 2006 Joe Orton <jorton@redhat.com> 2.2.3-8
 - fix path to instdso.sh in special.mk (#217677)
 - fix detection of links in "apachectl fullstatus"
