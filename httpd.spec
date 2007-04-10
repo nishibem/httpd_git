@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.4
-Release: 2
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -39,15 +39,14 @@ Patch25: httpd-2.0.54-selinux.patch
 Patch54: httpd-2.2.0-authnoprov.patch
 License: Apache Software License
 Group: System Environment/Daemons
-BuildRoot: %{_tmppath}/%{name}-root
-BuildRequires: autoconf, perl, pkgconfig, xmlto >= 0.0.11, findutils
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires: autoconf, perl, pkgconfig, findutils
 BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
 BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0, 
-Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
 Requires: initscripts >= 8.36
 Obsoletes: httpd-suexec
-Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
-Prereq: sh-utils, textutils, /usr/sbin/useradd
+Requires(pre): /usr/sbin/useradd
+Requires(post): chkconfig
 Provides: webserver
 Provides: httpd-mmn = %{mmn}
 Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache, stronghold-htdocs
@@ -136,7 +135,7 @@ rm -rf srclib/{apr,apr-util,pcre}
 autoheader && autoconf || exit 1
 
 # Limit size of CHANGES to recent history
-echo '1,/Changes with Apache MPM/wq' | ed CHANGES
+echo '1,/Changes with Apache 2.0/wq' | ed CHANGES
 
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
@@ -327,15 +326,6 @@ chmod 755 $RPM_BUILD_ROOT%{_sbindir}/suexec
 /usr/sbin/useradd -c "Apache" -u 48 \
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
-%triggerpostun -- apache < 2.0, stronghold-apache < 2.0
-/sbin/chkconfig --add httpd
-
-# Prevent removal of index.html on upgrades from 1.3
-%triggerun -- apache < 2.0, stronghold-apache < 2.0
-if [ -r %{contentdir}/index.html -a ! -r %{contentdir}/index.html.rpmold ]; then
-  mv %{contentdir}/index.html %{contentdir}/index.html.rpmold
-fi
-
 %post
 # Register the httpd service
 /sbin/chkconfig --add httpd
@@ -411,7 +401,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf/magic
 
 %config(noreplace) %{_sysconfdir}/logrotate.d/httpd
-%config %{_sysconfdir}/rc.d/init.d/httpd
+%{_sysconfdir}/rc.d/init.d/httpd
 
 %dir %{_sysconfdir}/httpd/conf.d
 %{_sysconfdir}/httpd/conf.d/README
@@ -472,6 +462,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Apr  3 2007 Joe Orton <jorton@redhat.com> 2.2.4-3
+- drop old triggers, old Requires, xmlto BR
+- use Requires(...) correctly 
+- use standard BuildRoot 
+- don't mark init script as config file
+- trim CHANGES further
+
 * Mon Mar 12 2007 Joe Orton <jorton@redhat.com> 2.2.4-2
 - update to 2.2.4
 - drop the migration guide (#223605)
