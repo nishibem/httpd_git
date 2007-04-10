@@ -42,7 +42,7 @@ Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils
 BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
-BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0, 
+BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 Requires: initscripts >= 8.36
 Obsoletes: httpd-suexec
 Requires(pre): /usr/sbin/useradd
