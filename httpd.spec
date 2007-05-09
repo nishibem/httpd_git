@@ -2,12 +2,11 @@
 %define suexec_caller apache
 %define mmn 20051115
 %define vstring Fedora
-%define distro Fedora Core
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.4
-Release: 3
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -125,7 +124,7 @@ if test "x${vmmn}" != "x%{mmn}"; then
    exit 1
 fi
 
-: Building for '%{distro}' with MMN %{mmn} and vendor string '%{vstring}'
+: Building with MMN %{mmn} and vendor string '%{vstring}'
 
 %build
 # forcibly prevent use of bundled apr, apr-util, pcre
@@ -395,7 +394,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/httpd/logs
 %{_sysconfdir}/httpd/run
 %dir %{_sysconfdir}/httpd/conf
-%config %{_sysconfdir}/httpd/conf/httpd.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf/httpd.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/welcome.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/proxy_ajp.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/magic
@@ -462,6 +461,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed May  9 2007 Joe Orton <jorton@redhat.com> 2.2.4-4
+- update welcome page branding
+
 * Tue Apr  3 2007 Joe Orton <jorton@redhat.com> 2.2.4-3
 - drop old triggers, old Requires, xmlto BR
 - use Requires(...) correctly 
