@@ -6,7 +6,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.4
-Release: 4
+Release: 4.1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -36,6 +36,11 @@ Patch24: httpd-2.0.48-corelimit.patch
 Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
+# Security fixes
+Patch70: httpd-2.2.3-CVE-2006-5752.patch
+Patch71: httpd-2.2.3-CVE-2007-1863.patch
+Patch72: httpd-2.2.3-CVE-2007-3304.patch
+Patch73: httpd-2.2.4-CVE-2007-1862.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -112,6 +117,11 @@ Security (TLS) protocols.
 %patch25 -p1 -b .selinux
 
 %patch54 -p1 -b .authnoprov
+
+%patch70 -p1 -b .cve5752
+%patch71 -p1 -b .cve1863
+%patch72 -p1 -b .cve3304
+%patch73 -p1 -b .cve1862
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -461,6 +471,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Jun 26 2007 Joe Orton <jorton@redhat.com> 2.2.4-4.1.fc7
+- add security fixes for CVE-2007-1863, CVE-2007-3304,
+  and CVE-2006-5752 (#244665)
+- add security fix for CVE-2007-1862 (#242606)
+
 * Wed May  9 2007 Joe Orton <jorton@redhat.com> 2.2.4-4
 - update welcome page branding
 
