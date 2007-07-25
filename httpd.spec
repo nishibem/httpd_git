@@ -6,7 +6,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.4
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -47,9 +47,10 @@ Obsoletes: httpd-suexec
 Requires(pre): /usr/sbin/useradd
 Requires(post): chkconfig
 Provides: webserver
+Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}
-Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache, stronghold-htdocs
-Obsoletes: mod_put, mod_roaming, mod_jk
+Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache
+Obsoletes: stronghold-htdocs, mod_put, mod_roaming
 Conflicts: pcre < 4.0
 
 %description
@@ -74,7 +75,7 @@ to install this package.
 
 %package manual
 Group: Documentation
-Summary: Documentation for the Apache HTTP server.
+Summary: Documentation for the Apache HTTP server
 Requires: httpd = %{version}-%{release}
 Obsoletes: secureweb-manual, apache-manual
 
@@ -461,6 +462,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Jul 24 2007 Joe Orton <jorton@redhat.com> 2.2.4-5
+- spec file cleanups: provide httpd-suexec, mod_dav; 
+ don't obsolete mod_jk; drop trailing dots from Summaries
+- init script
+ * add LSB info header, support force-reload (#246944)
+ * update description
+ * drop 1.3 config check
+ * pass $pidfile to daemon and pidfile everywhere
+
 * Wed May  9 2007 Joe Orton <jorton@redhat.com> 2.2.4-4
 - update welcome page branding
 
