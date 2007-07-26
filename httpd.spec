@@ -6,7 +6,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.4
-Release: 6
+Release: 7
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -88,7 +88,6 @@ also be found at http://httpd.apache.org/docs/2.2/.
 %package tools
 Group: System Environment/Daemons
 Summary: Tools for use with the Apache HTTP Server
-Requires: httpd = %{version}-%{release}
 
 %description tools
 The httpd-tools package contains tools which can be used with 
@@ -477,6 +476,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Jul 26 2007 Joe Orton <jorton@redhat.com> 2.2.4-7
+- drop -tools dependency on httpd (thanks to Matthias Saou)
+
 * Wed Jul 25 2007 Joe Orton <jorton@redhat.com> 2.2.4-6
 - split out utilities into -tools subpackage, based on patch
   by Jason Tibbs (#238257)
