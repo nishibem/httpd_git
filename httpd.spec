@@ -6,7 +6,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.4
-Release: 5
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -52,6 +52,7 @@ Provides: httpd-mmn = %{mmn}
 Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache
 Obsoletes: stronghold-htdocs, mod_put, mod_roaming
 Conflicts: pcre < 4.0
+Requires: httpd-tools = %{version}-%{release}
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -59,7 +60,7 @@ web server.
 
 %package devel
 Group: Development/Libraries
-Summary: Development tools for the Apache HTTP server.
+Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
 Requires: apr-devel, apr-util-devel, pkgconfig
 Requires: httpd = %{version}-%{release}
@@ -84,9 +85,18 @@ The httpd-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
 also be found at http://httpd.apache.org/docs/2.2/.
 
+%package tools
+Group: System Environment/Daemons
+Summary: Tools for use with the Apache HTTP Server
+Requires: httpd = %{version}-%{release}
+
+%description tools
+The httpd-tools package contains tools which can be used with 
+the Apache HTTP Server.
+
 %package -n mod_ssl
 Group: System Environment/Daemons
-Summary: SSL/TLS module for the Apache HTTP server
+Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel, distcache-devel
 Requires(post): openssl >= 0.9.7f-4, /bin/cat
@@ -408,7 +418,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %config(noreplace) %{_sysconfdir}/sysconfig/httpd
 
-%{_bindir}/*
 %{_sbindir}/ht*
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
@@ -435,8 +444,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
 
-%{_mandir}/man?/*
+%{_mandir}/man8/*
 %exclude %{_mandir}/man8/apxs.8*
+
+%files tools
+%defattr(-,root,root)
+%{_bindir}/*
+%{_mandir}/man1/*
+%doc LICENSE
 
 %files manual
 %defattr(-,root,root)
@@ -462,6 +477,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Jul 25 2007 Joe Orton <jorton@redhat.com> 2.2.4-6
+- split out utilities into -tools subpackage, based on patch
+  by Jason Tibbs (#238257)
+
 * Tue Jul 24 2007 Joe Orton <jorton@redhat.com> 2.2.4-5
 - spec file cleanups: provide httpd-suexec, mod_dav; 
  don't obsolete mod_jk; drop trailing dots from Summaries
