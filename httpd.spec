@@ -6,7 +6,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.4
-Release: 7
+Release: 8
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -36,13 +36,13 @@ Patch24: httpd-2.0.48-corelimit.patch
 Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
-License: Apache Software License
+License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, ed
 BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
 BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
-Requires: initscripts >= 8.36
+Requires: initscripts >= 8.36, /etc/mime.types
 Obsoletes: httpd-suexec
 Requires(pre): /usr/sbin/useradd
 Requires(post): chkconfig
@@ -288,8 +288,6 @@ ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -m755 $RPM_SOURCE_DIR/httpd.init \
 	$RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
-%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
-	$RPM_BUILD_ROOT/etc/rc.d/init.d/httpd	
 
 # install log rotation stuff
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
@@ -476,6 +474,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Aug 21 2007 Joe Orton <jorton@redhat.com> 2.2.4-8
+- fix License
+- require /etc/mime.types (#249223)
+
 * Thu Jul 26 2007 Joe Orton <jorton@redhat.com> 2.2.4-7
 - drop -tools dependency on httpd (thanks to Matthias Saou)
 
