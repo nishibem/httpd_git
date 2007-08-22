@@ -6,7 +6,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.4
-Release: 8
+Release: 9
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -474,6 +474,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Aug 22 2007 Joe Orton <jorton@redhat.com> 2.2.4-9
+- rebuild for expat soname bump
+
 * Tue Aug 21 2007 Joe Orton <jorton@redhat.com> 2.2.4-8
 - fix License
 - require /etc/mime.types (#249223)
