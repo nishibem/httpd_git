@@ -5,8 +5,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.4
-Release: 10
+Version: 2.2.6
+Release: 2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -36,6 +36,7 @@ Patch24: httpd-2.0.48-corelimit.patch
 Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
+Patch55: httpd-2.2.4-oldflush.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -122,6 +123,7 @@ Security (TLS) protocols.
 %patch25 -p1 -b .selinux
 
 %patch54 -p1 -b .authnoprov
+%patch55 -p1 -b .oldflush
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -474,6 +476,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Sep  7 2007 Joe Orton <jorton@redhat.com> 2.2.6-2
+- update to 2.2.6 (#250757, #282761)
+
 * Sun Sep  2 2007 Joe Orton <jorton@redhat.com> 2.2.4-10
 - rebuild for fixed APR
 
