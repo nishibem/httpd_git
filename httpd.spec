@@ -6,14 +6,13 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.6
-Release: 2
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
 Source5: httpd.sysconf
-Source7: powered_by_fedora.png
 Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
@@ -37,13 +36,14 @@ Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
 Patch55: httpd-2.2.4-oldflush.patch
+Patch56: httpd-2.2.6-ssllibver.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, ed
 BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
 BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
-Requires: initscripts >= 8.36, /etc/mime.types
+Requires: initscripts >= 8.36, /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
 Requires(pre): /usr/sbin/useradd
 Requires(post): chkconfig
@@ -124,6 +124,7 @@ Security (TLS) protocols.
 
 %patch54 -p1 -b .authnoprov
 %patch55 -p1 -b .oldflush
+%patch56 -p1 -b .ssllibver
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -226,15 +227,16 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
 for f in ssl.conf welcome.conf manual.conf proxy_ajp.conf; do
-  install -m 644 $RPM_SOURCE_DIR/$f $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
+  install -m 644 -p $RPM_SOURCE_DIR/$f \
+        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
 
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/*.conf
-install -m 644 $RPM_SOURCE_DIR/httpd.conf \
+install -m -p 644 $RPM_SOURCE_DIR/httpd.conf \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/httpd.conf
 
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-install -m 644 $RPM_SOURCE_DIR/httpd.sysconf \
+install -m 644 -p $RPM_SOURCE_DIR/httpd.sysconf \
    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/httpd
 
 # for holding mod_dav lock database
@@ -256,8 +258,7 @@ echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 
 # docroot
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
-install -m 644 $RPM_SOURCE_DIR/index.html \
-	$RPM_BUILD_ROOT%{contentdir}/error/noindex.html
+install -m 644 noindex.html $RPM_BUILD_ROOT%{contentdir}/error/noindex.html
 
 # remove manual sources
 find $RPM_BUILD_ROOT%{contentdir}/manual \( \
@@ -274,8 +275,9 @@ for f in `find $RPM_BUILD_ROOT%{contentdir}/manual -name \*.html -type f`; do
 done
 set -x
 
-install -m 644 $RPM_SOURCE_DIR/powered_by_fedora.png \
-	$RPM_BUILD_ROOT%{contentdir}/icons
+# Symlink for the powered-by-$DISTRO image:
+ln -s ../../..%{_datadir}/pixmaps/poweredby.png \
+        $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
 # logs
 rmdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/logs
@@ -293,7 +295,7 @@ install -m755 $RPM_SOURCE_DIR/httpd.init \
 
 # install log rotation stuff
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
-install -m644 $RPM_SOURCE_DIR/httpd.logrotate \
+install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
 # fix man page paths
@@ -476,6 +478,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Sep 17 2007 Joe Orton <jorton@redhat.com> 2.2.6-3
+- add fix for SSL library string regression (PR 43334)
+- use powered-by logo from system-logos (#250676)
+- preserve timestamps for installed config files
+
 * Fri Sep  7 2007 Joe Orton <jorton@redhat.com> 2.2.6-2
 - update to 2.2.6 (#250757, #282761)
 
