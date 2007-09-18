@@ -232,7 +232,7 @@ for f in ssl.conf welcome.conf manual.conf proxy_ajp.conf; do
 done
 
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/*.conf
-install -m -p 644 $RPM_SOURCE_DIR/httpd.conf \
+install -m 644 -p $RPM_SOURCE_DIR/httpd.conf \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/httpd.conf
 
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
@@ -258,7 +258,8 @@ echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 
 # docroot
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
-install -m 644 noindex.html $RPM_BUILD_ROOT%{contentdir}/error/noindex.html
+install -m 644 -p $RPM_SOURCE_DIR/index.html \
+        $RPM_BUILD_ROOT%{contentdir}/error/noindex.html
 
 # remove manual sources
 find $RPM_BUILD_ROOT%{contentdir}/manual \( \
