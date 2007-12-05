@@ -6,7 +6,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.6
-Release: 3
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -479,6 +479,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Dec 05 2007 Release Engineering <rel-eng at fedoraproject dot org> - 2.2.6-4
+ - Rebuild for openssl bump
+
 * Mon Sep 17 2007 Joe Orton <jorton@redhat.com> 2.2.6-3
 - add fix for SSL library string regression (PR 43334)
 - use powered-by logo from system-logos (#250676)
