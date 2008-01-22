@@ -5,8 +5,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.6
-Release: 4
+Version: 2.2.8
+Release: 2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -36,7 +36,6 @@ Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
 Patch55: httpd-2.2.4-oldflush.patch
-Patch56: httpd-2.2.6-ssllibver.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -124,7 +123,6 @@ Security (TLS) protocols.
 
 %patch54 -p1 -b .authnoprov
 %patch55 -p1 -b .oldflush
-%patch56 -p1 -b .ssllibver
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -145,9 +143,6 @@ rm -rf srclib/{apr,apr-util,pcre}
 
 # regenerate configure scripts
 autoheader && autoconf || exit 1
-
-# Limit size of CHANGES to recent history
-echo '1,/Changes with Apache 2.0/wq' | ed CHANGES
 
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
@@ -201,7 +196,8 @@ mpmbuild prefork \
         --enable-file-cache --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid \
-        --enable-authn-anon --enable-authn-alias
+        --enable-authn-anon --enable-authn-alias \
+        --disable-imagemap
 
 # For the other MPMs, just build httpd and no optional modules
 mpmbuild worker --enable-modules=none
@@ -479,6 +475,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Jan 22 2008 Joe Orton <jorton@redhat.com> 2.2.8-2
+- update to 2.2.8
+- drop mod_imagemap
+
 * Wed Dec 05 2007 Release Engineering <rel-eng at fedoraproject dot org> - 2.2.6-4
  - Rebuild for openssl bump
 
