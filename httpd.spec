@@ -5,7 +5,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.6
+Version: 2.2.8
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -37,7 +37,6 @@ Patch25: httpd-2.0.54-selinux.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
 Patch55: httpd-2.2.4-oldflush.patch
-Patch56: httpd-2.2.6-ssllibver.patch
 License: Apache Software License
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -115,7 +114,6 @@ Security (TLS) protocols.
 
 %patch54 -p1 -b .authnoprov
 %patch55 -p1 -b .oldflush
-%patch56 -p1 -b .ssllibver
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -136,9 +134,6 @@ rm -rf srclib/{apr,apr-util,pcre}
 
 # regenerate configure scripts
 autoheader && autoconf || exit 1
-
-# Limit size of CHANGES to recent history
-echo '1,/Changes with Apache 2.0/wq' | ed CHANGES
 
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
@@ -465,6 +460,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Jan 24 2008 Joe Orton <jorton@redhat.com> 2.2.8-1.fc7
+- update to 2.2.8 (#427982)
+
 * Tue Sep 18 2007 Joe Orton <jorton@redhat.com> 2.2.6-1.fc7
 - update to 2.2.6
 - require /etc/mime.types (#249223)
