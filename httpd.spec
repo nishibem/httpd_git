@@ -6,7 +6,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.8
-Release: 3
+Release: 3.1
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -475,6 +475,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri May 23 2008 Dennis Gilmore <dennis@ausil.us> - 2.2.8-3.1
+- minor rebuild for sparc
+
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 2.2.8-3
 - Autorebuild for GCC 4.3
 
