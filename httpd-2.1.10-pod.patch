@@ -5,6 +5,10 @@ configured, to avoid spamming the SSL vhost in the default install.
 In 2.2 lr->protocol could be used instead to do this properly, if
 that was actually initialized properly by mod_ssl.
 
+Upstream-Status: not submitted, ugly hack which only makes a difference
+		to the default configuration used in Fedora.  Need to find
+		a way to do this properly.
+
 --- httpd-2.1.10/server/mpm_common.c.pod
 +++ httpd-2.1.10/server/mpm_common.c
 @@ -583,6 +584,7 @@

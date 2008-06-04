@@ -1,6 +1,9 @@
 
 If SELinux is enabled, log the context on startup.
 
+Upstream-Status: not submitted, needs #ifdef-goodness, probably
+		not worth the battle
+
 --- httpd-2.1.10/server/core.c.selinux
 +++ httpd-2.1.10/server/core.c
 @@ -51,6 +51,8 @@

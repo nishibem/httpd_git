@@ -1,6 +1,8 @@
 
 http://issues.apache.org/bugzilla/show_bug.cgi?id=36780
 
+Upstream-Status: committed to trunk, r583817
+
 --- httpd-2.2.4/server/util_filter.c.oldflush
 +++ httpd-2.2.4/server/util_filter.c
 @@ -578,8 +578,18 @@ AP_DECLARE_NONSTD(apr_status_t) ap_filte

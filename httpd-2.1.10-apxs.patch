@@ -3,6 +3,9 @@
 - drop unnecessary --libs output from ap?-?-config
 - make multilib-safe
 
+Upstream-Status: The is-mod_so-linked-in hack is done better on trunk.
+		The multilib hack is awful and can't go upstream.
+
 --- httpd-2.2.2/support/apxs.in.apxs
 +++ httpd-2.2.2/support/apxs.in
 @@ -25,7 +25,18 @@

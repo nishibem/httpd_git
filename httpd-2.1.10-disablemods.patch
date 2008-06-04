@@ -2,6 +2,8 @@
 Support "--enable-modules=none" to build an httpd binary with 
 no optional modules enabled.
 
+Upstream-Status: committed to trunk, r357168
+
 --- httpd-2.1.10/acinclude.m4.disablemods
 +++ httpd-2.1.10/acinclude.m4
 @@ -289,14 +289,19 @@
