@@ -2,11 +2,12 @@
 %define suexec_caller apache
 %define mmn 20051115
 %define vstring Fedora
+%define mpms worker event
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.8
-Release: 4
+Version: 2.2.9
+Release: 2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -23,7 +24,7 @@ Source33: README.confd
 # build/scripts patches
 Patch1: httpd-2.1.10-apctl.patch
 Patch2: httpd-2.1.10-apxs.patch
-Patch3: httpd-2.0.45-deplibs.patch
+Patch3: httpd-2.2.9-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
 # Features/functional changes
@@ -200,8 +201,9 @@ mpmbuild prefork \
         --disable-imagemap
 
 # For the other MPMs, just build httpd and no optional modules
-mpmbuild worker --enable-modules=none
-#mpmbuild event --enable-modules=none
+for f in %{mpms}; do
+   mpmbuild $f --enable-modules=none
+done
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -215,8 +217,9 @@ make DESTDIR=$RPM_BUILD_ROOT install
 popd
 
 # install alternative MPMs
-install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
-#install -m 755 event/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.event
+for f in %{mpms}; do
+  install -m 755 ${f}/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.${f}
+done
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -382,7 +385,7 @@ fi
 
 # Verify that the same modules were built into the httpd binaries
 ./prefork/httpd -l | grep -v prefork > prefork.mods
-for mpm in worker; do
+for mpm in %{mpms}; do
   ./${mpm}/httpd -l | grep -v ${mpm} > ${mpm}.mods
   if ! diff -u prefork.mods ${mpm}.mods; then
     : Different modules built into httpd binaries, will not proceed
@@ -475,6 +478,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Jul  8 2008 Joe Orton <jorton@redhat.com> 2.2.9-2
+- update to 2.2.9
+- build event MPM too
+
 * Wed Jun  4 2008 Joe Orton <jorton@redhat.com> 2.2.8-4
 - correct UserDir directive in default config (#449815)
 
