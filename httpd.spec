@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.9
-Release: 2
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -478,6 +478,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Jul 10 2008 Tom "spot" Callaway <tcallawa@redhat.com>  2.2.9-3
+- rebuild against new db4 4.7
+
 * Tue Jul  8 2008 Joe Orton <jorton@redhat.com> 2.2.9-2
 - update to 2.2.9
 - build event MPM too
