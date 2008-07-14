@@ -4,6 +4,8 @@
 %define vstring Fedora
 %define mpms worker event
 
+%define _default_patch_fuzz 2
+
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.9
