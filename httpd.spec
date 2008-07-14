@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.9
-Release: 3
+Release: 4
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -34,6 +34,7 @@ Patch22: httpd-2.1.10-pod.patch
 Patch23: httpd-2.0.45-export.patch
 Patch24: httpd-2.0.48-corelimit.patch
 Patch25: httpd-2.0.54-selinux.patch
+Patch26: httpd-2.2.9-suenable.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
 Patch55: httpd-2.2.4-oldflush.patch
@@ -121,6 +122,7 @@ Security (TLS) protocols.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
+%patch26 -p1 -b .suenable
 
 %patch54 -p1 -b .authnoprov
 %patch55 -p1 -b .oldflush
@@ -478,6 +480,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Jul 14 2008 Joe Orton <jorton@redhat.com> 2.2.9-4
+- use Charset=UTF-8 in default httpd.conf (#455123)
+- only enable suexec when appropriate (Jim Radford, #453697)
+
 * Thu Jul 10 2008 Tom "spot" Callaway <tcallawa@redhat.com>  2.2.9-3
 - rebuild against new db4 4.7
 
