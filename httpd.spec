@@ -5,8 +5,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.8
-Release: 3.1
+Version: 2.2.9
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -23,7 +23,7 @@ Source33: README.confd
 # build/scripts patches
 Patch1: httpd-2.1.10-apctl.patch
 Patch2: httpd-2.1.10-apxs.patch
-Patch3: httpd-2.0.45-deplibs.patch
+Patch3: httpd-2.2.9-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
 # Features/functional changes
