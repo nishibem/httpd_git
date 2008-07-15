@@ -9,7 +9,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.9
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -482,6 +482,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Jul 15 2008 Joe Orton <jorton@redhat.com> 2.2.9-5
+- move AddTypes for SSL cert/CRL types from ssl.conf to httpd.conf (#449979)
+
 * Mon Jul 14 2008 Joe Orton <jorton@redhat.com> 2.2.9-4
 - use Charset=UTF-8 in default httpd.conf (#455123)
 - only enable suexec when appropriate (Jim Radford, #453697)
