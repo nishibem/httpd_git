@@ -8,8 +8,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.9
-Release: 5
+Version: 2.2.10
+Release: 2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -482,6 +482,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Oct 21 2008 Joe Orton <jorton@redhat.com> 2.2.10-2
+- update to 2.2.10
+
 * Tue Jul 15 2008 Joe Orton <jorton@redhat.com> 2.2.9-5
 - move AddTypes for SSL cert/CRL types from ssl.conf to httpd.conf (#449979)
 
