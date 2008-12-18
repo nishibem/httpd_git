@@ -4,12 +4,10 @@
 %define vstring Fedora
 %define mpms worker event
 
-%define _default_patch_fuzz 2
-
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.10
-Release: 2
+Version: 2.2.11
+Release: 3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -31,11 +29,11 @@ Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
-Patch21: httpd-2.0.40-xfsz.patch
+Patch21: httpd-2.2.11-xfsz.patch
 Patch22: httpd-2.1.10-pod.patch
 Patch23: httpd-2.0.45-export.patch
-Patch24: httpd-2.0.48-corelimit.patch
-Patch25: httpd-2.0.54-selinux.patch
+Patch24: httpd-2.2.11-corelimit.patch
+Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
@@ -43,8 +41,8 @@ Patch55: httpd-2.2.4-oldflush.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires: autoconf, perl, pkgconfig, findutils, ed
-BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
+BuildRequires: autoconf, perl, pkgconfig, findutils
+BuildRequires: zlib-devel, libselinux-devel
 BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 Requires: initscripts >= 8.36, /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
@@ -119,7 +117,7 @@ Security (TLS) protocols.
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
 
-%patch21 -p0 -b .xfsz
+%patch21 -p1 -b .xfsz
 %patch22 -p1 -b .pod
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -283,9 +281,10 @@ set -x
 ln -s ../../..%{_datadir}/pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
-# logs
+# Set up /var directories
 rmdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/logs
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/httpd
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/httpd
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
@@ -308,7 +307,7 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/magic|/etc/httpd/conf/magic|" \
     -e "s|/usr/local/apache2/logs/error_log|/var/log/httpd/error_log|" \
     -e "s|/usr/local/apache2/logs/access_log|/var/log/httpd/access_log|" \
-    -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd.pid|" \
+    -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
 
@@ -445,6 +444,7 @@ rm -rf $RPM_BUILD_ROOT
 %config %{contentdir}/error/*.var
 %config %{contentdir}/error/include/*.html
 
+%attr(0700,root,root) %dir %{_localstatedir}/run/httpd
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
@@ -482,6 +482,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Dec 18 2008 Joe Orton <jorton@redhat.com> 2.2.11-3
+- update to 2.2.11
+- package new /var/run/httpd directory, and move default pidfile
+  location inside there
+
 * Tue Oct 21 2008 Joe Orton <jorton@redhat.com> 2.2.10-2
 - update to 2.2.10
 
