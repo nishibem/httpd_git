@@ -482,7 +482,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
-* Sat Dec 27 2008 Robert Scheck <robert@fedraproject.org> 2.2.11-4
+* Sat Dec 27 2008 Robert Scheck <robert@fedoraproject.org> 2.2.11-4
 - Made default configuration using /var/run/httpd for pid file
 
 * Thu Dec 18 2008 Joe Orton <jorton@redhat.com> 2.2.11-3
