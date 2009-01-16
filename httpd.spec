@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.11
-Release: 4
+Release: 5
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -482,6 +482,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Jan 16 2009 Tomas Mraz <tmraz@redhat.com> 2.2.11-5
+- rebuild with new openssl
+
 * Sat Dec 27 2008 Robert Scheck <robert@fedoraproject.org> 2.2.11-4
 - Made default configuration using /var/run/httpd for pid file
 
