@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.11
-Release: 5
+Release: 6
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -54,7 +54,7 @@ Provides: httpd-mmn = %{mmn}
 Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache
 Obsoletes: stronghold-htdocs, mod_put, mod_roaming
 Conflicts: pcre < 4.0
-Requires: httpd-tools = %{version}-%{release}
+Requires: httpd-tools = %{version}-%{release}, apr-util-ldap
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -288,7 +288,7 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/httpd
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s ../..%{_localstatedir}/run $RPM_BUILD_ROOT/etc/httpd/run
+ln -s ../..%{_localstatedir}/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
 # install SYSV init stuff
@@ -482,6 +482,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Jan 22 2009 Joe Orton <jorton@redhat.com> 2.2.11-6
+- Require: apr-util-ldap (#471898)
+- init script changes: pass pidfile to status(), use status() in
+  condrestart (#480602), support try-restart as alias for
+  condrestart
+- change /etc/httpd/run symlink to have destination /var/run/httpd,
+  and restore "run/httpd.conf" as default PidFile (#478688)
+
 * Fri Jan 16 2009 Tomas Mraz <tmraz@redhat.com> 2.2.11-5
 - rebuild with new openssl
 

@@ -91,15 +91,15 @@ case "$1" in
 	stop
 	;;
   status)
-        status $httpd
+        status -p ${pidfile} $httpd
 	RETVAL=$?
 	;;
   restart)
 	stop
 	start
 	;;
-  condrestart)
-	if [ -f ${pidfile} ] ; then
+  condrestart|try-restart)
+	if status -p ${pidfile} $httpd >&/dev/null; then
 		stop
 		start
 	fi
