@@ -5,7 +5,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.10
+Version: 2.2.11
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -475,6 +475,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Feb  9 2009 Joe Orton <jorton@redhat.com> 2.2.11-1
+- update to 2.2.11
+
 * Fri Oct 24 2008 Joe Orton <jorton@redhat.com> 2.2.10-1
 - rebuild
 
