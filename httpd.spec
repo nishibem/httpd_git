@@ -8,8 +8,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.10
-Release: 2
+Version: 2.2.11
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -56,7 +56,7 @@ Provides: httpd-mmn = %{mmn}
 Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache
 Obsoletes: stronghold-htdocs, mod_put, mod_roaming
 Conflicts: pcre < 4.0
-Requires: httpd-tools = %{version}-%{release}
+Requires: httpd-tools = %{version}-%{release}, apr-util-ldap
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -482,6 +482,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Feb  9 2009 Joe Orton <jorton@redhat.com> 2.2.11-2
+- update to 2.2.11 (#482960)
+- Require apr-util-ldap (#471898)
+
 * Tue Oct 21 2008 Joe Orton <jorton@redhat.com> 2.2.10-2
 - update to 2.2.10
 
