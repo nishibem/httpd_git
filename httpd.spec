@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.11
-Release: 7
+Release: 8
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -195,8 +195,8 @@ mpmbuild prefork \
         --enable-mods-shared=all \
 	--enable-ssl --with-ssl --enable-distcache \
 	--enable-proxy \
-        --enable-cache --enable-mem-cache \
-        --enable-file-cache --enable-disk-cache \
+        --enable-cache \
+        --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid \
         --enable-authn-anon --enable-authn-alias \
@@ -482,6 +482,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Mar 17 2009 Joe Orton <jorton@redhat.com> 2.2.11-8
+- fix pidfile in httpd.logrotate (thanks to Rainer Traut)
+- don't build mod_mem_cache or mod_file_cache
+
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.11-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
