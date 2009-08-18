@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.11
-Release: 10
+Version: 2.2.13
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -37,7 +37,6 @@ Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
-Patch55: httpd-2.2.4-oldflush.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -126,7 +125,6 @@ Security (TLS) protocols.
 %patch26 -p1 -b .suenable
 
 %patch54 -p1 -b .authnoprov
-%patch55 -p1 -b .oldflush
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -483,6 +481,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Aug 18 2009 Joe Orton <jorton@redhat.com> 2.2.13-1
+- update to 2.2.13
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.11-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
