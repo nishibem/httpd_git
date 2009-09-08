@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.13
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -349,6 +349,9 @@ if [ $1 = 0 ]; then
 	/sbin/chkconfig --del httpd
 fi
 
+%posttrans
+/sbin/service httpd condrestart >/dev/null 2>&1 || :
+
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
 
@@ -481,6 +484,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Sep  8 2009 Joe Orton <jorton@redhat.com> 2.2.13-2
+- restart service in posttrans (#491567)
+
 * Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 2.2.13-2
 - rebuilt with new openssl
 
