@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.13
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -484,6 +484,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Oct 27 2009 Tom "spot" Callaway <tcallawa@redhat.com> 2.2.13-4
+- add additional explanatory text to test page to help prevent legal emails to Fedora
+
 * Tue Sep  8 2009 Joe Orton <jorton@redhat.com> 2.2.13-2
 - restart service in posttrans (#491567)
 
