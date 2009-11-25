@@ -1,11 +1,11 @@
 # Makefile for source rpm: httpd
-# $Id: Makefile,v 1.8 2005/12/02 10:42:59 jorton Exp $
+# $Id: Makefile,v 1.9 2007/10/15 18:52:20 notting Exp $
 NAME := httpd
 SPECFILE = $(firstword $(wildcard *.spec))
 UPSTREAM_CHECKS = asc
 
 define find-makefile-common
-for d in common ../common ../../common ; do if [ -f $$d/Makefile.common ] ; then if [ -f $$d/CVS/Root -a -w $$/Makefile.common ] ; then cd $$d ; cvs -Q update ; fi ; echo "$$d/Makefile.common" ; break ; fi ; done
+for d in common ../common ../../common ; do if [ -f $$d/Makefile.common ] ; then if [ -f $$d/CVS/Root -a -w $$d/Makefile.common ] ; then cd $$d ; cvs -Q update ; fi ; echo "$$d/Makefile.common" ; break ; fi ; done
 endef
 
 MAKEFILE_COMMON := $(shell $(find-makefile-common))
