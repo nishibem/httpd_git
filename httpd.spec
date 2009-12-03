@@ -4,11 +4,9 @@
 %define vstring Fedora
 %define mpms worker event
 
-%define _default_patch_fuzz 2
-
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.13
+Version: 2.2.14
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -31,19 +29,21 @@ Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
-Patch21: httpd-2.0.40-xfsz.patch
+Patch21: httpd-2.2.11-xfsz.patch
 Patch22: httpd-2.1.10-pod.patch
 Patch23: httpd-2.0.45-export.patch
-Patch24: httpd-2.0.48-corelimit.patch
-Patch25: httpd-2.0.54-selinux.patch
+Patch24: httpd-2.2.11-corelimit.patch
+Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
+# Security fixes
+Patch90: httpd-2.2.14-CVE-2009-3555.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires: autoconf, perl, pkgconfig, findutils, ed
-BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
+BuildRequires: autoconf, perl, pkgconfig, findutils
+BuildRequires: zlib-devel, libselinux-devel
 BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 Requires: initscripts >= 8.36, /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
@@ -102,6 +102,7 @@ Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel, distcache-devel
 Requires(post): openssl >= 0.9.7f-4, /bin/cat
+Requires(pre): httpd
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmn}
 Obsoletes: stronghold-mod_ssl
 
@@ -118,7 +119,7 @@ Security (TLS) protocols.
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
 
-%patch21 -p0 -b .xfsz
+%patch21 -p1 -b .xfsz
 %patch22 -p1 -b .pod
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -126,6 +127,8 @@ Security (TLS) protocols.
 %patch26 -p1 -b .suenable
 
 %patch54 -p1 -b .authnoprov
+
+%patch90 -p1 -b .cve3555
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -349,6 +352,9 @@ if [ $1 = 0 ]; then
 	/sbin/chkconfig --del httpd
 fi
 
+%posttrans
+/sbin/service httpd condrestart >/dev/null 2>&1 || :
+
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
 
@@ -480,6 +486,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Dec  3 2009 Joe Orton <jorton@redhat.com> - 2.2.14-1
+- update to 2.2.14
+- Requires(pre): httpd in mod_ssl subpackage (#543275)
+- add partial security fix for CVE-2009-3555 (#533125)
+- add condrestart in posttrans (#491567)
+
 * Sun Aug 23 2009 Joe Orton <jorton@redhat.com> 2.2.13-1
 - update to 2.2.13
 - add delaycompress to logrotate config
