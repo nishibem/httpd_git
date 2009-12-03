@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.13
-Release: 4%{?dist}
+Version: 2.2.14
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -37,6 +37,8 @@ Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
+# Security fixes
+Patch90: httpd-2.2.14-CVE-2009-3555.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -101,6 +103,7 @@ Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel, distcache-devel
 Requires(post): openssl >= 0.9.7f-4, /bin/cat
+Requires(pre): httpd
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmn}
 Obsoletes: stronghold-mod_ssl
 
@@ -125,6 +128,8 @@ Security (TLS) protocols.
 %patch26 -p1 -b .suenable
 
 %patch54 -p1 -b .authnoprov
+
+%patch90 -p1 -b .cve3555
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -446,7 +451,7 @@ rm -rf $RPM_BUILD_ROOT
 %config %{contentdir}/error/*.var
 %config %{contentdir}/error/include/*.html
 
-%attr(0700,root,root) %dir %{_localstatedir}/run/httpd
+%attr(0710,root,apache) %dir %{_localstatedir}/run/httpd
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
@@ -484,6 +489,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Dec  3 2009 Joe Orton <jorton@redhat.com> - 2.2.14-1
+- update to 2.2.14
+- relax permissions on /var/run/httpd (#495780)
+- Requires(pre): httpd in mod_ssl subpackage (#543275)
+- add partial security fix for CVE-2009-3555 (#533125)
+
 * Tue Oct 27 2009 Tom "spot" Callaway <tcallawa@redhat.com> 2.2.13-4
 - add additional explanatory text to test page to help prevent legal emails to Fedora
 
