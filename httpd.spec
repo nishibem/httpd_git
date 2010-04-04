@@ -6,7 +6,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.14
+Version: 2.2.15
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -37,8 +37,6 @@ Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
 # Bug fixes
 Patch54: httpd-2.2.0-authnoprov.patch
-# Security fixes
-Patch90: httpd-2.2.14-CVE-2009-3555.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -127,8 +125,6 @@ Security (TLS) protocols.
 %patch26 -p1 -b .suenable
 
 %patch54 -p1 -b .authnoprov
-
-%patch90 -p1 -b .cve3555
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -488,6 +484,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Sun Apr 04 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1
+- update to 2.2.15 (#572404, #579311)
+
 * Thu Dec  3 2009 Joe Orton <jorton@redhat.com> - 2.2.14-1
 - update to 2.2.14
 - relax permissions on /var/run/httpd (#495780)
