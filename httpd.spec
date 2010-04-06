@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.15
-Release: 1%{?dist}
+Release: 1%{?dist}.1
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -484,6 +484,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Apr 07 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1.1
+- rebuild against correct openssl version (#579311 #c5)
+
 * Sun Apr 04 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1
 - update to 2.2.15 (#572404, #579311)
 
