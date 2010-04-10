@@ -3,11 +3,13 @@
 %define mmn 20051115
 %define vstring Fedora
 %define mpms worker event
+# Minimum version of OpenSSL having support for the secure TLS reneg API
+%define opensslver 1.0.0-1
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.15
-Release: 1%{?dist}.1
+Release: 1%{?dist}.2
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -98,10 +100,11 @@ the Apache HTTP Server.
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
-BuildRequires: openssl-devel, distcache-devel
+BuildRequires: openssl-devel >= %{opensslver}, distcache-devel
 Requires(post): openssl >= 0.9.7f-4, /bin/cat
 Requires(pre): httpd
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmn}
+Requires: openssl >= %{opensslver}
 Obsoletes: stronghold-mod_ssl
 
 %description -n mod_ssl
@@ -484,6 +487,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Sat Apr 10 2010 Joe Orton <jorton@redhat.com> - 2.2.15-1.2
+- add Requires and BR for correct OpenSSL version
+
 * Wed Apr 07 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1.1
 - rebuild against correct openssl version (#579311 #c5)
 
