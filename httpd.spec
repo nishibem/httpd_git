@@ -4,12 +4,12 @@
 %define vstring Fedora
 %define mpms worker event
 # Minimum version of OpenSSL having support for the secure TLS reneg API
-%define opensslver 1.0.0-1
+%define opensslver 0.9.8n
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.15
-Release: 1%{?dist}.2
+Release: 1%{?dist}.3
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -487,6 +487,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Apr 12 2010 Joe Orton <jorton@redhat.com> - 2.2.15-1.3
+- fix OpenSSL version
+
 * Sat Apr 10 2010 Joe Orton <jorton@redhat.com> - 2.2.15-1.2
 - add Requires and BR for correct OpenSSL version
 
