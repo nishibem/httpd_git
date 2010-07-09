@@ -72,12 +72,16 @@ stop() {
 reload() {
     echo -n $"Reloading $prog: "
     if ! LANG=$HTTPD_LANG $httpd $OPTIONS -t >&/dev/null; then
-        RETVAL=$?
+        RETVAL=6
         echo $"not reloading due to configuration syntax error"
         failure $"not reloading $httpd due to configuration syntax error"
     else
-        killproc -p ${pidfile} $httpd -HUP
+        # Force LSB behaviour from killproc
+        LSB=1 killproc -p ${pidfile} $httpd -HUP
         RETVAL=$?
+        if [ $RETVAL -eq 7 ]; then
+            failure $"httpd shutdown"
+        fi
     fi
     echo
 }
@@ -112,8 +116,8 @@ case "$1" in
 	RETVAL=$?
 	;;
   *)
-	echo $"Usage: $prog {start|stop|restart|condrestart|reload|status|fullstatus|graceful|help|configtest}"
-	RETVAL=3
+	echo $"Usage: $prog {start|stop|restart|condrestart|try-restart|force-reload|reload|status|fullstatus|graceful|help|configtest}"
+	RETVAL=2
 esac
 
 exit $RETVAL

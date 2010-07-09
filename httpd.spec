@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.15
-Release: 1%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -18,7 +18,6 @@ Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
 Source13: manual.conf
-Source14: proxy_ajp.conf
 # Documentation
 Source33: README.confd
 # build/scripts patches
@@ -50,9 +49,6 @@ Requires(post): chkconfig
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}
-Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache
-Obsoletes: stronghold-htdocs, mod_put, mod_roaming
-Conflicts: pcre < 4.0
 Requires: httpd-tools = %{version}-%{release}, apr-util-ldap
 
 %description
@@ -100,7 +96,7 @@ Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel, distcache-devel
-Requires(post): openssl >= 0.9.7f-4, /bin/cat
+Requires(post): openssl, /bin/cat
 Requires(pre): httpd
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmn}
 Obsoletes: stronghold-mod_ssl
@@ -227,7 +223,7 @@ done
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
-for f in ssl.conf welcome.conf manual.conf proxy_ajp.conf; do
+for f in ssl.conf welcome.conf manual.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
@@ -414,7 +410,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/httpd/conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/httpd.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/welcome.conf
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/proxy_ajp.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/magic
 
 %config(noreplace) %{_sysconfdir}/logrotate.d/httpd
@@ -459,7 +454,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{_bindir}/*
 %{_mandir}/man1/*
-%doc LICENSE
+%doc LICENSE NOTICE
 
 %files manual
 %defattr(-,root,root)
@@ -485,6 +480,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Jul  9 2010 Joe Orton <jorton@redhat.com> - 2.2.15-3
+- default config tweaks:
+ * harden httpd.conf w.r.t. .htaccess restriction (#591293)
+ * load mod_substitute, mod_version by default
+ * drop proxy_ajp.conf, load mod_proxy_ajp in httpd.conf
+ * add commented list of shipped-but-unloaded modules
+ * bump up worker defaults a little
+ * drop KeepAliveTimeout to 5 secs per upstream
+- fix LSB compliance in init script (#522074)
+- bundle NOTICE in -tools
+- use init script in logrotate postrotate to pick up PIDFILE
+- drop some old Obsoletes/Conflicts
+
 * Sun Apr 04 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1
 - update to 2.2.15 (#572404, #579311)
 
