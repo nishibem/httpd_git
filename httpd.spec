@@ -6,8 +6,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.15
-Release: 3%{?dist}
+Version: 2.2.16
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -480,6 +480,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Jul 26 2010 Joe Orton <jorton@redhat.com> - 2.2.16-1
+- update to 2.2.16
+
 * Fri Jul  9 2010 Joe Orton <jorton@redhat.com> - 2.2.15-3
 - default config tweaks:
  * harden httpd.conf w.r.t. .htaccess restriction (#591293)
