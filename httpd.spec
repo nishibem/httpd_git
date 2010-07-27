@@ -6,7 +6,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.15
+Version: 2.2.16
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
@@ -485,6 +485,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Jul 27 2010 Joe Orton <jorton@redhat.com> - 2.2.16-1
+- update to 2.2.16
+
 * Sun Apr 04 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1
 - update to 2.2.15 (#572404, #579311)
 
