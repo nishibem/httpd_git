@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.16
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -147,9 +147,8 @@ autoheader && autoconf || exit 1
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
 	support/apxs.in
 
-CFLAGS=$RPM_OPT_FLAGS
-SH_LDFLAGS="-Wl,-z,relro"
-export CFLAGS SH_LDFLAGS
+export CFLAGS=$RPM_OPT_FLAGS
+export LDFLAGS="-Wl,-z,relro,-z,now"
 
 # Hard-code path to links to avoid unnecessary builddep
 export LYNX_PATH=/usr/bin/links
@@ -480,6 +479,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Sep 10 2010 Joe Orton <jorton@redhat.com> - 2.2.16-2
+- link everything using -z relro and -z now
+
 * Mon Jul 26 2010 Joe Orton <jorton@redhat.com> - 2.2.16-1
 - update to 2.2.16
 
