@@ -6,10 +6,10 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.16
-Release: 2%{?dist}
+Version: 2.2.17
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
+Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
@@ -479,6 +479,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Oct 27 2010 Joe Orton <jorton@redhat.com> - 2.2.17-1
+- update to 2.2.17
+
 * Fri Sep 10 2010 Joe Orton <jorton@redhat.com> - 2.2.16-2
 - link everything using -z relro and -z now
 
