@@ -1,1 +1,8 @@
 httpd-2.2.16.tar.gz
+/httpd-2.2.17.tar.bz2
+x86_64
+/httpd-2.2.17
+/*.rpm
+/.build*.log
+/noarch
+/clog
