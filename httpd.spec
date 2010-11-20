@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -422,7 +422,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/ht*
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-%attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
+%caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -479,6 +479,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Sat Nov 20 2010 Joe Orton <jorton@redhat.com> - 2.2.17-2
+- drop setuid bit, use capabilities for suexec binary
+
 * Wed Oct 27 2010 Joe Orton <jorton@redhat.com> - 2.2.17-1
 - update to 2.2.17
 
