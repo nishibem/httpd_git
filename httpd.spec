@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -18,6 +18,7 @@ Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
 Source13: manual.conf
+Source14: httpd.tmpfiles
 # Documentation
 Source33: README.confd
 # build/scripts patches
@@ -49,7 +50,7 @@ Requires(post): chkconfig
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}
-Requires: httpd-tools = %{version}-%{release}, apr-util-ldap
+Requires: httpd-tools = %{version}-%{release}, apr-util-ldap, systemd-utils
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -235,6 +236,11 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 install -m 644 -p $RPM_SOURCE_DIR/httpd.sysconf \
    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/httpd
 
+# tmpfiles.d configuration
+mkdir $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d 
+install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
+   $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d/httpd.conf
+
 # for holding mod_dav lock database
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
 
@@ -418,6 +424,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/httpd/conf.d/README
 
 %config(noreplace) %{_sysconfdir}/sysconfig/httpd
+%config %{_sysconfdir}/tmpfiles.d/httpd.conf
 
 %{_sbindir}/ht*
 %{_sbindir}/apachectl
@@ -441,7 +448,7 @@ rm -rf $RPM_BUILD_ROOT
 %config %{contentdir}/error/*.var
 %config %{contentdir}/error/include/*.html
 
-%attr(0710,root,apache) %dir %{_localstatedir}/run/httpd
+%attr(0710,root,apache) %ghost %dir %{_localstatedir}/run/httpd
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
@@ -479,6 +486,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Jan  4 2011 Joe Orton <jorton@redhat.com> - 2.2.17-3
+- add tmpfiles.d configuration, ghost /var/run/httpd (#656600)
+
 * Sat Nov 20 2010 Joe Orton <jorton@redhat.com> - 2.2.17-2
 - drop setuid bit, use capabilities for suexec binary
 
