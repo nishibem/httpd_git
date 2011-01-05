@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -448,7 +448,7 @@ rm -rf $RPM_BUILD_ROOT
 %config %{contentdir}/error/*.var
 %config %{contentdir}/error/include/*.html
 
-%attr(0710,root,apache) %ghost %dir %{_localstatedir}/run/httpd
+%attr(0710,root,apache) %dir %{_localstatedir}/run/httpd
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
@@ -486,6 +486,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Jan  5 2011 Joe Orton <jorton@redhat.com> - 2.2.17-4
+- de-ghost /var/run/httpd
+
 * Tue Jan  4 2011 Joe Orton <jorton@redhat.com> - 2.2.17-3
 - add tmpfiles.d configuration, ghost /var/run/httpd (#656600)
 
