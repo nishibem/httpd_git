@@ -7,7 +7,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -486,6 +486,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Sat Jan  8 2011 Joe Orton <jorton@redhat.com> - 2.2.17-6
+- update default SSLCipherSuite per upstream trunk
+
 * Wed Jan  5 2011 Joe Orton <jorton@redhat.com> - 2.2.17-5
 - fix requires (#667397)
 
