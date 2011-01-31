@@ -20,6 +20,7 @@ Source12: welcome.conf
 Source13: manual.conf
 Source14: httpd.tmpfiles
 # Documentation
+Source31: httpd.mpm.xml
 Source33: README.confd
 # build/scripts patches
 Patch1: httpd-2.1.10-apctl.patch
@@ -40,7 +41,7 @@ Patch54: httpd-2.2.0-authnoprov.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires: autoconf, perl, pkgconfig, findutils
+BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel
 BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 Requires: initscripts >= 8.36, /etc/mime.types, system-logos >= 7.92.1-1
@@ -96,7 +97,7 @@ the Apache HTTP Server.
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
-BuildRequires: openssl-devel, distcache-devel
+BuildRequires: openssl-devel
 Requires(post): openssl, /bin/cat
 Requires(pre): httpd
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmn}
@@ -189,7 +190,7 @@ popd
 # Build everything and the kitchen sink with the prefork build
 mpmbuild prefork \
         --enable-mods-shared=all \
-	--enable-ssl --with-ssl --enable-distcache \
+	--enable-ssl --with-ssl --disable-distcache \
 	--enable-proxy \
         --enable-cache \
         --enable-disk-cache \
@@ -203,6 +204,14 @@ for f in %{mpms}; do
    mpmbuild $f --enable-modules=none
 done
 
+# Build the man pages
+ymdate=`date +'%b %Y'`
+for mpm in %{mpms}; do
+    sed "s/@PROGNAME@/httpd.${mpm}/g;s/@DATE@/${ymdate}/g;s/@VERSION@/%{version}/g;s/@MPM@/${mpm}/g;" \
+        < $RPM_SOURCE_DIR/httpd.mpm.xml > httpd.${mpm}.8.xml
+    xmlto man httpd.${mpm}.8.xml
+done
+
 %install
 rm -rf $RPM_BUILD_ROOT
 
@@ -214,9 +223,10 @@ pushd prefork
 make DESTDIR=$RPM_BUILD_ROOT install
 popd
 
-# install alternative MPMs
+# install alternative MPMs, and man pages
 for f in %{mpms}; do
   install -m 755 ${f}/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.${f}
+  install -m 644 httpd.${f}.8 $RPM_BUILD_ROOT%{_mandir}/man8/httpd.${f}.8
 done
 
 # install conf file/directory
@@ -371,7 +381,7 @@ fi
 
 if [ ! -f %{sslcert} ] ; then
 cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
-         -x509 -days 365 -set_serial $RANDOM \
+         -x509 -days 365 -set_serial $RANDOM -extensions v3_req \
          -out %{sslcert} 2>/dev/null
 --
 SomeState
@@ -486,6 +496,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Jan 31 2011 Joe Orton <jorton@redhat.com> - 2.2.17-7
+- generate dummy mod_ssl cert with CA:FALSE constraint (#667841)
+- add man page stubs for httpd.event, httpd.worker
+- drop distcache support
+- add STOP_TIMEOUT support to init script
+
 * Sat Jan  8 2011 Joe Orton <jorton@redhat.com> - 2.2.17-6
 - update default SSLCipherSuite per upstream trunk
 

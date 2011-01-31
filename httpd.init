@@ -45,6 +45,7 @@ prog=httpd
 pidfile=${PIDFILE-/var/run/httpd/httpd.pid}
 lockfile=${LOCKFILE-/var/lock/subsys/httpd}
 RETVAL=0
+STOP_TIMEOUT=${STOP_TIMEOUT-10}
 
 # The semantics of these two functions differ from the way apachectl does
 # things -- attempting to start while running is a failure, and shutdown
@@ -59,12 +60,12 @@ start() {
         return $RETVAL
 }
 
-# When stopping httpd a delay of >10 second is required before SIGKILLing the
-# httpd parent; this gives enough time for the httpd parent to SIGKILL any
-# errant children.
+# When stopping httpd, a delay (of default 10 second) is required
+# before SIGKILLing the httpd parent; this gives enough time for the
+# httpd parent to SIGKILL any errant children.
 stop() {
 	echo -n $"Stopping $prog: "
-	killproc -p ${pidfile} -d 10 $httpd
+	killproc -p ${pidfile} -d ${STOP_TIMEOUT} $httpd
 	RETVAL=$?
 	echo
 	[ $RETVAL = 0 ] && rm -f ${lockfile} ${pidfile}
