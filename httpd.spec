@@ -1,13 +1,14 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20051115
+%define mmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define vstring Fedora
 %define mpms worker event
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -50,7 +51,7 @@ Requires(pre): /usr/sbin/useradd
 Requires(post): chkconfig
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
-Provides: httpd-mmn = %{mmn}
+Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: httpd-tools = %{version}-%{release}, apr-util-ldap, systemd-units
 
 %description
@@ -100,7 +101,7 @@ Epoch: 1
 BuildRequires: openssl-devel
 Requires(post): openssl, /bin/cat
 Requires(pre): httpd
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmn}
+Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl
 
 %description -n mod_ssl
@@ -131,12 +132,12 @@ sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
 if test "x${vmmn}" != "x%{mmn}"; then
-   : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}.
+   : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}
    : Update the mmn macro and rebuild.
    exit 1
 fi
 
-: Building with MMN %{mmn} and vendor string '%{vstring}'
+: Building with MMN %{mmn}, MMN-ISA %{mmnisa} and vendor string '%{vstring}'
 
 %build
 # forcibly prevent use of bundled apr, apr-util, pcre
@@ -266,7 +267,7 @@ mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
    $RPM_BUILD_ROOT%{_bindir}
 
 # Make the MMN accessible to module packages
-echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
+echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 
 # docroot
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
@@ -496,6 +497,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Feb 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-8
+- use arch-specific mmn
+
 * Mon Jan 31 2011 Joe Orton <jorton@redhat.com> - 2.2.17-7
 - generate dummy mod_ssl cert with CA:FALSE constraint (#667841)
 - add man page stubs for httpd.event, httpd.worker
