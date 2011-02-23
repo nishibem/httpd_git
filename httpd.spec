@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -497,8 +497,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
-* Wed Feb 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-8
+* Wed Feb 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-9
 - use arch-specific mmn
+
+* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.17-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Mon Jan 31 2011 Joe Orton <jorton@redhat.com> - 2.2.17-7
 - generate dummy mod_ssl cert with CA:FALSE constraint (#667841)
