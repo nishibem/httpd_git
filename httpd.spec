@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -497,6 +497,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Mar  2 2011 Joe Orton <jorton@redhat.com> - 2.2.17-10
+- rebuild
+
 * Wed Feb 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-9
 - use arch-specific mmn
 
