@@ -1,3 +1,10 @@
+
+Bump up the core size limit if CoreDumpDirectory is
+configured.
+
+Was discussed upstream but there are competing desires;
+there are portability oddities here too.
+
 --- httpd-2.2.11/server/core.c.corelimit
 +++ httpd-2.2.11/server/core.c
 @@ -3777,6 +3779,25 @@ static int core_post_config(apr_pool_t *
