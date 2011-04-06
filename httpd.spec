@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 10%{?dist}.1
+Release: 11%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -31,14 +31,11 @@ Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
-Patch21: httpd-2.2.11-xfsz.patch
 Patch22: httpd-2.1.10-pod.patch
 Patch23: httpd-2.0.45-export.patch
 Patch24: httpd-2.2.11-corelimit.patch
 Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
-# Bug fixes
-Patch54: httpd-2.2.0-authnoprov.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -117,14 +114,11 @@ Security (TLS) protocols.
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
 
-%patch21 -p1 -b .xfsz
 %patch22 -p1 -b .pod
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .suenable
-
-%patch54 -p1 -b .authnoprov
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -497,6 +491,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Mar 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-11
+- minor updates to httpd.conf
+- drop old patches
+
 * Mon Mar  7 2011 Joe Orton <jorton@redhat.com> - 2.2.17-10.1
 - rebuild for new APR (#681305)
 

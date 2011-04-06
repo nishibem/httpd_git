@@ -1,3 +1,8 @@
+
+Log the SELinux context at startup.
+
+Upstream-Status: unlikely to be any interest in this upstream
+
 --- httpd-2.2.11/configure.in.selinux
 +++ httpd-2.2.11/configure.in
 @@ -412,6 +412,10 @@ getpgid
