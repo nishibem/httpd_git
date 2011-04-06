@@ -31,7 +31,6 @@ Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
-Patch21: httpd-2.2.11-xfsz.patch
 Patch22: httpd-2.1.10-pod.patch
 Patch23: httpd-2.0.45-export.patch
 Patch24: httpd-2.2.11-corelimit.patch
@@ -115,7 +114,6 @@ Security (TLS) protocols.
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
 
-%patch21 -p1 -b .xfsz
 %patch22 -p1 -b .pod
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -494,7 +492,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Wed Mar 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-11
-- drop backwards-compat authz module hack
 - minor updates to httpd.conf
 - drop old patches
 
