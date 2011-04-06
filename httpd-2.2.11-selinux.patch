@@ -1,7 +1,7 @@
 
 Log the SELinux context at startup.
 
-Almost certainly undesired upstream.
+Upstream-Status: unlikely to be any interest in this upstream
 
 --- httpd-2.2.11/configure.in.selinux
 +++ httpd-2.2.11/configure.in

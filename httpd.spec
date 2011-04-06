@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -37,8 +37,6 @@ Patch23: httpd-2.0.45-export.patch
 Patch24: httpd-2.2.11-corelimit.patch
 Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
-# Bug fixes
-Patch54: httpd-2.2.0-authnoprov.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -123,8 +121,6 @@ Security (TLS) protocols.
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .suenable
-
-%patch54 -p1 -b .authnoprov
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -497,6 +493,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Mar 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-11
+- drop backwards-compat authz module hack
+- minor updates to httpd.conf
+- drop old patches
+
 * Wed Mar  2 2011 Joe Orton <jorton@redhat.com> - 2.2.17-10
 - rebuild
 

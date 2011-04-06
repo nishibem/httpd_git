@@ -1,3 +1,6 @@
+
+Upstream-Status: in trunk, differently
+
 --- httpd-2.2.9/os/unix/unixd.c.suenable
 +++ httpd-2.2.9/os/unix/unixd.c
 @@ -215,7 +215,7 @@ AP_DECLARE(void) unixd_pre_config(apr_po
