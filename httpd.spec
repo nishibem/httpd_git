@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 11%{?dist}
+Release: 12%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -20,6 +20,7 @@ Source11: ssl.conf
 Source12: welcome.conf
 Source13: manual.conf
 Source14: httpd.tmpfiles
+Source15: httpd.service
 # Documentation
 Source31: httpd.mpm.xml
 Source33: README.confd
@@ -153,6 +154,18 @@ export LYNX_PATH=/usr/bin/links
 function mpmbuild()
 {
 mpm=$1; shift
+
+# Build the systemd file
+sed "s,@NAME@,${mpm},g;s,@EXEC@,%{_sbindir}/httpd.${mpm},g" %{SOURCE15} > httpd-${mpm}.service
+touch -r %{SOURCE15} httpd-${mpm}.service
+
+# Build the man page
+ymdate=`date +'%b %Y'`
+sed "s/@PROGNAME@/httpd.${mpm}/g;s/@DATE@/${ymdate}/g;s/@VERSION@/%{version}/g;s/@MPM@/${mpm}/g;" \
+    < $RPM_SOURCE_DIR/httpd.mpm.xml > httpd.${mpm}.8.xml
+xmlto man httpd.${mpm}.8.xml
+
+# Build the daemon
 mkdir $mpm; pushd $mpm
 ../configure \
  	--prefix=%{_sysconfdir}/httpd \
@@ -199,13 +212,9 @@ for f in %{mpms}; do
    mpmbuild $f --enable-modules=none
 done
 
-# Build the man pages
-ymdate=`date +'%b %Y'`
-for mpm in %{mpms}; do
-    sed "s/@PROGNAME@/httpd.${mpm}/g;s/@DATE@/${ymdate}/g;s/@VERSION@/%{version}/g;s/@MPM@/${mpm}/g;" \
-        < $RPM_SOURCE_DIR/httpd.mpm.xml > httpd.${mpm}.8.xml
-    xmlto man httpd.${mpm}.8.xml
-done
+# Create default/prefork service file for systemd
+sed "s,@NAME@,prefork,g;s,@EXEC@,%{sbindir}/httpd,g" %{SOURCE15} > httpd.service
+touch -r %{SOURCE15} httpd.service
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -218,11 +227,18 @@ pushd prefork
 make DESTDIR=$RPM_BUILD_ROOT install
 popd
 
-# install alternative MPMs, and man pages
+# install alternative MPMs; executables, man pages, and systemd service files
+mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
 for f in %{mpms}; do
   install -m 755 ${f}/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.${f}
   install -m 644 httpd.${f}.8 $RPM_BUILD_ROOT%{_mandir}/man8/httpd.${f}.8
+  install -p -m 644 httpd-${f}.service \
+          $RPM_BUILD_ROOT/lib/systemd/system/httpd-${f}.service
 done
+
+# Default httpd (prefork) service file
+install -p -m 644 httpd.service \
+        $RPM_BUILD_ROOT/lib/systemd/system/httpd.service
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
@@ -461,6 +477,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/*
 %exclude %{_mandir}/man8/apxs.8*
 
+/lib/systemd/system/*.service
+
 %files tools
 %defattr(-,root,root)
 %{_bindir}/*
@@ -491,6 +509,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Apr 12 2011 Joe Orton <jorton@redhat.com> - 2.2.17-12
+- add systemd service files (#684175, thanks to Jóhann B. Guðmundsson)
+
 * Wed Mar 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-11
 - minor updates to httpd.conf
 - drop old patches
