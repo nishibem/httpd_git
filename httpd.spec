@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.17
-Release: 12%{?dist}
+Release: 13%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -213,7 +213,7 @@ for f in %{mpms}; do
 done
 
 # Create default/prefork service file for systemd
-sed "s,@NAME@,prefork,g;s,@EXEC@,%{sbindir}/httpd,g" %{SOURCE15} > httpd.service
+sed "s,@NAME@,prefork,g;s,@EXEC@,%{_sbindir}/httpd,g" %{SOURCE15} > httpd.service
 touch -r %{SOURCE15} httpd.service
 
 %install
@@ -509,6 +509,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu Apr 14 2011 Joe Orton <jorton@redhat.com> - 2.2.17-13
+- fix path expansion in service files
+
 * Tue Apr 12 2011 Joe Orton <jorton@redhat.com> - 2.2.17-12
 - add systemd service files (#684175, thanks to Jóhann B. Guðmundsson)
 
