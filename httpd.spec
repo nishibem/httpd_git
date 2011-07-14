@@ -7,10 +7,10 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.17
-Release: 13%{?dist}
+Version: 2.2.19
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
+Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
@@ -509,6 +509,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Jul  1 2011 Joe Orton <jorton@redhat.com> - 2.2.19-1
+- update to 2.2.19
+- enable dbd, authn_dbd in default config
+
 * Thu Apr 14 2011 Joe Orton <jorton@redhat.com> - 2.2.17-13
 - fix path expansion in service files
 

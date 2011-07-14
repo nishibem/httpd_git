@@ -5,3 +5,4 @@ x86_64
 /*.rpm
 /.build*.log
 /noarch
+/httpd-2.2.19.tar.gz
