@@ -7,10 +7,10 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.17
-Release: 11%{?dist}
+Version: 2.2.19
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
+Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
@@ -491,6 +491,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Jul 19 2011 Joe Orton <jorton@redhat.com> - 2.2.19-1
+- update to 2.2.19
+
 * Wed Mar 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-11
 - minor updates to httpd.conf
 - drop old patches
