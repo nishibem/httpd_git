@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.19
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -452,7 +452,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/ht*
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-%caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
+# cap_dac_override needed to write to /var/log/httpd
+%caps(cap_setuid,cap_setgid,cap_dac_override+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -511,6 +512,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Jul 20 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-3
+- fix #716621 - suexec now works without setuid bit
+
 * Thu Jul 14 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-2
 - fix #689091 - backported patch from 2.3 branch to support IPv6 in logresolve
 
