@@ -1,13 +1,20 @@
+Removes setuid check because we are now using capabilities to ensure proper
+suexec rights.
 
-Upstream-Status: in trunk, differently
+Upstream-status: Not acceptable for upstream in current status.
+suexec_enabled part is in trunk,differently
 
---- httpd-2.2.9/os/unix/unixd.c.suenable
-+++ httpd-2.2.9/os/unix/unixd.c
-@@ -215,7 +215,7 @@ AP_DECLARE(void) unixd_pre_config(apr_po
+diff --git a/os/unix/unixd.c b/os/unix/unixd.c
+index 85d5a98..1ee1dfe 100644
+--- a/os/unix/unixd.c
++++ b/os/unix/unixd.c
+@@ -271,8 +271,8 @@ AP_DECLARE(void) unixd_pre_config(apr_pool_t *ptemp)
+         return;
      }
  
-     if ((wrapper.protection & APR_USETID) && wrapper.user == 0) {
+-    if ((wrapper.protection & APR_USETID) && wrapper.user == 0) {
 -        unixd_config.suexec_enabled = 1;
++    if (wrapper.user == 0) {
 +        unixd_config.suexec_enabled = access(SUEXEC_BIN, R_OK|X_OK) == 0;
      }
  }

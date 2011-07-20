@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.19
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -36,6 +36,7 @@ Patch23: httpd-2.0.45-export.patch
 Patch24: httpd-2.2.11-corelimit.patch
 Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
+Patch27: httpd-2.2.19-logresolve-ipv6.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -119,6 +120,7 @@ Security (TLS) protocols.
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .suenable
+%patch27 -p1 -b .logresolve-ipv6
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -434,7 +436,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/ht*
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-%caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
+# cap_dac_override needed to write to /var/log/httpd
+%caps(cap_setuid,cap_setgid,cap_dac_override+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -491,6 +494,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Jul 20 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-2
+- fix #716621 - suexec now works without setuid bit
+- fix #689091 - backported patch from 2.3 branch to support IPv6 in logresolve
+
 * Tue Jul 19 2011 Joe Orton <jorton@redhat.com> - 2.2.19-1
 - update to 2.2.19
 
