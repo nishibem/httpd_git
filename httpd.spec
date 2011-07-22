@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.19
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -512,6 +512,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Fri Jul 22 2011 Iain Arnell <iarnell@gmail.com> 1:2.2.19-4
+- rebuild while rpm-4.9.1 is untagged to remove trailing slash in provided
+  directory names
+
 * Wed Jul 20 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-3
 - fix #716621 - suexec now works without setuid bit
 
