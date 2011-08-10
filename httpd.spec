@@ -8,13 +8,14 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.19
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
 Source5: httpd.sysconf
+Source6: httpd-ssl-pass-dialog
 Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
@@ -320,6 +321,11 @@ mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -m755 $RPM_SOURCE_DIR/httpd.init \
 	$RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 
+# install http-ssl-pass-dialog
+mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}
+install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
+	$RPM_BUILD_ROOT/%{_libexecdir}/httpd-ssl-pass-dialog
+
 # install log rotation stuff
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
@@ -501,6 +507,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.dir
 %attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.pag
 %attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.sem
+%{_libexecdir}/httpd-ssl-pass-dialog
 
 %files devel
 %defattr(-,root,root)
@@ -512,6 +519,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Wed Aug 10 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-5
+- fix #707917 - add httpd-ssl-pass-dialog to ask for SSL password using systemd
+
 * Fri Jul 22 2011 Iain Arnell <iarnell@gmail.com> 1:2.2.19-4
 - rebuild while rpm-4.9.1 is untagged to remove trailing slash in provided
   directory names
