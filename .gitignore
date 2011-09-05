@@ -6,3 +6,4 @@ x86_64
 /.build*.log
 /noarch
 /httpd-2.2.19.tar.gz
+/httpd-2.2.20.tar.gz
