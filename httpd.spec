@@ -7,8 +7,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.19
-Release: 5%{?dist}
+Version: 2.2.20
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
 Source1: index.html
@@ -519,6 +519,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Mon Sep  5 2011 Joe Orton <jorton@redhat.com> - 2.2.20-1
+- update to 2.2.20
+
 * Wed Aug 10 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-5
 - fix #707917 - add httpd-ssl-pass-dialog to ask for SSL password using systemd
 
