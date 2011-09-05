@@ -167,7 +167,7 @@ ymdate=`date +'%b %Y'`
 sed "s/@PROGNAME@/httpd.${mpm}/g;s/@DATE@/${ymdate}/g;s/@VERSION@/%{version}/g;s/@MPM@/${mpm}/g;" \
     < $RPM_SOURCE_DIR/httpd.mpm.xml > httpd.${mpm}.8.xml
 xmlto man httpd.${mpm}.8.xml
-test httpd.${mpm}.8 || mv man/man8/httpd.${mpm}.8 .
+test -f httpd.${mpm}.8 || mv man/man8/httpd.${mpm}.8 .
 
 # Build the daemon
 mkdir $mpm; pushd $mpm
