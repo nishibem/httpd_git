@@ -166,7 +166,7 @@ touch -r %{SOURCE15} httpd-${mpm}.service
 ymdate=`date +'%b %Y'`
 sed "s/@PROGNAME@/httpd.${mpm}/g;s/@DATE@/${ymdate}/g;s/@VERSION@/%{version}/g;s/@MPM@/${mpm}/g;" \
     < $RPM_SOURCE_DIR/httpd.mpm.xml > httpd.${mpm}.8.xml
-xmlto man httpd.${mpm}.8.xml
+xmlto -o $PWD man httpd.${mpm}.8.xml
 
 # Build the daemon
 mkdir $mpm; pushd $mpm
@@ -521,6 +521,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Mon Sep  5 2011 Joe Orton <jorton@redhat.com> - 2.2.20-1
 - update to 2.2.20
+- fix MPM stub man page generation
 
 * Wed Aug 10 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-5
 - fix #707917 - add httpd-ssl-pass-dialog to ask for SSL password using systemd
