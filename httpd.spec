@@ -31,6 +31,7 @@ Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
+Patch21: httpd-2.2.0-authnoprov.patch
 Patch22: httpd-2.1.10-pod.patch
 Patch23: httpd-2.0.45-export.patch
 Patch24: httpd-2.2.11-corelimit.patch
@@ -115,6 +116,7 @@ Security (TLS) protocols.
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
 
+%patch21 -p1 -b .authnoprov
 %patch22 -p1 -b .pod
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -496,6 +498,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Tue Sep 13 2011 Joe Orton <jorton@redhat.com> - 2.2.21-1
 - update to 2.2.21
+- restore authnoprov patch (#736104)
 
 * Wed Jul 20 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-2
 - fix #716621 - suexec now works without setuid bit
