@@ -7,10 +7,10 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.20
+Version: 2.2.21
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
+Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
@@ -520,6 +520,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Sep 13 2011 Joe Orton <jorton@redhat.com> - 2.2.21-1
+- update to 2.2.21
+
 * Mon Sep  5 2011 Joe Orton <jorton@redhat.com> - 2.2.20-1
 - update to 2.2.20
 - fix MPM stub man page generation
