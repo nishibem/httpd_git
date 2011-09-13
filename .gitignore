@@ -5,3 +5,10 @@ x86_64
 /*.rpm
 /.build*.log
 /noarch
+<<<<<<< HEAD
+=======
+/httpd-2.2.19.tar.gz
+/httpd-2.2.20.tar.gz
+/httpd-2.2.21.tar.bz2
+/clog
+>>>>>>> f93baaa... update to 2.2.21

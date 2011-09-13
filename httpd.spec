@@ -7,10 +7,10 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.19
-Release: 2%{?dist}
+Version: 2.2.21
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
+Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
 Source3: httpd.logrotate
 Source4: httpd.init
@@ -494,6 +494,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Tue Sep 13 2011 Joe Orton <jorton@redhat.com> - 2.2.21-1
+- update to 2.2.21
+
 * Wed Jul 20 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-2
 - fix #716621 - suexec now works without setuid bit
 - fix #689091 - backported patch from 2.3 branch to support IPv6 in logresolve
