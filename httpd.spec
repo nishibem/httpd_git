@@ -525,6 +525,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Thu Sep 22 2011 Ville Skyttä <ville.skytta@iki.fi> - 2.2.21-2
 - Make mmn available as %%{_httpd_mmn}.
+- Add .svgz to AddEncoding x-gzip example in httpd.conf.
 
 * Tue Sep 13 2011 Joe Orton <jorton@redhat.com> - 2.2.21-1
 - update to 2.2.21
