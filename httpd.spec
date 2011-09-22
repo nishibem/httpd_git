@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.21
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -282,6 +282,8 @@ mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
 
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm
+echo "%%_httpd_mmn %{mmnisa}" > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd
 
 # docroot
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
@@ -518,8 +520,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
 %{_libdir}/httpd/build/*.sh
+%{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Sep 22 2011 Ville Skyttä <ville.skytta@iki.fi> - 2.2.21-2
+- Make mmn available as %%{_httpd_mmn}.
+
 * Tue Sep 13 2011 Joe Orton <jorton@redhat.com> - 2.2.21-1
 - update to 2.2.21
 
