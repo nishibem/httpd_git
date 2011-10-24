@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.21
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -39,6 +39,7 @@ Patch24: httpd-2.2.11-corelimit.patch
 Patch25: httpd-2.2.11-selinux.patch
 Patch26: httpd-2.2.9-suenable.patch
 Patch27: httpd-2.2.19-logresolve-ipv6.patch
+Patch28: httpd-2.2.21-mod_proxy-change-state.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -123,6 +124,7 @@ Security (TLS) protocols.
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .suenable
 %patch27 -p1 -b .logresolve-ipv6
+%patch28 -p1 -b .mod_proxy-change-state
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -523,6 +525,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Oct 24 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.21-3
+- allow change state of BalancerMember in mod_proxy_balancer web interface
+
 * Thu Sep 22 2011 Ville Skyttä <ville.skytta@iki.fi> - 2.2.21-2
 - Make mmn available as %%{_httpd_mmn}.
 - Add .svgz to AddEncoding x-gzip example in httpd.conf.
