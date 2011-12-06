@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.21
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -525,6 +525,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Dec 06 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.21-4
+- fix #751591 - start httpd after remote-fs
+
 * Mon Oct 24 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.21-3
 - allow change state of BalancerMember in mod_proxy_balancer web interface
 
