@@ -9,7 +9,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.21
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -539,6 +539,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Jan 23 2012 Jan Kaluza <jkaluza@redhat.com> - 2.2.21-7
+- fix #783629 - start httpd after named
+
 * Mon Jan 16 2012 Joe Orton <jorton@redhat.com> - 2.2.21-6
 - complete conversion to systemd, drop init script (#770311)
 - fix comments in /etc/sysconfig/httpd (#771024)
