@@ -8,8 +8,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.21
-Release: 8%{?dist}
+Version: 2.2.22
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -539,6 +539,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Feb 13 2012 Joe Orton <jorton@redhat.com> - 2.2.22-1
+- update to 2.2.22
+
 * Fri Feb 10 2012 Petr Pisar <ppisar@redhat.com> - 2.2.21-8
 - Rebuild against PCRE 8.30
 
