@@ -223,10 +223,6 @@ touch -r %{SOURCE15} httpd.service
 %install
 rm -rf $RPM_BUILD_ROOT
 
-# Classify ab and logresolve as section 1 commands, as they are in /usr/bin
-mv docs/man/ab.8 docs/man/ab.1
-mv docs/man/logresolve.8 docs/man/logresolve.1
-
 pushd prefork
 make DESTDIR=$RPM_BUILD_ROOT install
 popd
@@ -485,7 +481,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
 
 %{_mandir}/man8/*
-%exclude %{_mandir}/man8/apxs.8*
 
 /lib/systemd/system/*.service
 
@@ -514,7 +509,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{_includedir}/httpd
 %{_sbindir}/apxs
-%{_mandir}/man8/apxs.8*
+%{_mandir}/man1/apxs.1*
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
 %{_libdir}/httpd/build/*.sh
