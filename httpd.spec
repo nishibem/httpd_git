@@ -9,7 +9,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.22
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -31,6 +31,7 @@ Patch2: httpd-2.1.10-apxs.patch
 Patch3: httpd-2.2.9-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
+Patch6: httpd-2.2.22-pcre830.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
 Patch22: httpd-2.1.10-pod.patch
@@ -119,6 +120,7 @@ Security (TLS) protocols.
 %patch3 -p1 -b .deplibs
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
+%patch6 -p1 -b .pcre830
 
 %patch22 -p1 -b .pod
 %patch23 -p1 -b .export
@@ -539,6 +541,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Feb 13 2012 Joe Orton <jorton@redhat.com> - 2.2.22-2
+- fix build against PCRE 8.30
+
 * Mon Feb 13 2012 Joe Orton <jorton@redhat.com> - 2.2.22-1
 - update to 2.2.22
 
