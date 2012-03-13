@@ -279,7 +279,6 @@ set -x
 # Clean Document Root
 rm -v $RPM_BUILD_ROOT%{docroot}/html/*.html \
       $RPM_BUILD_ROOT%{docroot}/cgi-bin/*
-rm -rv $RPM_BUILD_ROOT%{docroot}/manual
 
 # Symlink for the powered-by-$DISTRO image:
 ln -s ../../..%{_datadir}/pixmaps/poweredby.png \
