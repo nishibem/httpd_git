@@ -29,7 +29,6 @@ Source18: 00-ldap.conf
 Source19: userdir.conf
 Source20: ssl.conf
 Source21: welcome.conf
-Source22: manual.conf
 # Documentation
 Source33: README.confd
 # build/scripts patches
@@ -219,10 +218,19 @@ for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
 
-for f in welcome.conf manual.conf ssl.conf userdir.conf; do
+for f in welcome.conf ssl.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
+
+# Split-out extra config shipped as default in conf.d:
+for f in manual autoindex; do
+  mv docs/conf/extra/httpd-${f}.conf \
+        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/${f}.conf
+done
+
+# Extra config trimmed:
+rm -v docs/conf/extra/httpd-{ssl,userdir}.conf
 
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/*.conf
 install -m 644 -p $RPM_SOURCE_DIR/httpd.conf \
@@ -241,9 +249,9 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
 
 # Create cache directory
-mkdir $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
-      $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/proxy \
-      $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/ssl
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
+         $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/proxy \
+         $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/ssl
 
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
@@ -414,6 +422,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
+%doc docs/conf/extra/*.conf
 
 %dir %{_sysconfdir}/httpd
 %{_sysconfdir}/httpd/modules
@@ -427,8 +436,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %{_sysconfdir}/httpd/conf.d
 %{_sysconfdir}/httpd/conf.d/README
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/welcome.conf
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/userdir.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
+%exclude %{_sysconfdir}/httpd/conf.d/ssl.conf
+%exclude %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %dir %{_sysconfdir}/httpd/conf.modules.d
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/*.conf
@@ -510,6 +520,8 @@ rm -rf $RPM_BUILD_ROOT
 - default config:
  * unrestricted access to (only) /var/www
  * remove (commented) Mutex, MaxRanges, ScriptSock
+ * split autoindex config to conf.d/autoindex.conf
+- ship additional example configs in docdir
 
 * Tue Mar  6 2012 Joe Orton <jorton@redhat.com> - 2.4.1-1
 - update to 2.4.1
