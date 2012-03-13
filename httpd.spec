@@ -30,6 +30,7 @@ Source19: 00-proxyhtml.conf
 Source20: userdir.conf
 Source21: ssl.conf
 Source22: welcome.conf
+Source23: manual.conf
 # Documentation
 Source30: README.confd
 # build/scripts patches
@@ -240,13 +241,13 @@ for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
 
-for f in welcome.conf ssl.conf userdir.conf; do
+for f in welcome.conf ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
 
 # Split-out extra config shipped as default in conf.d:
-for f in manual autoindex; do
+for f in autoindex; do
   mv docs/conf/extra/httpd-${f}.conf \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/${f}.conf
 done
@@ -554,6 +555,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-4
 - fix symlink for poweredby.png
+- fix manual.conf
 
 * Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-3
 - add mod_proxy_html subpackage (w/mod_proxy_html + mod_xml2enc)
