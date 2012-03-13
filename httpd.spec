@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -25,12 +25,13 @@ Source14: 01-cgi.conf
 Source15: 00-dav.conf
 Source16: 00-proxy.conf
 Source17: 00-ssl.conf
-Source18: 00-ldap.conf
-Source19: userdir.conf
-Source20: ssl.conf
-Source21: welcome.conf
+Source18: 01-ldap.conf
+Source19: 00-proxyhtml.conf
+Source20: userdir.conf
+Source21: ssl.conf
+Source22: welcome.conf
 # Documentation
-Source33: README.confd
+Source30: README.confd
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.1-apxs.patch
@@ -54,7 +55,7 @@ Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
-Requires: httpd-tools = %{version}-%{release}, apr-util-ldap
+Requires: httpd-tools = %{version}-%{release}
 Requires(pre): /usr/sbin/useradd
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -114,6 +115,28 @@ Obsoletes: stronghold-mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
+
+%package -n mod_proxy_html
+Group: System Environment/Daemons
+Summary: HTML and XML content filters for the Apache HTTP Server
+Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+BuildRequires: libxml2-devel
+Epoch: 1
+Obsoletes: mod_proxy_html < 1:2.4.1-2
+
+%description -n mod_proxy_html
+The mod_proxy_html and mod_xml2enc modules provide filters which can
+transform and modify HTML and XML content.
+
+%package -n mod_ldap
+Group: System Environment/Daemons
+Summary: LDAP authentication modules for the Apache HTTP Server
+Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: apr-util-ldap
+
+%description -n mod_ldap
+The mod_ldap and mod_authnz_ldap modules add support for LDAP
+authentication to the Apache HTTP Server.
 
 %prep
 %setup -q
@@ -191,8 +214,6 @@ export LYNX_PATH=/usr/bin/links
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
         --disable-imagemap  \
-        --disable-proxy-html \
-        --disable-xml2enc \
         --disable-session
 	$*
 make %{?_smp_mflags}
@@ -213,7 +234,8 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d \
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
-         00-proxy.conf 00-ssl.conf 00-ldap.conf; do
+         00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
+         01-ldap.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -443,6 +465,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/httpd/conf.modules.d
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/*.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
+%exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
+%exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/httpd
 %config %{_sysconfdir}/tmpfiles.d/httpd.conf
@@ -458,6 +482,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/httpd/modules
 %{_libdir}/httpd/modules/mod*.so
 %exclude %{_libdir}/httpd/modules/mod_ssl.so
+%exclude %{_libdir}/httpd/modules/mod_*ldap.so
+%exclude %{_libdir}/httpd/modules/mod_proxy_html.so
+%exclude %{_libdir}/httpd/modules/mod_xml2enc.so
 
 %dir %{contentdir}
 %dir %{contentdir}/icons
@@ -503,6 +530,17 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
 %{_libexecdir}/httpd-ssl-pass-dialog
 
+%files -n mod_proxy_html
+%defattr(-,root,root)
+%{_libdir}/httpd/modules/mod_proxy_html.so
+%{_libdir}/httpd/modules/mod_xml2enc.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
+
+%files -n mod_ldap
+%defattr(-,root,root)
+%{_libdir}/httpd/modules/mod_*ldap.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
+
 %files devel
 %defattr(-,root,root)
 %{_includedir}/httpd
@@ -514,6 +552,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-3
+- add mod_proxy_html subpackage (w/mod_proxy_html + mod_xml2enc)
+- move mod_ldap, mod_authnz_ldap to mod_ldap subpackage
+
 * Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-2
 - clean docroot better
 - ship proxy, ssl directories within /var/cache/httpd
