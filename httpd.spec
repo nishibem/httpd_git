@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -312,7 +312,7 @@ rm -v $RPM_BUILD_ROOT%{docroot}/html/*.html \
       $RPM_BUILD_ROOT%{docroot}/cgi-bin/*
 
 # Symlink for the powered-by-$DISTRO image:
-ln -s ../../..%{_datadir}/pixmaps/poweredby.png \
+ln -s ../../pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
 # symlinks for /etc/httpd
@@ -552,6 +552,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-4
+- fix symlink for poweredby.png
+
 * Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-3
 - add mod_proxy_html subpackage (w/mod_proxy_html + mod_xml2enc)
 - move mod_ldap, mod_authnz_ldap to mod_ldap subpackage
