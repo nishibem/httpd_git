@@ -5,12 +5,12 @@ configured.
 Upstream-Status: Was discussed but there are competing desires;
 	there are portability oddities here too.
 
---- httpd-2.2.11/server/core.c.corelimit
-+++ httpd-2.2.11/server/core.c
-@@ -3777,6 +3779,25 @@ static int core_post_config(apr_pool_t *
- 
-     set_banner(pconf);
-     ap_setup_make_content_type(pconf);
+--- httpd-2.4.1/server/core.c.corelimit
++++ httpd-2.4.1/server/core.c
+@@ -4433,6 +4433,25 @@ static int core_post_config(apr_pool_t *
+     }
+     apr_pool_cleanup_register(pconf, NULL, ap_mpm_end_gen_helper,
+                               apr_pool_cleanup_null);
 +
 +#ifdef RLIMIT_CORE
 +    if (ap_coredumpdir_configured) {

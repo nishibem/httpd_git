@@ -1,4 +1,8 @@
-# Configuration file for the httpd service.
+#
+# This file can be used to set additional environment variables
+# for the httpd process, or pass additional options to the httpd
+# executable
+# 
 
 #
 # To pass additional options (for instance, -D definitions) to the
