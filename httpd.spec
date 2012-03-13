@@ -507,6 +507,9 @@ rm -rf $RPM_BUILD_ROOT
 * Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-2
 - clean docroot better
 - ship proxy, ssl directories within /var/cache/httpd
+- default config:
+ * unrestricted access to (only) /var/www
+ * remove (commented) Mutex, MaxRanges, ScriptSock
 
 * Tue Mar  6 2012 Joe Orton <jorton@redhat.com> - 2.4.1-1
 - update to 2.4.1
