@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -279,6 +279,7 @@ set -x
 # Clean Document Root
 rm -v $RPM_BUILD_ROOT%{docroot}/html/*.html \
       $RPM_BUILD_ROOT%{docroot}/cgi-bin/*
+rm -rv $RPM_BUILD_ROOT%{docroot}/manual
 
 # Symlink for the powered-by-$DISTRO image:
 ln -s ../../..%{_datadir}/pixmaps/poweredby.png \
@@ -294,7 +295,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
 	$RPM_BUILD_ROOT/%{_libexecdir}/httpd-ssl-pass-dialog
 
-# install log rotation stuff
+# Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
@@ -318,7 +319,8 @@ sed -i '/instdso/s,top_srcdir,top_builddir,' \
     $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
 
 # Remove unpackaged files
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.exp \
+rm -vf \
+      $RPM_BUILD_ROOT%{_libdir}/*.exp \
       $RPM_BUILD_ROOT/etc/httpd/conf/mime.types \
       $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.exp \
       $RPM_BUILD_ROOT%{_libdir}/httpd/build/config.nice \
@@ -504,6 +506,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-2
+- clean docroot better
+
 * Tue Mar  6 2012 Joe Orton <jorton@redhat.com> - 2.4.1-1
 - update to 2.4.1
 - adopt upstream default httpd.conf (almost verbatim)
