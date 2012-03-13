@@ -240,12 +240,10 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 # for holding mod_dav lock database
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
 
-# create a prototype session cache
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_ssl
-touch $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_ssl/scache.{dir,pag,sem}
-
-# create cache root
-mkdir $RPM_BUILD_ROOT%{_localstatedir}/cache/mod_proxy
+# Create cache directory
+mkdir $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
+      $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/proxy \
+      $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/ssl
 
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
@@ -468,7 +466,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0710,root,apache) %dir %{_localstatedir}/run/httpd
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
-%attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
+%attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd
+%attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
 
 %{_mandir}/man8/*
 
@@ -491,10 +490,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
-%attr(0700,apache,root) %dir %{_localstatedir}/cache/mod_ssl
-%attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.dir
-%attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.pag
-%attr(0600,apache,root) %ghost %{_localstatedir}/cache/mod_ssl/scache.sem
+%attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %files devel
@@ -510,6 +506,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-2
 - clean docroot better
+- ship proxy, ssl directories within /var/cache/httpd
 
 * Tue Mar  6 2012 Joe Orton <jorton@redhat.com> - 2.4.1-1
 - update to 2.4.1
