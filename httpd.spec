@@ -253,6 +253,9 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm
 cat > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd <<EOF
 %%_httpd_mmn %{mmnisa}
 %%_httpd_apxs %{_bindir}/apxs
+%%_httpd_modconfdir %{_sysconfigdir}/httpd/conf.modules.d
+%%_httpd_confdir %{_sysconfigdir}/httpd/conf.d
+%%_httpd_contentdir %{contentdir}
 EOF
 
 # Handle contentdir
