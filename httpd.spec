@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -285,6 +285,7 @@ cat > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd <<EOF
 %%_httpd_modconfdir %{_sysconfigdir}/httpd/conf.modules.d
 %%_httpd_confdir %{_sysconfigdir}/httpd/conf.d
 %%_httpd_contentdir %{contentdir}
+%%_httpd_moddir %{_libdir}/httpd/modules
 EOF
 
 # Handle contentdir
@@ -553,6 +554,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri Mar 23 2012 Joe Orton <jorton@redhat.com> - 2.4.1-5
+- add _httpd_moddir to macros
+
 * Tue Mar 13 2012 Joe Orton <jorton@redhat.com> - 2.4.1-4
 - fix symlink for poweredby.png
 - fix manual.conf
