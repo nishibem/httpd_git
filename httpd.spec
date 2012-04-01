@@ -9,7 +9,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.22
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -536,6 +536,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Sat Mar 31 2012 Adam Williamson <awilliam@redhat.com> - 2.2.22-3
+- rebuild against openssl 1.0.0h (previous build was against
+  1.0.1, this is not good) RH #808793
+
 * Mon Feb 13 2012 Joe Orton <jorton@redhat.com> - 2.2.22-2
 - fix build against PCRE 8.30
 
