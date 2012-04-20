@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -554,6 +554,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri Apr 20 2012 Joe Orton <jorton@redhat.com> - 2.4.2-2
+- tweak default ssl.conf
+- fix restart handling (#814645)
+- use graceful restart by default
+
 * Wed Apr 18 2012 Jan Kaluza <jkaluza@redhat.com> - 2.4.2-1
 - update to 2.4.2
 
