@@ -30,7 +30,7 @@ Patch1: httpd-2.1.10-apctl.patch
 Patch2: httpd-2.1.10-apxs.patch
 Patch3: httpd-2.2.9-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
-Patch5: httpd-2.1.10-layout.patch
+Patch5: httpd-2.2.22-layout.patch
 Patch6: httpd-2.2.22-pcre830.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
@@ -544,6 +544,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Mon Apr 30 2012 Joe Orton <jorton@redhat.com> - 2.2.22-4
+- switch default runtimedir to /var/run/httpd
 - extend _httpd_* macro set per proposed guidelines
 - fix comments in sysconfig file (#771024)
 
