@@ -9,7 +9,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.22
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -285,7 +285,14 @@ mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm
-echo "%%_httpd_mmn %{mmnisa}" > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd
+cat > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd <<EOF
+%%_httpd_mmn %{mmnisa}
+%%_httpd_apxs %%{_sbindir}/apxs
+%%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.d
+%%_httpd_confdir %%{_sysconfdir}/httpd/conf.d
+%%_httpd_contentdir %{contentdir}
+%%_httpd_moddir %%{_libdir}/httpd/modules
+EOF
 
 # docroot
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
@@ -536,6 +543,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Apr 30 2012 Joe Orton <jorton@redhat.com> - 2.2.22-4
+- extend _httpd_* macro set per proposed guidelines
+- fix comments in sysconfig file (#771024)
+
 * Sat Mar 31 2012 Adam Williamson <awilliam@redhat.com> - 2.2.22-3
 - rebuild against openssl 1.0.0h (previous build was against
   1.0.1, this is not good) RH #808793
