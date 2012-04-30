@@ -318,11 +318,6 @@ set -x
 ln -s ../../..%{_datadir}/pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
-# Set up /var directories
-rmdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/logs
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/httpd
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/httpd
-
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
 ln -s ../..%{_localstatedir}/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
