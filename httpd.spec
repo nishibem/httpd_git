@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.2.22
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -515,6 +515,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
+* Thu May 10 2012 Joe Orton <jorton@redhat.com> - 2.2.22-3
+- set LANG=C in systemd service file directly (#697015)
+
 * Mon Mar 05 2012 Jan Kaluza <jkaluza@redhat.com> - 2.2.22-2
 - fix #751591 - start httpd after network filesystems
 - fix #783629 - start httpd after named
