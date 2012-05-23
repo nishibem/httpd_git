@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -43,8 +43,7 @@ Patch20: httpd-2.0.48-release.patch
 Patch23: httpd-2.4.1-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
-Patch26: httpd-2.4.1-suenable.patch
-Patch27: httpd-2.4.2-r1337344+.patch
+Patch26: httpd-2.4.2-r1337344+.patch
 # Bug fixes
 Patch40: httpd-2.4.2-restart.patch
 Patch41: httpd-2.4.2-r1327036+.patch
@@ -154,8 +153,7 @@ authentication to the Apache HTTP Server.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
-%patch26 -p1 -b .suenable
-%patch27 -p1 -b .r1337344+
+%patch26 -p1 -b .r1337344+
 
 %patch40 -p1 -b .restart
 %patch41 -p1 -b .r1327036+
@@ -164,6 +162,9 @@ authentication to the Apache HTTP Server.
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
+
+# Prevent use of setcap in "install-suexec-caps" target.
+sed -i '/suexec/s,setcap ,echo Skipping setcap for ,' Makefile.in
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
@@ -209,6 +210,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-mpms-shared=all \
         --with-apr=%{_prefix} --with-apr-util=%{_prefix} \
 	--enable-suexec --with-suexec \
+        --enable-suexec-capabilities \
 	--with-suexec-caller=%{suexec_caller} \
 	--with-suexec-docroot=%{docroot} \
 	--without-suexec-logfile \
@@ -374,9 +376,6 @@ rm -vf \
       $RPM_BUILD_ROOT%{contentdir}/cgi-bin/*
 
 rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
-
-# Make suexec a+rw so it can be stripped.  %%files lists real permissions
-chmod 755 $RPM_BUILD_ROOT%{_sbindir}/suexec
 
 %pre
 # Add the "apache" user
@@ -564,6 +563,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed May 23 2012 Joe Orton <jorton@redhat.com> - 2.4.2-9
+- suexec: use upstream version of patch for capability bit support
+
 * Wed May 23 2012 Joe Orton <jorton@redhat.com> - 2.4.2-8
 - suexec: use syslog rather than suexec.log, drop dac_override capability
 
