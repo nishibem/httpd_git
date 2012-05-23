@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -44,6 +44,7 @@ Patch23: httpd-2.4.1-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.1-suenable.patch
+Patch27: httpd-2.4.2-r1337344+.patch
 # Bug fixes
 Patch40: httpd-2.4.2-restart.patch
 Patch41: httpd-2.4.2-r1327036+.patch
@@ -154,6 +155,7 @@ authentication to the Apache HTTP Server.
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .suenable
+%patch27 -p1 -b .r1337344+
 
 %patch40 -p1 -b .restart
 %patch41 -p1 -b .r1327036+
@@ -209,7 +211,8 @@ export LYNX_PATH=/usr/bin/links
 	--enable-suexec --with-suexec \
 	--with-suexec-caller=%{suexec_caller} \
 	--with-suexec-docroot=%{docroot} \
-	--with-suexec-logfile=%{_localstatedir}/log/httpd/suexec.log \
+	--without-suexec-logfile \
+        --with-suexec-syslog \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-uidmin=500 --with-suexec-gidmin=100 \
         --enable-pie \
@@ -485,8 +488,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/fcgistarter
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-# cap_dac_override needed to write to /var/log/httpd
-%caps(cap_setuid,cap_setgid,cap_dac_override+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
+%caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -562,6 +564,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed May 23 2012 Joe Orton <jorton@redhat.com> - 2.4.2-8
+- suexec: use syslog rather than suexec.log, drop dac_override capability
+
 * Tue May  1 2012 Joe Orton <jorton@redhat.com> - 2.4.2-7
 - mod_ssl: add TLS NPN support (r1332643, #809599)
 
