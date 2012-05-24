@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -44,6 +44,7 @@ Patch23: httpd-2.4.1-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.2-r1337344+.patch
+Patch27: httpd-2.4.2-iconlink.patch
 # Bug fixes
 Patch40: httpd-2.4.2-restart.patch
 Patch41: httpd-2.4.2-r1327036+.patch
@@ -154,6 +155,7 @@ authentication to the Apache HTTP Server.
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .r1337344+
+%patch27 -p1 -b .iconlink
 
 %patch40 -p1 -b .restart
 %patch41 -p1 -b .r1327036+
@@ -563,6 +565,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu May 24 2012 Joe Orton <jorton@redhat.com> - 2.4.2-11
+- really fix autoindex.conf (thanks to remi@)
+
 * Thu May 24 2012 Joe Orton <jorton@redhat.com> - 2.4.2-10
 - fix autoindex.conf to allow symlink to poweredby.png
 
