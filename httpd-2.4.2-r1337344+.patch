@@ -1,4 +1,9 @@
 
+suexec enhancements:
+
+1) use syslog for logging
+2) use capabilities not setuid/setgid root binary
+
 http://svn.apache.org/viewvc?view=revision&revision=1337344
 http://svn.apache.org/viewvc?view=revision&revision=1341905
 http://svn.apache.org/viewvc?view=revision&revision=1342065
