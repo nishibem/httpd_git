@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -563,6 +563,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu May 24 2012 Joe Orton <jorton@redhat.com> - 2.4.2-10
+- fix autoindex.conf to allow symlink to poweredby.png
+
 * Wed May 23 2012 Joe Orton <jorton@redhat.com> - 2.4.2-9
 - suexec: use upstream version of patch for capability bit support
 
