@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 if [ $# -lt 1 ]; then
     echo "What?"
