@@ -14,9 +14,10 @@ vcurl="http://svn.apache.org/viewvc?view=revision&revision="
 
 if test -f ${fn}; then
     mv -v -f ${fn} ${fn}\~
-    sed '/^--- /,$d' < ${fn}\~ > ${fn}
+    echo "# $0 $*" > ${fn}
+    sed '1{/#.*pullrev/d;};/^--- /,$d' < ${fn}\~ >> ${fn}
 else
-    echo > ${fn}
+    echo "# $0 $*" > ${fn}
 fi
 
 new=0
