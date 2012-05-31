@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 11%{?dist}
+Release: 12%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -565,6 +565,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu May 31 2012 Joe Orton <jorton@redhat.com> - 2.4.2-12
+- update suexec patch to use LOG_AUTHPRIV facility
+
 * Thu May 24 2012 Joe Orton <jorton@redhat.com> - 2.4.2-11
 - really fix autoindex.conf (thanks to remi@)
 
