@@ -165,23 +165,6 @@ http://svn.apache.org/viewvc?view=revision&revision=1344712
  
      /*
       * Execute the command, replacing our image with its own.
---- httpd-2.4.2/CHANGES
-+++ httpd-2.4.2/CHANGES
-@@ -1,6 +1,14 @@
-                                                          -*- coding: utf-8 -*-
- Changes with Apache 2.5.0
- 
-+  *) suexec: Add --enable-suexec-capabilites support on Linux, to use
-+     setuid/setgid capability bits rather than a setuid root binary.
-+     [Joe Orton]
-+
-+  *) suexec: Add support for logging to syslog as an alternative to
-+     logging to a file; use --without-suexec-logfile --with-suexec-syslog.  
-+     [Joe Orton]
-+
-   *) mod_proxy_ajp: Reduce memory usage in case of many keep-alive requests on
-      one connection. PR 52275. [Naohiro Ooiwa <naohiro ooiwa miraclelinux com>]
- 
 --- httpd-2.4.2/configure.in
 +++ httpd-2.4.2/configure.in
 @@ -703,7 +703,24 @@
