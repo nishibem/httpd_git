@@ -34,7 +34,8 @@ prev=/dev/null
 for r in $*; do
     echo "+ fetching ${r}"
     this=`mktemp /tmp/pullrevXXXXXX`
-    svn diff -c ${r} ${repo} | filterdiff --remove-timestamps --addprefix="${prefix}/" > ${this}
+    svn diff -c ${r} ${repo} | filterdiff --remove-timestamps -x 'CHANGES' \
+        --addprefix="${prefix}/" > ${this}
     next=`mktemp /tmp/pullrevXXXXXX`
     combinediff --quiet ${prev} ${this} > ${next}
     rm -f "${this}"
