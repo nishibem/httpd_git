@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 14%{?dist}
+Release: 15%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -281,9 +281,9 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.sysconf \
    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/httpd
 
 # tmpfiles.d configuration
-mkdir $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d 
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d 
 install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
-   $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d/httpd.conf
+   $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/httpd.conf
 
 # for holding mod_dav lock database
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
@@ -336,7 +336,7 @@ ln -s ../../pixmaps/poweredby.png \
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s ../..%{_localstatedir}/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
+ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
 # install http-ssl-pass-dialog
@@ -355,7 +355,7 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/magic|/etc/httpd/conf/magic|" \
     -e "s|/usr/local/apache2/logs/error_log|/var/log/httpd/error_log|" \
     -e "s|/usr/local/apache2/logs/access_log|/var/log/httpd/access_log|" \
-    -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd/httpd.pid|" \
+    -e "s|/usr/local/apache2/logs/httpd.pid|/run/httpd/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
 
@@ -485,7 +485,7 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/httpd
-%config %{_sysconfdir}/tmpfiles.d/httpd.conf
+%{_prefix}/lib/tmpfiles.d/httpd.conf
 
 %{_sbindir}/ht*
 %{_sbindir}/fcgistarter
@@ -515,7 +515,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{docroot}/cgi-bin
 %dir %{docroot}/html
 
-%attr(0710,root,apache) %dir %{_localstatedir}/run/httpd
+%attr(0710,root,apache) %dir /run/httpd
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd
@@ -567,6 +567,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Jun  6 2012 Joe Orton <jorton@redhat.com> - 2.4.2-15
+- move tmpfiles.d fragment into /usr/lib per new guidelines
+- package /run/httpd not /var/run/httpd
+- set runtimedir to /run/httpd likewise
+
 * Wed Jun  6 2012 Joe Orton <jorton@redhat.com> - 2.4.2-14
 - fix htdbm/htpasswd crash on crypt() failure (#818684)
 
