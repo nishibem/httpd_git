@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 12%{?dist}
+Release: 13%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -49,7 +49,7 @@ Patch27: httpd-2.4.2-iconlink.patch
 Patch40: httpd-2.4.2-restart.patch
 Patch41: httpd-2.4.2-r1327036+.patch
 Patch42: httpd-2.4.2-r1326980+.patch
-Patch43: httpd-2.4.2-r1332643.patch
+Patch43: httpd-2.4.2-r1332643+.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -160,7 +160,7 @@ authentication to the Apache HTTP Server.
 %patch40 -p1 -b .restart
 %patch41 -p1 -b .r1327036+
 %patch42 -p1 -b .r1326980+
-%patch43 -p1 -b .r1332643
+%patch43 -p1 -b .r1332643+
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
@@ -565,6 +565,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Jun  6 2012 Joe Orton <jorton@redhat.com> - 2.4.2-13
+- pull fix for NPN patch from upstream (r1345599)
+
 * Thu May 31 2012 Joe Orton <jorton@redhat.com> - 2.4.2-12
 - update suexec patch to use LOG_AUTHPRIV facility
 

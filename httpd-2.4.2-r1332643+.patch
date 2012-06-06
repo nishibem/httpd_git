@@ -1,7 +1,10 @@
+# ./pullrev.sh 1332643 1345599
 
 https://bugzilla.redhat.com//show_bug.cgi?id=809599
 
 http://svn.apache.org/viewvc?view=revision&revision=1332643
+
+http://svn.apache.org/viewvc?view=revision&revision=1345599
 
 --- httpd-2.4.2/modules/ssl/ssl_private.h
 +++ httpd-2.4.2/modules/ssl/ssl_private.h
@@ -107,7 +110,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1332643
  } bio_filter_in_ctx_t;
  
  /*
-@@ -1374,6 +1376,27 @@
+@@ -1374,6 +1376,26 @@
          APR_BRIGADE_INSERT_TAIL(bb, bucket);
      }
  
@@ -123,9 +126,8 @@ http://svn.apache.org/viewvc?view=revision&revision=1332643
 +        SSL_get0_next_proto_negotiated(
 +            inctx->ssl, &next_proto, &next_proto_len);
 +        ap_log_cerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, f->c,
-+                      "SSL NPN negotiated protocol: '%s'",
-+                      apr_pstrmemdup(f->c->pool, (const char*)next_proto,
-+                                     next_proto_len));
++                      APLOGNO(02306) "SSL NPN negotiated protocol: '%*s'",
++                      next_proto_len, (const char*)next_proto);
 +        modssl_run_npn_proto_negotiated_hook(
 +            f->c, (const char*)next_proto, next_proto_len);
 +        inctx->npn_finished = 1;
@@ -135,7 +137,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1332643
      return APR_SUCCESS;
  }
  
-@@ -1855,6 +1878,7 @@
+@@ -1855,6 +1877,7 @@
      inctx->block = APR_BLOCK_READ;
      inctx->pool = c->pool;
      inctx->filter_ctx = filter_ctx;
@@ -153,10 +155,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1332643
  #include "util_md5.h"
  
  static void ssl_configure_env(request_rec *r, SSLConnRec *sslconn);
-@@ -2143,3 +2144,84 @@
-     return -1;
- }
- #endif
+@@ -2145,0 +2147,83 @@
 +
 +#ifdef HAVE_TLS_NPN
 +/*
@@ -202,7 +201,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1332643
 +        /* If the protocol name is too long (the length must fit in one byte),
 +         * then log an error and skip it. */
 +        if (length > 255) {
-+            ap_log_cerror(APLOG_MARK, APLOG_ERR, 0, c,
++            ap_log_cerror(APLOG_MARK, APLOG_ERR, 0, c, APLOGNO(02307)
 +                          "SSL NPN protocol name too long (length=%u): %s",
 +                          length, string);
 +            continue;
@@ -226,6 +225,8 @@ http://svn.apache.org/viewvc?view=revision&revision=1332643
 +    for (i = 0; i < num_protos; ++i) {
 +        const char *string = APR_ARRAY_IDX(protos, i, const char*);
 +        apr_size_t length = strlen(string);
++        if (length > 255)
++            continue;
 +        *start = (unsigned char)length;
 +        ++start;
 +        memcpy(start, string, length * sizeof(unsigned char));
