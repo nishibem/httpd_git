@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 15%{?dist}
+Release: 16%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -567,6 +567,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Jun  7 2012 Joe Orton <jorton@redhat.com> - 2.4.2-16
+- mod_ssl: fix NPN patch merge
+
 * Wed Jun  6 2012 Joe Orton <jorton@redhat.com> - 2.4.2-15
 - move tmpfiles.d fragment into /usr/lib per new guidelines
 - package /run/httpd not /var/run/httpd
