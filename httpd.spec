@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 16%{?dist}
+Release: 17%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -567,6 +567,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Jun  7 2012 Joe Orton <jorton@redhat.com> - 2.4.2-17
+- use _unitdir for systemd unit file
+- use /run in unit file, ssl.conf
+
 * Thu Jun  7 2012 Joe Orton <jorton@redhat.com> - 2.4.2-16
 - mod_ssl: fix NPN patch merge
 
