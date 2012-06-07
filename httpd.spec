@@ -242,9 +242,9 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 
 # Install systemd service files
-mkdir -p $RPM_BUILD_ROOT/lib/systemd/system
+mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 install -p -m 644 $RPM_SOURCE_DIR/httpd.service \
-        $RPM_BUILD_ROOT/lib/systemd/system/httpd.service
+        $RPM_BUILD_ROOT%{_unitdir}/httpd.service
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d \
@@ -523,7 +523,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_mandir}/man8/*
 
-/lib/systemd/system/*.service
+%{_unitdir}/*.service
 
 %files tools
 %defattr(-,root,root)
