@@ -569,6 +569,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Fri Jun  8 2012 Joe Orton <jorton@redhat.com> - 2.4.2-18
 - avoid use of "core" GIF for a "core" directory (#168776)
+- drop use of "syslog.target" in systemd unit file
 
 * Thu Jun  7 2012 Joe Orton <jorton@redhat.com> - 2.4.2-17
 - use _unitdir for systemd unit file
