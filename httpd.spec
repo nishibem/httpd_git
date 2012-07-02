@@ -8,15 +8,17 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 18%{?dist}
+Release: 19%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
-Source3: httpd.logrotate
-Source5: httpd.sysconf
-Source6: httpd-ssl-pass-dialog
-Source7: httpd.tmpfiles
-Source8: httpd.service
+Source2: httpd.logrotate
+Source3: httpd.sysconf
+Source4: httpd-ssl-pass-dialog
+Source5: httpd.tmpfiles
+Source6: httpd.service
+Source7: action-graceful.sh
+Source8: action-configtest.sh
 Source10: httpd.conf
 Source11: 00-base.conf
 Source12: 00-mpm.conf
@@ -67,6 +69,8 @@ Requires(pre): /usr/sbin/useradd
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires(post): systemd-units
+# For legacy-actions:
+Requires: initscripts >= 9.39
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -340,9 +344,16 @@ ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
 # install http-ssl-pass-dialog
-mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}
+mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
-	$RPM_BUILD_ROOT/%{_libexecdir}/httpd-ssl-pass-dialog
+	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
+
+# Install action scripts
+mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
+for f in graceful configtest; do
+    install -p -m 755 $RPM_SOURCE_DIR/action-${f}.sh \
+            $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd/${f}
+done
 
 # Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
@@ -487,6 +498,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/sysconfig/httpd
 %{_prefix}/lib/tmpfiles.d/httpd.conf
 
+%dir %{_libexecdir}/initscripts/legacy-actions/httpd
+%{_libexecdir}/initscripts/legacy-actions/httpd/*
+
 %{_sbindir}/ht*
 %{_sbindir}/fcgistarter
 %{_sbindir}/apachectl
@@ -567,6 +581,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Jul  2 2012 Joe Orton <jorton@redhat.com> - 2.4.2-19
+- support "configtest" and "graceful" as initscripts "legacy actions"
+
 * Fri Jun  8 2012 Joe Orton <jorton@redhat.com> - 2.4.2-18
 - avoid use of "core" GIF for a "core" directory (#168776)
 - drop use of "syslog.target" in systemd unit file
