@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.2
-Release: 20%{?dist}
+Release: 21%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -70,8 +70,6 @@ Requires(pre): /usr/sbin/useradd
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires(post): systemd-units
-# For legacy-actions:
-Requires: initscripts >= 9.39
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -583,6 +581,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri Jul  6 2012 Joe Orton <jorton@redhat.com> - 2.4.2-21
+- drop explicit version requirement on initscripts
+
 * Thu Jul  5 2012 Joe Orton <jorton@redhat.com> - 2.4.2-20
 - mod_ext_filter: fix error_log warnings
 
