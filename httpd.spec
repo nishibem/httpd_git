@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -48,6 +48,8 @@ Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.2-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch28: httpd-2.4.2-r1332643+.patch
+# Bug fixes
+Patch50: httpd-2.4.2-r1374214+.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -155,6 +157,8 @@ authentication to the Apache HTTP Server.
 %patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
 %patch28 -p1 -b .r1332643+
+
+%patch50 -p1 -b .r1374214+
 
 # Patch in vendor/release string
 sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch --fuzz=%{_default_patch_fuzz} -p1
@@ -570,6 +574,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Aug 21 2012 Joe Orton <jorton@redhat.com> - 2.4.3-2
+- mod_ssl: add check for proxy keypair match (upstream r1374214)
+
 * Tue Aug 21 2012 Joe Orton <jorton@redhat.com> - 2.4.3-1
 - update to 2.4.3 (#849883)
 - own the docroot (#848121)
