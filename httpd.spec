@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -574,6 +574,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Sep 13 2012 Joe Orton <jorton@redhat.com> - 2.4.3-3
+- use IncludeOptional for conf.d/*.conf inclusion
+
 * Tue Aug 21 2012 Joe Orton <jorton@redhat.com> - 2.4.3-2
 - mod_ssl: add check for proxy keypair match (upstream r1374214)
 
