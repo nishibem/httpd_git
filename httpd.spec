@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -398,21 +398,33 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
 %post
+%if 0%{?systemd_post:1}
+%systemd_post httpd.service
+%else
 # Register the httpd service
 if [ $1 -eq 1 ] ; then 
     # Initial installation 
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
 fi
+%endif
 
 %preun
+%if 0%{?systemd_preun:1}
+%systemd_preun httpd.service
+%else
 if [ $1 -eq 0 ] ; then
     # Package removal, not upgrade
-    /bin/systemctl --no-reload disable %{all_services} > /dev/null 2>&1 || :
-    /bin/systemctl stop %{all_services} > /dev/null 2>&1 || :
+    /bin/systemctl --no-reload disable httpd.service > /dev/null 2>&1 || :
+    /bin/systemctl stop httpd.service > /dev/null 2>&1 || :
 fi
+%endif
 
 %postun
+%if 0%{?systemd_postun:1}
+%systemd_postun
+%else
 /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%endif
 
 # Trigger for conversion from SysV, per guidelines at:
 # https://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Systemd
@@ -426,7 +438,8 @@ fi
 /sbin/chkconfig --del httpd >/dev/null 2>&1 || :
 
 %posttrans
-/bin/systemctl try-restart httpd.service >/dev/null 2>&1 || :
+test -f /etc/sysconfig/httpd-disable-posttrans || \
+  /bin/systemctl try-restart httpd.service >/dev/null 2>&1 || :
 
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
@@ -582,6 +595,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Oct  1 2012 Joe Orton <jorton@redhat.com> - 2.4.3-7
+- use systemd scriptlets if available (#850149)
+- don't run posttrans restart if /etc/sysconfig/httpd-disable-posttrans exists
+
 * Mon Oct 01 2012 Jan Kaluza <jkaluza@redhat.com> - 2.4.3-6
 - use systemctl from apachectl (#842736)
 
