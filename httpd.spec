@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -43,7 +43,6 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 # Features/functional changes
-Patch20: httpd-2.4.3-release.patch
 Patch23: httpd-2.4.1-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
@@ -168,8 +167,8 @@ authentication to the Apache HTTP Server.
 %patch50 -p1 -b .r1374214+
 %patch51 -p1 -b .r1387633
 
-# Patch in vendor/release string
-sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch --fuzz=%{_default_patch_fuzz} -p1
+# Patch in the vendor string
+sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 
 # Prevent use of setcap in "install-suexec-caps" target.
 sed -i '/suexec/s,setcap ,echo Skipping setcap for ,' Makefile.in
@@ -575,6 +574,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Oct  1 2012 Joe Orton <jorton@redhat.com> - 2.4.3-9
+- define PLATFORM in os.h using vendor string
+
 * Mon Oct  1 2012 Joe Orton <jorton@redhat.com> - 2.4.3-8
 - use systemd script unconditionally (#850149)
 
