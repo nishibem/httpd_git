@@ -9,7 +9,7 @@ index c6ac3ea..2599386 100644
 +if [ "x$2" != "x" ] ; then
 +    echo Passing arguments to httpd using apachectl is no longer supported.
 +    echo You can only start/stop/restart httpd using this script.
-+    echo If you want to pass extra arguments to httpd, edit
++    echo If you want to pass extra arguments to httpd, edit the
 +    echo /etc/sysconfig/httpd config file.
 +fi
 +
