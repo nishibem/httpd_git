@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -41,6 +41,7 @@ Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.3-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
+Patch6: httpd-2.4.3-apctl-systemd.patch
 # Features/functional changes
 Patch20: httpd-2.4.3-release.patch
 Patch23: httpd-2.4.1-export.patch
@@ -154,6 +155,7 @@ authentication to the Apache HTTP Server.
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
+%patch6 -p1 -b .apctlsystemd
 
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -580,6 +582,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Oct 01 2012 Jan Kaluza <jkaluza@redhat.com> - 2.4.3-6
+- use systemctl from apachectl (#842736)
+
 * Wed Sep 19 2012 Joe Orton <jorton@redhat.com> - 2.4.3-5
 - fix some error log spam with graceful-stop (r1387633)
 - minor mod_systemd tweaks
