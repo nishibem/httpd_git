@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -52,7 +52,7 @@ Patch28: httpd-2.4.2-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 # Bug fixes
 Patch50: httpd-2.4.2-r1374214+.patch
-Patch51: httpd-2.4.2-r1387633.patch
+Patch51: httpd-2.4.3-r1387633+.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -574,6 +574,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Oct  3 2012 Joe Orton <jorton@redhat.com> - 2.4.3-10
+- pull upstream patch r1392850 in addition to r1387633
+
 * Mon Oct  1 2012 Joe Orton <jorton@redhat.com> - 2.4.3-9
 - define PLATFORM in os.h using vendor string
 
