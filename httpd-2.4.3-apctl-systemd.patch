@@ -1,3 +1,6 @@
+
+Upstream-Status: vendor specific patch
+
 diff --git a/support/apachectl.in b/support/apachectl.in
 index c6ac3ea..2599386 100644
 --- a/support/apachectl.in
