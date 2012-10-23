@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -574,6 +574,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Oct 23 2012 Joe Orton <jorton@redhat.com> - 2.4.3-11
+- rebuild
+
 * Wed Oct  3 2012 Joe Orton <jorton@redhat.com> - 2.4.3-10
 - pull upstream patch r1392850 in addition to r1387633
 
