@@ -1,4 +1,4 @@
-# ./pullrev.sh 1337344 1341905 1342065 1341930 1344712
+# ./pullrev.sh 1337344 1341905 1342065 1341930
 
 suexec enhancements:
 
@@ -9,7 +9,6 @@ http://svn.apache.org/viewvc?view=revision&revision=1337344
 http://svn.apache.org/viewvc?view=revision&revision=1341905
 http://svn.apache.org/viewvc?view=revision&revision=1342065
 http://svn.apache.org/viewvc?view=revision&revision=1341930
-http://svn.apache.org/viewvc?view=revision&revision=1344712
 
 --- httpd-2.4.3/configure.in.r1337344+
 +++ httpd-2.4.3/configure.in
@@ -138,7 +137,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1344712
 +
 +install-suexec-caps:
 +	@if test -f $(builddir)/support/suexec; then \
-+            echo Skipping echo Skipping setcap for for 'cap_setuid,cap_setgid+pe' $(DESTDIR)$(sbindir)/suexec; \
++            echo Skipping setcap for 'cap_setuid,cap_setgid+pe' $(DESTDIR)$(sbindir)/suexec; \
  	fi
  
  suexec:
@@ -167,18 +166,6 @@ http://svn.apache.org/viewvc?view=revision&revision=1344712
              && (access(SUEXEC_BIN, R_OK|X_OK) == 0)) {
              ap_unixd_config.suexec_enabled = 1;
              ap_unixd_config.suexec_disabled_reason = "";
---- httpd-2.4.3/server/log.c.r1337344+
-+++ httpd-2.4.3/server/log.c
-@@ -1087,7 +1087,8 @@ static void write_logline(char *errstr,
-     }
- #ifdef HAVE_SYSLOG
-     else {
--        syslog(level < LOG_PRIMASK ? level : APLOG_DEBUG, "%s", errstr);
-+        syslog(level < LOG_PRIMASK ? level : APLOG_DEBUG, "%.*s",
-+               (int)len, errstr);
-     }
- #endif
- }
 --- httpd-2.4.3/support/suexec.c.r1337344+
 +++ httpd-2.4.3/support/suexec.c
 @@ -58,6 +58,10 @@

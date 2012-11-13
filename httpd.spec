@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 13%{?dist}
+Release: 14%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -580,6 +580,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Nov 13 2012 Joe Orton <jorton@redhat.com> - 2.4.3-14
+- drop patch for r1344712
+
 * Tue Nov 13 2012 Joe Orton <jorton@redhat.com> - 2.4.3-13
 - filter mod_*.so auto-provides (thanks to rcollet)
 - pull in syslog logging fix from upstream (r1344712)
