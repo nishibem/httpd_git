@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.3
-Release: 14%{?dist}
+Release: 15%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -42,6 +42,8 @@ Source23: manual.conf
 Source24: 00-systemd.conf
 # Documentation
 Source30: README.confd
+Source40: htcacheclean.service
+Source41: htcacheclean.sysconf
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.3-apxs.patch
@@ -252,8 +254,10 @@ make DESTDIR=$RPM_BUILD_ROOT install
 
 # Install systemd service files
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-install -p -m 644 $RPM_SOURCE_DIR/httpd.service \
-        $RPM_BUILD_ROOT%{_unitdir}/httpd.service
+for s in httpd htcacheclean; do
+  install -p -m 644 $RPM_SOURCE_DIR/${s}.service \
+                    $RPM_BUILD_ROOT%{_unitdir}/${s}.service
+done
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d \
@@ -286,16 +290,19 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.conf \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/httpd.conf
 
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-install -m 644 -p $RPM_SOURCE_DIR/httpd.sysconf \
-   $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/httpd
+for s in httpd htcacheclean; do
+  install -m 644 -p $RPM_SOURCE_DIR/${s}.sysconf \
+                    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/${s}
+done
 
 # tmpfiles.d configuration
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d 
 install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
    $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/httpd.conf
 
-# for holding mod_dav lock database
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
+# Other directories
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
+         $RPM_BUILD_ROOT/run/httpd/htcacheclean
 
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
@@ -403,10 +410,10 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
 %post
-%systemd_post httpd.service
+%systemd_post httpd.service htcacheclean.service
 
 %preun
-%systemd_preun httpd.service
+%systemd_preun httpd.service htcacheclean.service
 
 %postun
 %systemd_postun
@@ -424,7 +431,7 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
-  /bin/systemctl try-restart httpd.service >/dev/null 2>&1 || :
+  /bin/systemctl try-restart httpd.service htcacheclean.service >/dev/null 2>&1 || :
 
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
@@ -493,7 +500,7 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
-%config(noreplace) %{_sysconfdir}/sysconfig/httpd
+%config(noreplace) %{_sysconfdir}/sysconfig/ht*
 %{_prefix}/lib/tmpfiles.d/httpd.conf
 
 %dir %{_libexecdir}/initscripts/legacy-actions/httpd
@@ -529,6 +536,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{docroot}/html
 
 %attr(0710,root,apache) %dir /run/httpd
+%attr(0700,apache,apache) %dir /run/httpd/htcacheclean
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd
@@ -580,6 +588,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Jan  8 2013 Joe Orton <jorton@redhat.com> - 2.4.3-15
+- add systemd service for htcacheclean
+
 * Tue Nov 13 2012 Joe Orton <jorton@redhat.com> - 2.4.3-14
 - drop patch for r1344712
 
