@@ -8,8 +8,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.22
-Release: 2%{?dist}
+Version: 2.2.23
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -31,7 +31,6 @@ Patch2: httpd-2.1.10-apxs.patch
 Patch3: httpd-2.2.9-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
-Patch6: httpd-2.2.22-pcre830.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
 Patch22: httpd-2.1.10-pod.patch
@@ -120,7 +119,6 @@ Security (TLS) protocols.
 %patch3 -p1 -b .deplibs
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
-%patch6 -p1 -b .pcre830
 
 %patch22 -p1 -b .pod
 %patch23 -p1 -b .export
@@ -365,6 +363,9 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 # Make suexec a+rw so it can be stripped.  %%files lists real permissions
 chmod 755 $RPM_BUILD_ROOT%{_sbindir}/suexec
 
+# rename apxs.8 to apxs.1
+mv $RPM_BUILD_ROOT%{_mandir}/man8/apxs.8 $RPM_BUILD_ROOT%{_mandir}/man1/apxs.1
+
 %pre
 # Add the "apache" user
 /usr/sbin/useradd -c "Apache" -u 48 \
@@ -536,6 +537,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Jan 29 2013 Jan Kaluza <jkaluza@redhat.com> - 2.2.23-1
+- update to 2.2.23
+
 * Mon Feb 13 2012 Joe Orton <jorton@redhat.com> - 2.2.22-2
 - fix build against PCRE 8.30
 

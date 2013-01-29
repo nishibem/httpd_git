@@ -9,9 +9,11 @@ Upstream-Status: not submitted, ugly hack which only makes a difference
 		to the default configuration used in Fedora.  Need to find
 		a way to do this properly.
 
---- httpd-2.1.10/server/mpm_common.c.pod
-+++ httpd-2.1.10/server/mpm_common.c
-@@ -583,6 +584,7 @@
+diff --git a/server/mpm_common.c b/server/mpm_common.c
+index eb59407..36e318e 100644
+--- a/server/mpm_common.c
++++ b/server/mpm_common.c
+@@ -648,6 +648,7 @@ static apr_status_t dummy_connection(ap_pod_t *pod)
      apr_socket_t *sock;
      apr_pool_t *p;
      apr_size_t len;
@@ -19,7 +21,7 @@ Upstream-Status: not submitted, ugly hack which only makes a difference
  
      /* create a temporary pool for the socket.  pconf stays around too long */
      rv = apr_pool_create(&p, pod->p);
-@@ -590,8 +592,11 @@
+@@ -655,8 +656,11 @@ static apr_status_t dummy_connection(ap_pod_t *pod)
          return rv;
      }
  
@@ -33,7 +35,7 @@ Upstream-Status: not submitted, ugly hack which only makes a difference
      if (rv != APR_SUCCESS) {
          ap_log_error(APLOG_MARK, APLOG_WARNING, rv, ap_server_conf,
                       "get socket to connect to listener");
-@@ -614,7 +619,7 @@
+@@ -679,7 +683,7 @@ static apr_status_t dummy_connection(ap_pod_t *pod)
          return rv;
      }
  
@@ -42,12 +44,12 @@ Upstream-Status: not submitted, ugly hack which only makes a difference
      if (rv != APR_SUCCESS) {
          int log_level = APLOG_WARNING;
  
-@@ -627,7 +632,7 @@
+@@ -692,7 +696,7 @@ static apr_status_t dummy_connection(ap_pod_t *pod)
          }
  
          ap_log_error(APLOG_MARK, log_level, rv, ap_server_conf,
 -                     "connect to listener on %pI", ap_listeners->bind_addr);
 +                     "connect to listener on %pI", lr->bind_addr);
+         apr_pool_destroy(p);
+         return rv;
      }
- 
-     /* Create the request string. We include a User-Agent so that
