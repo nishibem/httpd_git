@@ -30,7 +30,7 @@ Patch1: httpd-2.1.10-apctl.patch
 Patch2: httpd-2.1.10-apxs.patch
 Patch3: httpd-2.2.9-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
-Patch5: httpd-2.1.10-layout.patch
+Patch5: httpd-2.2.22-layout.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
 Patch22: httpd-2.1.10-pod.patch
@@ -283,7 +283,14 @@ mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm
-echo "%%_httpd_mmn %{mmnisa}" > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd
+cat > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd <<EOF
+%%_httpd_mmn %{mmnisa}
+%%_httpd_apxs %%{_sbindir}/apxs
+%%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.d
+%%_httpd_confdir %%{_sysconfdir}/httpd/conf.d
+%%_httpd_contentdir %{contentdir}
+%%_httpd_moddir %%{_libdir}/httpd/modules
+EOF
 
 # docroot
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
@@ -308,11 +315,6 @@ set -x
 # Symlink for the powered-by-$DISTRO image:
 ln -s ../../..%{_datadir}/pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
-
-# Set up /var directories
-rmdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/logs
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/httpd
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/httpd
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
@@ -539,6 +541,15 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Tue Jan 29 2013 Jan Kaluza <jkaluza@redhat.com> - 2.2.23-1
 - update to 2.2.23
+
+* Mon Apr 30 2012 Joe Orton <jorton@redhat.com> - 2.2.22-4
+- switch default runtimedir to /var/run/httpd
+- extend _httpd_* macro set per proposed guidelines
+- fix comments in sysconfig file (#771024)
+
+* Sat Mar 31 2012 Adam Williamson <awilliam@redhat.com> - 2.2.22-3
+- rebuild against openssl 1.0.0h (previous build was against
+  1.0.1, this is not good) RH #808793
 
 * Mon Feb 13 2012 Joe Orton <jorton@redhat.com> - 2.2.22-2
 - fix build against PCRE 8.30
