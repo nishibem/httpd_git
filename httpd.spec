@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -590,6 +590,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -n mod_session
 %defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_session*.so
+%{_libdir}/httpd/modules/mod_auth_form.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %files devel
@@ -603,6 +604,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Feb 26 2013 Joe Orton <jorton@redhat.com> - 2.4.4-2
+- really package mod_auth_form in mod_session (#915438)
+
 * Tue Feb 26 2013 Joe Orton <jorton@redhat.com> - 2.4.4-1
 - update to 2.4.4
 - fix duplicate ownership of mod_session config (#914901)
