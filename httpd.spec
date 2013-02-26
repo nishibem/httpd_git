@@ -506,6 +506,7 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
+%exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
 %{_prefix}/lib/tmpfiles.d/httpd.conf
@@ -604,6 +605,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Tue Feb 26 2013 Joe Orton <jorton@redhat.com> - 2.4.4-1
 - update to 2.4.4
+- fix duplicate ownership of mod_session config (#914901)
 
 * Fri Feb 22 2013 Joe Orton <jorton@redhat.com> - 2.4.3-17
 - add mod_session subpackage, move mod_auth_form there (#894500)
