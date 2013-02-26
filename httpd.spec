@@ -40,6 +40,7 @@ Source21: ssl.conf
 Source22: welcome.conf
 Source23: manual.conf
 Source24: 00-systemd.conf
+Source25: 01-session.conf
 # Documentation
 Source30: README.confd
 Source40: htcacheclean.service
@@ -155,6 +156,15 @@ Requires: apr-util-ldap
 The mod_ldap and mod_authnz_ldap modules add support for LDAP
 authentication to the Apache HTTP Server.
 
+%package -n mod_session
+Group: System Environment/Daemons
+Summary: Session interface for the Apache HTTP Server
+Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+
+%description -n mod_session
+The mod_session module and associated backends provide an abstract
+interface for storing and accessing per-user session data.
+
 %prep
 %setup -q
 %patch1 -p1 -b .apctl
@@ -241,7 +251,6 @@ export LYNX_PATH=/usr/bin/links
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
         --disable-imagemap  \
-        --disable-session
 	$*
 make %{?_smp_mflags}
 
@@ -264,7 +273,7 @@ install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 00-systemd.conf; do
+         01-ldap.conf 00-systemd.conf 01-session.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -513,10 +522,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
 %{_libdir}/httpd/modules/mod*.so
+%exclude %{_libdir}/httpd/modules/mod_auth_form.so
 %exclude %{_libdir}/httpd/modules/mod_ssl.so
 %exclude %{_libdir}/httpd/modules/mod_*ldap.so
 %exclude %{_libdir}/httpd/modules/mod_proxy_html.so
 %exclude %{_libdir}/httpd/modules/mod_xml2enc.so
+%exclude %{_libdir}/httpd/modules/mod_session*.so
 
 %dir %{contentdir}
 %dir %{contentdir}/icons
@@ -575,6 +586,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/modules/mod_*ldap.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
+%files -n mod_session
+%defattr(-,root,root)
+%{_libdir}/httpd/modules/mod_session*.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
+
 %files devel
 %defattr(-,root,root)
 %{_includedir}/httpd
@@ -588,6 +604,12 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Tue Feb 26 2013 Joe Orton <jorton@redhat.com> - 2.4.4-1
 - update to 2.4.4
+
+* Fri Feb 22 2013 Joe Orton <jorton@redhat.com> - 2.4.3-17
+- add mod_session subpackage, move mod_auth_form there (#894500)
+
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4.3-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
 * Tue Jan  8 2013 Joe Orton <jorton@redhat.com> - 2.4.3-15
 - add systemd service for htcacheclean
