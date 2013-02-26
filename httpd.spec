@@ -13,8 +13,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.3
-Release: 15%{?dist}
+Version: 2.4.4
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -51,16 +51,15 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 # Features/functional changes
-Patch23: httpd-2.4.1-export.patch
+Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
-Patch26: httpd-2.4.3-r1337344+.patch
+Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch28: httpd-2.4.2-r1332643+.patch
+Patch28: httpd-2.4.4-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 # Bug fixes
 Patch50: httpd-2.4.2-r1374214+.patch
-Patch51: httpd-2.4.3-r1387633+.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -173,7 +172,6 @@ authentication to the Apache HTTP Server.
 %patch29 -p1 -b .systemd
 
 %patch50 -p1 -b .r1374214+
-%patch51 -p1 -b .r1387633
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -588,6 +586,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Feb 26 2013 Joe Orton <jorton@redhat.com> - 2.4.4-1
+- update to 2.4.4
+
 * Tue Jan  8 2013 Joe Orton <jorton@redhat.com> - 2.4.3-15
 - add systemd service for htcacheclean
 
