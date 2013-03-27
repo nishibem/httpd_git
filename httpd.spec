@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -604,6 +604,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Mar 26 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-3
+- protect MIMEMagicFile with IfModule (#893949)
+
 * Tue Feb 26 2013 Joe Orton <jorton@redhat.com> - 2.4.4-2
 - really package mod_auth_form in mod_session (#915438)
 
