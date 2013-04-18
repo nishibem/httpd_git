@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -604,6 +604,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Apr 18 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-5
+- execute systemctl reload as result of apachectl graceful
+
 * Tue Apr 16 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-4
 - fix service file to not send SIGTERM after ExecStop (#906321, #912288)
 
