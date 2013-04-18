@@ -61,6 +61,7 @@ Patch28: httpd-2.4.4-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 # Bug fixes
 Patch50: httpd-2.4.2-r1374214+.patch
+Patch51: httpd-2.4.3-sslsninotreq.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -182,6 +183,7 @@ interface for storing and accessing per-user session data.
 %patch29 -p1 -b .systemd
 
 %patch50 -p1 -b .r1374214+
+%patch51 -p1 -b .sninotreq
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -606,6 +608,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Thu Apr 18 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-5
 - execute systemctl reload as result of apachectl graceful
+- mod_ssl: ignore SNI hints unless required by config
 
 * Tue Apr 16 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-4
 - fix service file to not send SIGTERM after ExecStop (#906321, #912288)
