@@ -60,6 +60,7 @@ Patch27: httpd-2.4.2-icons.patch
 Patch28: httpd-2.4.4-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
+Patch31: httpd-2.4.4-sslmultiproxy.patch
 # Bug fixes
 Patch50: httpd-2.4.2-r1374214+.patch
 Patch51: httpd-2.4.3-sslsninotreq.patch
@@ -183,6 +184,7 @@ interface for storing and accessing per-user session data.
 %patch28 -p1 -b .r1332643+
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
+%patch31 -p1 -b .sslmulti
 
 %patch50 -p1 -b .r1374214+
 %patch51 -p1 -b .sninotreq
@@ -612,6 +614,8 @@ rm -rf $RPM_BUILD_ROOT
 - execute systemctl reload as result of apachectl graceful
 - mod_ssl: ignore SNI hints unless required by config
 - mod_cache: forward-port CacheMaxExpire "hard" option
+- mod_ssl: fall back on another module's proxy hook if mod_ssl proxy
+  is not configured.
 
 * Tue Apr 16 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-4
 - fix service file to not send SIGTERM after ExecStop (#906321, #912288)
