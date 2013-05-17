@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -61,6 +61,9 @@ Patch28: httpd-2.4.4-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 # Bug fixes
 Patch50: httpd-2.4.2-r1374214+.patch
+Patch51: httpd-2.4.4-r1476674.patch
+Patch52: httpd-2.4.4-mod_cache-tmppath.patch
+Patch53: httpd-2.4.4-dump-vhost-twice.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -182,6 +185,9 @@ interface for storing and accessing per-user session data.
 %patch29 -p1 -b .systemd
 
 %patch50 -p1 -b .r1374214+
+%patch51 -p1 -b .r1476674
+%patch52 -p1 -b .tmppath
+%patch53 -p1 -b .dumpvhost
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -604,6 +610,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri May 17 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-3
+- fix service file to not send SIGTERM after ExecStop (#906321, #912288)
+- execute systemctl reload as result of apachectl graceful
+- htpasswd/htdbm: fix hash generation bug (#956344)
+- do not dump vhosts twice in httpd -S output (#928761)
+- mod_cache: fix potential crash caused by uninitialized variable (#954109)
+
 * Tue Feb 26 2013 Joe Orton <jorton@redhat.com> - 2.4.4-2
 - really package mod_auth_form in mod_session (#915438)
 
