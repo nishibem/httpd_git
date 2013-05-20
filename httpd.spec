@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -64,6 +64,9 @@ Patch31: httpd-2.4.4-sslmultiproxy.patch
 # Bug fixes
 Patch50: httpd-2.4.2-r1374214+.patch
 Patch51: httpd-2.4.3-sslsninotreq.patch
+Patch52: httpd-2.4.4-r1476674.patch
+Patch53: httpd-2.4.4-mod_cache-tmppath.patch
+Patch54: httpd-2.4.4-dump-vhost-twice.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -188,6 +191,9 @@ interface for storing and accessing per-user session data.
 
 %patch50 -p1 -b .r1374214+
 %patch51 -p1 -b .sninotreq
+%patch52 -p1 -b .r1476674
+%patch53 -p1 -b .tmppath
+%patch54 -p1 -b .vhosttwice
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -610,6 +616,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon May 20 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-6
+- htpasswd/htdbm: fix hash generation bug (#956344)
+- do not dump vhosts twice in httpd -S output (#928761)
+- mod_cache: fix potential crash caused by uninitialized variable (#954109)
+
 * Thu Apr 18 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-5
 - execute systemctl reload as result of apachectl graceful
 - mod_ssl: ignore SNI hints unless required by config
