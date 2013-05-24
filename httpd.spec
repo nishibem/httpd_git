@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -616,6 +616,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri May 24 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-7
+- ignore /etc/sysconfig/httpd and document systemd way of setting env variables
+  in this file
+
 * Mon May 20 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-6
 - htpasswd/htdbm: fix hash generation bug (#956344)
 - do not dump vhosts twice in httpd -S output (#928761)
