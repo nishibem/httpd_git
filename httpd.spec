@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -67,6 +67,7 @@ Patch51: httpd-2.4.3-sslsninotreq.patch
 Patch52: httpd-2.4.4-r1476674.patch
 Patch53: httpd-2.4.4-mod_cache-tmppath.patch
 Patch54: httpd-2.4.4-dump-vhost-twice.patch
+Patch55: httpd-2.4.4-malformed-host.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -194,6 +195,7 @@ interface for storing and accessing per-user session data.
 %patch52 -p1 -b .r1476674
 %patch53 -p1 -b .tmppath
 %patch54 -p1 -b .vhosttwice
+%patch55 -p1 -b .malformedhost
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -616,6 +618,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri May 31 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-7
+- return 400 Bad Request on malformed Host header
+
 * Mon May 20 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-6
 - htpasswd/htdbm: fix hash generation bug (#956344)
 - do not dump vhosts twice in httpd -S output (#928761)
