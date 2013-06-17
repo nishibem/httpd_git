@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -417,8 +417,8 @@ rm -vf \
       $RPM_BUILD_ROOT/etc/httpd/conf/mime.types \
       $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.exp \
       $RPM_BUILD_ROOT%{_libdir}/httpd/build/config.nice \
-      $RPM_BUILD_ROOT%{_bindir}/ap?-config \
-      $RPM_BUILD_ROOT%{_sbindir}/{checkgid,dbmmanage,envvars*} \
+      $RPM_BUILD_ROOT%{_bindir}/{ap?-config,dbmmanage} \
+      $RPM_BUILD_ROOT%{_sbindir}/{checkgid,envvars*} \
       $RPM_BUILD_ROOT%{contentdir}/htdocs/* \
       $RPM_BUILD_ROOT%{_mandir}/man1/dbmmanage.* \
       $RPM_BUILD_ROOT%{contentdir}/cgi-bin/*
@@ -618,6 +618,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Jun 17 2013 Joe Orton <jorton@redhat.com> - 2.4.4-9
+- remove zombie dbmmanage script
+
 * Fri May 31 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-8
 - return 400 Bad Request on malformed Host header
 
