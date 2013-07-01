@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -576,6 +576,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/*
 %doc LICENSE NOTICE
 %exclude %{_bindir}/apxs
+%exclude %{_mandir}/man1/apxs.1*
 
 %files manual
 %defattr(-,root,root)
@@ -618,6 +619,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Jul  1 2013 Joe Orton <jorton@redhat.com> - 2.4.4-10
+- remove duplicate apxs man page from httpd-tools
+
 * Mon Jun 17 2013 Joe Orton <jorton@redhat.com> - 2.4.4-9
 - remove zombie dbmmanage script
 
