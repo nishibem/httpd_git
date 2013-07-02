@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.4
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -51,6 +51,7 @@ Patch2: httpd-2.4.3-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
+Patch7: httpd-2.4.4-aarch64.patch
 # Features/functional changes
 Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
@@ -179,6 +180,7 @@ interface for storing and accessing per-user session data.
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
+%patch7 -p1 -b .aarch64
 
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -619,6 +621,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Jul  2 2013 Joe Orton <jorton@redhat.com> - 2.4.4-11
+- add patch for aarch64 (Dennis Gilmore, #925558)
+
 * Mon Jul  1 2013 Joe Orton <jorton@redhat.com> - 2.4.4-10
 - remove duplicate apxs man page from httpd-tools
 
