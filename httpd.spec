@@ -57,10 +57,10 @@ Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch28: httpd-2.4.4-r1332643+.patch
+Patch28: httpd-2.4.6-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
-Patch31: httpd-2.4.4-sslmultiproxy.patch
+Patch31: httpd-2.4.6-sslmultiproxy.patch
 # Bug fixes
 Patch51: httpd-2.4.3-sslsninotreq.patch
 Patch54: httpd-2.4.4-dump-vhost-twice.patch
@@ -186,7 +186,7 @@ interface for storing and accessing per-user session data.
 %patch28 -p1 -b .r1332643+
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
-%patch31 -p1 -b .sslmulti
+%patch31 -p1 -b .sslmultiproxy
 
 %patch51 -p1 -b .sninotreq
 %patch54 -p1 -b .vhosttwice
@@ -615,6 +615,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Jul 22 2013 Joe Orton <jorton@redhat.com> - 2.4.6-1
+- update to 2.4.6
+- mod_ssl: use revised NPN API (r1487772)
+
 * Thu Jul 11 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-12
 - mod_unique_id: replace use of hostname + pid with PRNG output (#976666)
 - apxs: mention -p option in manpage
