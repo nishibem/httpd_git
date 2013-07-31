@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -63,7 +63,6 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 # Bug fixes
 Patch51: httpd-2.4.3-sslsninotreq.patch
-Patch54: httpd-2.4.4-dump-vhost-twice.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 License: ASL 2.0
@@ -189,7 +188,6 @@ interface for storing and accessing per-user session data.
 %patch31 -p1 -b .sslmultiproxy
 
 %patch51 -p1 -b .sninotreq
-%patch54 -p1 -b .vhosttwice
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 
@@ -615,6 +613,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Jul 31 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-2
+- revert fix for dumping vhosts twice
+
 * Mon Jul 22 2013 Joe Orton <jorton@redhat.com> - 2.4.6-1
 - update to 2.4.6
 - mod_ssl: use revised NPN API (r1487772)
