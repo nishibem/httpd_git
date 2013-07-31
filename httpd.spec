@@ -13,8 +13,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.4
-Release: 3%{?dist}
+Version: 2.4.6
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -57,13 +57,14 @@ Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch28: httpd-2.4.4-r1332643+.patch
+Patch28: httpd-2.4.6-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
+Patch30: httpd-2.4.4-cachehardmax.patch
+Patch31: httpd-2.4.6-sslmultiproxy.patch
 # Bug fixes
-Patch50: httpd-2.4.2-r1374214+.patch
-Patch51: httpd-2.4.4-r1476674.patch
-Patch52: httpd-2.4.4-mod_cache-tmppath.patch
-Patch53: httpd-2.4.4-dump-vhost-twice.patch
+Patch51: httpd-2.4.3-sslsninotreq.patch
+Patch55: httpd-2.4.4-malformed-host.patch
+Patch56: httpd-2.4.4-mod_unique_id.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -183,11 +184,12 @@ interface for storing and accessing per-user session data.
 %patch27 -p1 -b .icons
 %patch28 -p1 -b .r1332643+
 %patch29 -p1 -b .systemd
+%patch30 -p1 -b .cachehardmax
+%patch31 -p1 -b .sslmultiproxy
 
-%patch50 -p1 -b .r1374214+
-%patch51 -p1 -b .r1476674
-%patch52 -p1 -b .tmppath
-%patch53 -p1 -b .dumpvhost
+%patch51 -p1 -b .sninotreq
+%patch55 -p1 -b .malformedhost
+%patch56 -p1 -b .uniqueid
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -409,8 +411,8 @@ rm -vf \
       $RPM_BUILD_ROOT/etc/httpd/conf/mime.types \
       $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.exp \
       $RPM_BUILD_ROOT%{_libdir}/httpd/build/config.nice \
-      $RPM_BUILD_ROOT%{_bindir}/ap?-config \
-      $RPM_BUILD_ROOT%{_sbindir}/{checkgid,dbmmanage,envvars*} \
+      $RPM_BUILD_ROOT%{_bindir}/{ap?-config,dbmmanage} \
+      $RPM_BUILD_ROOT%{_sbindir}/{checkgid,envvars*} \
       $RPM_BUILD_ROOT%{contentdir}/htdocs/* \
       $RPM_BUILD_ROOT%{_mandir}/man1/dbmmanage.* \
       $RPM_BUILD_ROOT%{contentdir}/cgi-bin/*
@@ -568,6 +570,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/*
 %doc LICENSE NOTICE
 %exclude %{_bindir}/apxs
+%exclude %{_mandir}/man1/apxs.1*
 
 %files manual
 %defattr(-,root,root)
@@ -610,6 +613,29 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Jul 31 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-2
+- revert fix for dumping vhosts twice
+
+* Mon Jul 22 2013 Joe Orton <jorton@redhat.com> - 2.4.6-1
+- update to 2.4.6
+- mod_ssl: use revised NPN API (r1487772)
+
+* Thu Jul 11 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-12
+- mod_unique_id: replace use of hostname + pid with PRNG output (#976666)
+- apxs: mention -p option in manpage
+
+* Tue Jul  2 2013 Joe Orton <jorton@redhat.com> - 2.4.4-11
+- add patch for aarch64 (Dennis Gilmore, #925558)
+
+* Mon Jul  1 2013 Joe Orton <jorton@redhat.com> - 2.4.4-10
+- remove duplicate apxs man page from httpd-tools
+
+* Mon Jun 17 2013 Joe Orton <jorton@redhat.com> - 2.4.4-9
+- remove zombie dbmmanage script
+
+* Fri May 31 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-8
+- return 400 Bad Request on malformed Host header
+
 * Fri May 17 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-3
 - fix service file to not send SIGTERM after ExecStop (#906321, #912288)
 - execute systemctl reload as result of apachectl graceful
