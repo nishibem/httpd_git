@@ -13,8 +13,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.4
-Release: 11%{?dist}
+Version: 2.4.6
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -51,24 +51,20 @@ Patch2: httpd-2.4.3-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
-Patch7: httpd-2.4.4-aarch64.patch
 # Features/functional changes
 Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch28: httpd-2.4.4-r1332643+.patch
+Patch28: httpd-2.4.6-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
-Patch31: httpd-2.4.4-sslmultiproxy.patch
+Patch31: httpd-2.4.6-sslmultiproxy.patch
 # Bug fixes
-Patch50: httpd-2.4.2-r1374214+.patch
 Patch51: httpd-2.4.3-sslsninotreq.patch
-Patch52: httpd-2.4.4-r1476674.patch
-Patch53: httpd-2.4.4-mod_cache-tmppath.patch
-Patch54: httpd-2.4.4-dump-vhost-twice.patch
 Patch55: httpd-2.4.4-malformed-host.patch
+Patch56: httpd-2.4.4-mod_unique_id.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -180,7 +176,6 @@ interface for storing and accessing per-user session data.
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
-%patch7 -p1 -b .aarch64
 
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -190,14 +185,11 @@ interface for storing and accessing per-user session data.
 %patch28 -p1 -b .r1332643+
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
-%patch31 -p1 -b .sslmulti
+%patch31 -p1 -b .sslmultiproxy
 
-%patch50 -p1 -b .r1374214+
 %patch51 -p1 -b .sninotreq
-%patch52 -p1 -b .r1476674
-%patch53 -p1 -b .tmppath
-%patch54 -p1 -b .vhosttwice
 %patch55 -p1 -b .malformedhost
+%patch56 -p1 -b .uniqueid
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -621,6 +613,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Jul 31 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-2
+- revert fix for dumping vhosts twice
+
+* Mon Jul 22 2013 Joe Orton <jorton@redhat.com> - 2.4.6-1
+- update to 2.4.6
+- mod_ssl: use revised NPN API (r1487772)
+
+* Thu Jul 11 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.4-12
+- mod_unique_id: replace use of hostname + pid with PRNG output (#976666)
+- apxs: mention -p option in manpage
+
 * Tue Jul  2 2013 Joe Orton <jorton@redhat.com> - 2.4.4-11
 - add patch for aarch64 (Dennis Gilmore, #925558)
 

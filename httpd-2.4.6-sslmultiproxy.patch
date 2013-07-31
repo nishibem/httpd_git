@@ -1,8 +1,9 @@
-diff --git a/modules/ssl/mod_ssl.c b/modules/ssl/mod_ssl.c
-index 6ea367c..3cbd08f 100644
---- a/modules/ssl/mod_ssl.c
-+++ b/modules/ssl/mod_ssl.c
-@@ -378,6 +378,9 @@ static SSLConnRec *ssl_init_connection_ctx(conn_rec *c)
+
+Ugly hack to enable mod_ssl and mod_nss to "share" hooks.
+
+--- httpd-2.4.6/modules/ssl/mod_ssl.c.sslmultiproxy
++++ httpd-2.4.6/modules/ssl/mod_ssl.c
+@@ -369,6 +369,9 @@ static SSLConnRec *ssl_init_connection_c
      return sslconn;
  }
  
@@ -12,7 +13,7 @@ index 6ea367c..3cbd08f 100644
  int ssl_proxy_enable(conn_rec *c)
  {
      SSLSrvConfigRec *sc;
-@@ -386,6 +389,12 @@ int ssl_proxy_enable(conn_rec *c)
+@@ -377,6 +380,12 @@ int ssl_proxy_enable(conn_rec *c)
      sc = mySrvConfig(sslconn->server);
  
      if (!sc->proxy_enabled) {
@@ -25,7 +26,7 @@ index 6ea367c..3cbd08f 100644
          ap_log_cerror(APLOG_MARK, APLOG_ERR, 0, c, APLOGNO(01961)
                        "SSL Proxy requested for %s but not enabled "
                        "[Hint: SSLProxyEngine]", sc->vhost_id);
-@@ -405,6 +414,10 @@ int ssl_engine_disable(conn_rec *c)
+@@ -396,6 +405,10 @@ int ssl_engine_disable(conn_rec *c)
  
      SSLConnRec *sslconn = myConnConfig(c);
  
@@ -36,7 +37,7 @@ index 6ea367c..3cbd08f 100644
      if (sslconn) {
          sc = mySrvConfig(sslconn->server);
      }
-@@ -590,6 +603,9 @@ static void ssl_register_hooks(apr_pool_t *p)
+@@ -612,6 +625,9 @@ static void ssl_register_hooks(apr_pool_
      ap_hook_post_read_request(ssl_hook_ReadReq, pre_prr,NULL, APR_HOOK_MIDDLE);
  
      ssl_var_register(p);
@@ -46,11 +47,9 @@ index 6ea367c..3cbd08f 100644
  
      APR_REGISTER_OPTIONAL_FN(ssl_proxy_enable);
      APR_REGISTER_OPTIONAL_FN(ssl_engine_disable);
-diff --git a/modules/ssl/ssl_engine_vars.c b/modules/ssl/ssl_engine_vars.c
-index 536e6b1..c508fff 100644
---- a/modules/ssl/ssl_engine_vars.c
-+++ b/modules/ssl/ssl_engine_vars.c
-@@ -53,10 +53,15 @@ static void  ssl_var_lookup_ssl_cipher_bits(SSL *ssl, int *usekeysize, int *algk
+--- httpd-2.4.6/modules/ssl/ssl_engine_vars.c.sslmultiproxy
++++ httpd-2.4.6/modules/ssl/ssl_engine_vars.c
+@@ -53,10 +53,15 @@ static void  ssl_var_lookup_ssl_cipher_b
  static char *ssl_var_lookup_ssl_version(apr_pool_t *p, char *var);
  static char *ssl_var_lookup_ssl_compress_meth(SSL *ssl);
  
@@ -77,7 +76,7 @@ index 536e6b1..c508fff 100644
      APR_REGISTER_OPTIONAL_FN(ssl_is_https);
      APR_REGISTER_OPTIONAL_FN(ssl_var_lookup);
      APR_REGISTER_OPTIONAL_FN(ssl_ext_list);
-@@ -241,6 +249,15 @@ char *ssl_var_lookup(apr_pool_t *p, server_rec *s, conn_rec *c, request_rec *r,
+@@ -241,6 +249,15 @@ char *ssl_var_lookup(apr_pool_t *p, serv
       */
      if (result == NULL && c != NULL) {
          SSLConnRec *sslconn = myConnConfig(c);
