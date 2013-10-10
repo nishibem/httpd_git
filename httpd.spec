@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -72,7 +72,7 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.4.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 BuildRequires: systemd-devel
-Requires: /etc/mime.types, system-logos >= 7.92.1-1
+Requires: /etc/mime.types, fedora-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
@@ -613,6 +613,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Oct 10 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-3
+- require fedora-logos-httpd (#1009162)
+
 * Wed Jul 31 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-2
 - revert fix for dumping vhosts twice
 
