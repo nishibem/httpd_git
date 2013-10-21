@@ -1,0 +1,17 @@
+# ./pullrev.sh 1530793
+
+http://svn.apache.org/viewvc?view=revision&revision=1530793
+
+--- httpd-2.4.6/server/core_filters.c
++++ httpd-2.4.6/server/core_filters.c
+@@ -779,7 +779,9 @@
+                 pollset.reqevents = APR_POLLOUT;
+                 pollset.desc.s = s;
+                 apr_socket_timeout_get(s, &timeout);
+-                rv = apr_poll(&pollset, 1, &nsds, timeout);
++                do {
++                    rv = apr_poll(&pollset, 1, &nsds, timeout);
++                } while (APR_STATUS_IS_EINTR(rv));
+                 if (rv != APR_SUCCESS) {
+                     break;
+                 }

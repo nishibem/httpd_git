@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -43,6 +43,7 @@ Source24: 00-systemd.conf
 Source25: 01-session.conf
 # Documentation
 Source30: README.confd
+Source31: README.confmod
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 # build/scripts patches
@@ -65,6 +66,8 @@ Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch51: httpd-2.4.3-sslsninotreq.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
+Patch57: httpd-2.4.6-r1530793.patch
+Patch58: httpd-2.4.6-r1534321.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -190,6 +193,8 @@ interface for storing and accessing per-user session data.
 %patch51 -p1 -b .sninotreq
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
+%patch57 -p1 -b .r1530793
+%patch58 -p1 -b .r1534321
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -279,6 +284,8 @@ mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d \
       $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
+install -m 644 $RPM_SOURCE_DIR/README.confmod \
+    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
          01-ldap.conf 00-systemd.conf 01-session.conf; do
@@ -505,6 +512,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %{_sysconfdir}/httpd/conf.d
 %{_sysconfdir}/httpd/conf.d/README
+%{_sysconfdir}/httpd/conf.modules.d/README
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
 %exclude %{_sysconfdir}/httpd/conf.d/ssl.conf
 %exclude %{_sysconfdir}/httpd/conf.d/manual.conf
@@ -613,6 +621,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Oct 21 2013 Joe Orton <jorton@redhat.com> - 2.4.6-4
+- load mod_macro by default (#998452)
+- add README to conf.modules.d
+- mod_proxy_http: add possible fix for threading issues (r1534321)
+- core: add fix for truncated output with CGI scripts (r1530793)
+
 * Thu Oct 10 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-3
 - require fedora-logos-httpd (#1009162)
 
