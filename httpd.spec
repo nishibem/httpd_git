@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -613,6 +613,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Oct 24 2013 Jan kaluza <jkaluza@redhat.com> - 2.4.6-4
+- systemd: send SIGWINCH signal without httpd -k in ExecStop
+
 * Thu Oct 10 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-3
 - require fedora-logos-httpd (#1009162)
 
