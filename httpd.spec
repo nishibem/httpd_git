@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -62,6 +62,7 @@ Patch28: httpd-2.4.6-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
+Patch32: httpd-2.4.6-r1537535.patch
 # Bug fixes
 Patch51: httpd-2.4.3-sslsninotreq.patch
 Patch55: httpd-2.4.4-malformed-host.patch
@@ -189,6 +190,7 @@ interface for storing and accessing per-user session data.
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
+%patch32 -p1 -b .r1537535
 
 %patch51 -p1 -b .sninotreq
 %patch55 -p1 -b .malformedhost
@@ -621,6 +623,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Oct 31 2013 Joe Orton <jorton@redhat.com> - 2.4.6-5
+- mod_ssl: allow SSLEngine to override Listen-based default (r1537535)
+
 * Mon Oct 21 2013 Joe Orton <jorton@redhat.com> - 2.4.6-4
 - load mod_macro by default (#998452)
 - add README to conf.modules.d
