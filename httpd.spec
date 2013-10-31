@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -623,8 +623,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
-* Thu Oct 31 2013 Joe Orton <jorton@redhat.com> - 2.4.6-5
+* Thu Oct 31 2013 Joe Orton <jorton@redhat.com> - 2.4.6-6
 - mod_ssl: allow SSLEngine to override Listen-based default (r1537535)
+
+* Thu Oct 24 2013 Jan kaluza <jkaluza@redhat.com> - 2.4.6-5
+- systemd: send SIGWINCH signal without httpd -k in ExecStop
 
 * Mon Oct 21 2013 Joe Orton <jorton@redhat.com> - 2.4.6-4
 - load mod_macro by default (#998452)
