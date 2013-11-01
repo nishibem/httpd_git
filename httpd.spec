@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -623,6 +623,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fir Nov  1 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-7
+- systemd: use {MAINPID} notation to ensure /bin/kill has always the second arg
+
 * Thu Oct 31 2013 Joe Orton <jorton@redhat.com> - 2.4.6-6
 - mod_ssl: allow SSLEngine to override Listen-based default (r1537535)
 

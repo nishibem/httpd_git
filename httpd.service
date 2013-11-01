@@ -24,7 +24,7 @@ Environment=LANG=C
 
 ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND
 ExecReload=/usr/sbin/httpd $OPTIONS -k graceful
-ExecStop=/bin/kill -WINCH $MAINPID
+ExecStop=/bin/kill -WINCH ${MAINPID}
 # We want systemd to give httpd some time to finish gracefully, but still want
 # it to kill httpd after TimeoutStopSec if something went wrong during the
 # graceful stop. Normally, Systemd sends SIGTERM signal right after the
