@@ -623,7 +623,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
-* Fir Nov  1 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-7
+* Fri Nov  1 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-7
 - systemd: use {MAINPID} notation to ensure /bin/kill has always the second arg
 
 * Thu Oct 31 2013 Joe Orton <jorton@redhat.com> - 2.4.6-6
