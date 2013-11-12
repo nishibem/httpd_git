@@ -2,7 +2,8 @@
 %define docroot /var/www
 %define suexec_caller apache
 %define mmn 20120211
-%define mmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
+%define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
+%define mmnisa %{mmn}-%{__isa_name}%{__isa_bits}
 %define vstring Fedora
 
 # Drop automatic provides for module DSOs
@@ -14,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -80,7 +81,7 @@ Requires: /etc/mime.types, fedora-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
-Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
+Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires(pre): /usr/sbin/useradd
 Requires(preun): systemd-units
@@ -623,6 +624,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Tue Nov 12 2013 Joe Orton <jorton@redhat.com> - 2.4.6-8
+- drop ambiguous invalid "-" in RHS of httpd-mmn Provide, keeping old Provide
+  for transition
+
 * Fri Nov  1 2013 Jan Kaluza <jkaluza@redhat.com> - 2.4.6-7
 - systemd: use {MAINPID} notation to ensure /bin/kill has always the second arg
 
