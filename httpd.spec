@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.6
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -77,7 +77,7 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.4.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 BuildRequires: systemd-devel
-Requires: /etc/mime.types, fedora-logos-httpd
+Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
@@ -624,6 +624,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri Nov 22 2013 Joe Orton <jorton@redhat.com> - 2.4.6-10
+- switch to requiring system-logos-httpd (#1031288)
+
 * Tue Nov 12 2013 Joe Orton <jorton@redhat.com> - 2.4.6-9
 - change mmnisa to drop "-" altogether
 
