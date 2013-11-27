@@ -14,8 +14,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.6
-Release: 10%{?dist}
+Version: 2.4.7
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -59,23 +59,21 @@ Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch28: httpd-2.4.6-r1332643+.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
-Patch32: httpd-2.4.6-r1537535.patch
+Patch32: httpd-2.4.7-r1537535.patch
 # Bug fixes
-Patch51: httpd-2.4.3-sslsninotreq.patch
+Patch51: httpd-2.4.7-sslsninotreq.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
-Patch57: httpd-2.4.6-r1530793.patch
 Patch58: httpd-2.4.6-r1534321.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: apr-devel >= 1.4.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
+BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
@@ -187,7 +185,6 @@ interface for storing and accessing per-user session data.
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
-%patch28 -p1 -b .r1332643+
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
@@ -196,7 +193,6 @@ interface for storing and accessing per-user session data.
 %patch51 -p1 -b .sninotreq
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
-%patch57 -p1 -b .r1530793
 %patch58 -p1 -b .r1534321
 
 # Patch in the vendor string
@@ -624,6 +620,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Nov 27 2013 Joe Orton <jorton@redhat.com> - 2.4.7-1
+- update to 2.4.7 (#1034071)
+
 * Fri Nov 22 2013 Joe Orton <jorton@redhat.com> - 2.4.6-10
 - switch to requiring system-logos-httpd (#1031288)
 
