@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -85,6 +85,7 @@ Requires(pre): /usr/sbin/useradd
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires(post): systemd-units
+Conflicts: apr < 1.5.0-1
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -190,7 +191,7 @@ interface for storing and accessing per-user session data.
 %patch31 -p1 -b .sslmultiproxy
 %patch32 -p1 -b .r1537535
 
-%patch51 -p1 -b .sninotreq
+%patch51 -p1 -b .sslsninotreq
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch58 -p1 -b .r1534321
@@ -620,6 +621,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Dec 12 2013 Joe Orton <jorton@redhat.com> - 2.4.7-2
+- conflict with pre-1.5.0 APR
+- fix sslsninotreq patch
+
 * Wed Nov 27 2013 Joe Orton <jorton@redhat.com> - 2.4.7-1
 - update to 2.4.7 (#1034071)
 
