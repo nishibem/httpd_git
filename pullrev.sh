@@ -6,6 +6,7 @@ if [ $# -lt 1 ]; then
 fi
 
 repo="https://svn.apache.org/repos/asf/httpd/httpd/trunk"
+repo="https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x"
 ver=2.4.6
 prefix="httpd-${ver}"
 suffix="r$1${2:++}"
@@ -34,7 +35,7 @@ prev=/dev/null
 for r in $*; do
     echo "+ fetching ${r}"
     this=`mktemp /tmp/pullrevXXXXXX`
-    svn diff -c ${r} ${repo} | filterdiff --remove-timestamps -x 'CHANGES' -x 'next-number' \
+    svn diff -c ${r} ${repo} | filterdiff --remove-timestamps -x 'CHANGES' -x 'next-number' -x 'STATUS' \
         --addprefix="${prefix}/" > ${this}
     next=`mktemp /tmp/pullrevXXXXXX`
     combinediff --quiet ${prev} ${this} > ${next}
