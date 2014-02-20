@@ -15,7 +15,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -621,6 +621,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Feb 20 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.7-3
+- fix graceful restart using legacy actions
+
 * Thu Dec 12 2013 Joe Orton <jorton@redhat.com> - 2.4.7-2
 - conflict with pre-1.5.0 APR
 - fix sslsninotreq patch
