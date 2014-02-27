@@ -2,7 +2,6 @@
 %define docroot /var/www
 %define suexec_caller apache
 %define mmn 20120211
-%define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring Fedora
 
@@ -15,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.7
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -79,7 +78,7 @@ Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
-Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
+Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires(pre): /usr/sbin/useradd
 Requires(preun): systemd-units
@@ -621,6 +620,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Thu Feb 27 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.7-4
+- remove provides of old MMN, because it contained double-dash (#1068851)
+
 * Thu Feb 20 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.7-3
 - fix graceful restart using legacy actions
 
