@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.7
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -469,7 +469,7 @@ if [ -f %{sslkey} -o -f %{sslcert} ]; then
    exit 0
 fi
 
-%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{sslkey} 2> /dev/null
+%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 2048 > %{sslkey} 2> /dev/null
 
 FQDN=`hostname`
 if [ "x${FQDN}" = "x" ]; then
@@ -477,7 +477,7 @@ if [ "x${FQDN}" = "x" ]; then
 fi
 
 cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
-         -x509 -days 365 -set_serial $RANDOM -extensions v3_req \
+         -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
          -out %{sslcert} 2>/dev/null
 --
 SomeState
@@ -626,6 +626,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Fri Feb 28 2014 Joe Orton <jorton@redhat.com> - 2.4.7-6
+- use 2048-bit RSA key with SHA-256 signature in dummy certificate
+
 * Fri Feb 28 2014 Stephen Gallagher <sgallagh@redhat.com> 2.4.7-5
 - Create drop directory for systemd snippets
 
