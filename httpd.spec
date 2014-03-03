@@ -286,6 +286,11 @@ for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
 
+# install systemd override drop directory
+# Web application packages can drop snippets into this location if
+# they need ExecStart[pre|post].
+mkdir $RPM_BUILD_ROOT%{_unitdir}/httpd.service.d
+
 for f in welcome.conf ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
@@ -467,7 +472,7 @@ if [ -f %{sslkey} -o -f %{sslcert} ]; then
    exit 0
 fi
 
-%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{sslkey} 2> /dev/null
+%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 2048 > %{sslkey} 2> /dev/null
 
 FQDN=`hostname`
 if [ "x${FQDN}" = "x" ]; then
@@ -475,7 +480,7 @@ if [ "x${FQDN}" = "x" ]; then
 fi
 
 cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
-         -x509 -days 365 -set_serial $RANDOM -extensions v3_req \
+         -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
          -out %{sslcert} 2>/dev/null
 --
 SomeState
@@ -573,6 +578,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/*
 
 %{_unitdir}/*.service
+%attr(755,root,root) %dir %{_unitdir}/httpd.service.d
 
 %files tools
 %defattr(-,root,root)
@@ -626,6 +632,8 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Jul 21 2014 Joe Orton <jorton@redhat.com> - 2.4.10-1
 - update to 2.4.10
 - expand variables in docdir example configs
+- create drop directory for systemd snippets (jkaluza)
+- use 2048-bit RSA key with SHA-256 signature in dummy certificate
 
 * Wed Apr 09 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-1
 - update to 2.4.9
