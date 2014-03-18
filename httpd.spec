@@ -13,8 +13,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.7
-Release: 6%{?dist}
+Version: 2.4.9
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -48,7 +48,7 @@ Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
-Patch2: httpd-2.4.3-apxs.patch
+Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
@@ -63,10 +63,9 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch32: httpd-2.4.7-r1537535.patch
 # Bug fixes
-Patch51: httpd-2.4.7-sslsninotreq.patch
+Patch51: httpd-2.4.9-sslsninotreq.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
-Patch58: httpd-2.4.6-r1534321.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -193,7 +192,6 @@ interface for storing and accessing per-user session data.
 %patch51 -p1 -b .sslsninotreq
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
-%patch58 -p1 -b .r1534321
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -626,6 +624,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Mon Mar 17 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-1
+- update to 2.4.9
+
 * Fri Feb 28 2014 Joe Orton <jorton@redhat.com> - 2.4.7-6
 - use 2048-bit RSA key with SHA-256 signature in dummy certificate
 
