@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.9
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -63,7 +63,6 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch32: httpd-2.4.7-r1537535.patch
 # Bug fixes
-Patch51: httpd-2.4.9-sslsninotreq.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 License: ASL 2.0
@@ -189,7 +188,6 @@ interface for storing and accessing per-user session data.
 %patch31 -p1 -b .sslmultiproxy
 %patch32 -p1 -b .r1537535
 
-%patch51 -p1 -b .sslsninotreq
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 
@@ -335,8 +333,8 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
 
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/rpm
-cat > $RPM_BUILD_ROOT%{_sysconfdir}/rpm/macros.httpd <<EOF
+mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d
+cat > $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d/macros.httpd <<EOF
 %%_httpd_mmn %{mmnisa}
 %%_httpd_apxs %%{_bindir}/apxs
 %%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.modules.d
@@ -621,9 +619,13 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
 %{_libdir}/httpd/build/*.sh
-%{_sysconfdir}/rpm/macros.httpd
+%{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Mar 27 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-2
+- move macros from /etc/rpm to macros.d (#1074277)
+- remove unused patches
+
 * Mon Mar 17 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-1
 - update to 2.4.9
 
