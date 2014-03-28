@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.9
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -62,6 +62,7 @@ Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch32: httpd-2.4.7-r1537535.patch
+Patch33: httpd-2.4.9-r1573626.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
@@ -187,6 +188,7 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
 %patch32 -p1 -b .r1537535
+%patch33 -p1 -b .r1573626
 
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
@@ -622,6 +624,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Mar 28 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-3
+- add support for SetHandler + proxy (#1078970)
+
 * Thu Mar 27 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-2
 - move macros from /etc/rpm to macros.d (#1074277)
 - remove unused patches
