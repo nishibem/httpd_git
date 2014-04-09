@@ -13,7 +13,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.7
+Version: 2.4.9
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -48,7 +48,7 @@ Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
-Patch2: httpd-2.4.3-apxs.patch
+Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
@@ -62,17 +62,16 @@ Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch32: httpd-2.4.7-r1537535.patch
+Patch33: httpd-2.4.9-r1573626.patch
 # Bug fixes
-Patch51: httpd-2.4.7-sslsninotreq.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
-Patch58: httpd-2.4.6-r1534321.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: apr-devel >= 1.4.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
+BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
 BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
@@ -84,6 +83,7 @@ Requires(pre): /usr/sbin/useradd
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires(post): systemd-units
+Conflicts: apr < 1.5.0-1
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -188,11 +188,10 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
 %patch32 -p1 -b .r1537535
- 
-%patch51 -p1 -b .sslsninotreq
+%patch33 -p1 -b .r1573626
+
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
-%patch58 -p1 -b .r1534321
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -619,6 +618,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
+* Wed Apr 09 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-1
+- update to 2.4.9
+- add support for SetHandler + proxy (#1078970)
+- fix graceful restart using legacy actions
+- conflict with pre-1.5.0 APR
+
 * Mon Jan 27 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.7-1
 - update to 2.4.7 (#1034071)
 - mod_ssl: allow SSLEngine to override Listen-based default (r1537535)
