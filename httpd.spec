@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.9
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -624,6 +624,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jun 20 2014 Joe Orton <jorton@redhat.com> - 2.4.9-5
+- mod_ssl: don't use the default OpenSSL cipher suite in ssl.conf (#1109119)
+
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4.9-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
