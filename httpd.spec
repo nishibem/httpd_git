@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.9
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -527,6 +527,7 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %dir %{_sysconfdir}/httpd/conf.modules.d
+%{_sysconfdir}/httpd/conf.modules.d/README
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/*.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
@@ -580,7 +581,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/httpd
 %dir %{_sysconfdir}/httpd/conf.d
 %{_sysconfdir}/httpd/conf.d/README
-%{_sysconfdir}/httpd/conf.modules.d/README
 %dir %{docroot}
 %dir %{docroot}/cgi-bin
 %dir %{docroot}/html
@@ -636,6 +636,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jul 07 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-7
+- remove conf.modules.d from httpd-filesystem subpackage (#1081453)
+
 * Mon Jul 07 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-6
 - add httpd-filesystem subpackage (#1081453)
 
