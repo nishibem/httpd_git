@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.9
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -79,6 +79,7 @@ Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: httpd-tools = %{version}-%{release}
+Requires: httpd-filesystem = %{version}-%{release}
 Requires(pre): /usr/sbin/useradd
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -116,6 +117,16 @@ BuildArch: noarch
 The httpd-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
 also be found at http://httpd.apache.org/docs/2.2/.
+
+%package filesystem
+Group: System Environment/Daemons
+Summary: The basic directory layout for the Apache HTTP server
+BuildArch: noarch
+
+%description filesystem
+The httpd-filesystem package contains the basic directory layout
+for the Apache HTTP server including the correct permissions
+for the directories.
 
 %package tools
 Group: System Environment/Daemons
@@ -428,7 +439,7 @@ rm -vf \
 
 rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
-%pre
+%pre filesystem
 # Add the "apache" user
 /usr/sbin/useradd -c "Apache" -u 48 \
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
@@ -502,7 +513,6 @@ rm -rf $RPM_BUILD_ROOT
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
 %doc docs/conf/extra/*.conf
 
-%dir %{_sysconfdir}/httpd
 %{_sysconfdir}/httpd/modules
 %{_sysconfdir}/httpd/logs
 %{_sysconfdir}/httpd/run
@@ -512,9 +522,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %config(noreplace) %{_sysconfdir}/logrotate.d/httpd
 
-%dir %{_sysconfdir}/httpd/conf.d
-%{_sysconfdir}/httpd/conf.d/README
-%{_sysconfdir}/httpd/conf.modules.d/README
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
 %exclude %{_sysconfdir}/httpd/conf.d/ssl.conf
 %exclude %{_sysconfdir}/httpd/conf.d/manual.conf
@@ -548,8 +555,6 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_libdir}/httpd/modules/mod_xml2enc.so
 %exclude %{_libdir}/httpd/modules/mod_session*.so
 
-%dir %{contentdir}
-%dir %{contentdir}/icons
 %dir %{contentdir}/error
 %dir %{contentdir}/error/include
 %dir %{contentdir}/noindex
@@ -558,10 +563,6 @@ rm -rf $RPM_BUILD_ROOT
 %{contentdir}/error/*.var
 %{contentdir}/error/include/*.html
 %{contentdir}/noindex/index.html
-
-%dir %{docroot}
-%dir %{docroot}/cgi-bin
-%dir %{docroot}/html
 
 %attr(0710,root,apache) %dir /run/httpd
 %attr(0700,apache,apache) %dir /run/httpd/htcacheclean
@@ -574,6 +575,17 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_unitdir}/*.service
 %attr(755,root,root) %dir %{_unitdir}/httpd.service.d
+
+%files filesystem
+%dir %{_sysconfdir}/httpd
+%dir %{_sysconfdir}/httpd/conf.d
+%{_sysconfdir}/httpd/conf.d/README
+%{_sysconfdir}/httpd/conf.modules.d/README
+%dir %{docroot}
+%dir %{docroot}/cgi-bin
+%dir %{docroot}/html
+%dir %{contentdir}
+%dir %{contentdir}/icons
 
 %files tools
 %defattr(-,root,root)
@@ -624,6 +636,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jul 07 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-6
+- add httpd-filesystem subpackage (#1081453)
+
 * Fri Jun 20 2014 Joe Orton <jorton@redhat.com> - 2.4.9-5
 - mod_ssl: don't use the default OpenSSL cipher suite in ssl.conf (#1109119)
 
