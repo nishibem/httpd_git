@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.9
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -41,6 +41,8 @@ Source22: welcome.conf
 Source23: manual.conf
 Source24: 00-systemd.conf
 Source25: 01-session.conf
+Source26: 10-listen443.conf
+Source27: httpd.socket
 # Documentation
 Source30: README.confd
 Source31: README.confmod
@@ -63,6 +65,7 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch32: httpd-2.4.7-r1537535.patch
 Patch33: httpd-2.4.9-r1573626.patch
+Patch34: httpd-2.4.9-socket-activation.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
@@ -200,6 +203,7 @@ interface for storing and accessing per-user session data.
 %patch31 -p1 -b .sslmultiproxy
 %patch32 -p1 -b .r1537535
 %patch33 -p1 -b .r1573626
+%patch34 -p1 -b .socketactivation
 
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
@@ -282,9 +286,9 @@ make DESTDIR=$RPM_BUILD_ROOT install
 
 # Install systemd service files
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-for s in httpd htcacheclean; do
-  install -p -m 644 $RPM_SOURCE_DIR/${s}.service \
-                    $RPM_BUILD_ROOT%{_unitdir}/${s}.service
+for s in httpd.service htcacheclean.service httpd.socket; do
+  install -p -m 644 $RPM_SOURCE_DIR/${s} \
+                    $RPM_BUILD_ROOT%{_unitdir}/${s}
 done
 
 # install conf file/directory
@@ -305,6 +309,10 @@ done
 # Web application packages can drop snippets into this location if
 # they need ExecStart[pre|post].
 mkdir $RPM_BUILD_ROOT%{_unitdir}/httpd.service.d
+mkdir $RPM_BUILD_ROOT%{_unitdir}/httpd.socket.d
+
+install -m 644 -p $RPM_SOURCE_DIR/10-listen443.conf \
+      $RPM_BUILD_ROOT%{_unitdir}/httpd.socket.d/10-listen443.conf
 
 for f in welcome.conf ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
@@ -445,10 +453,10 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
 %post
-%systemd_post httpd.service htcacheclean.service
+%systemd_post httpd.service htcacheclean.service httpd.socket
 
 %preun
-%systemd_preun httpd.service htcacheclean.service
+%systemd_preun httpd.service htcacheclean.service httpd.socket
 
 %postun
 %systemd_postun
@@ -575,7 +583,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/*
 
 %{_unitdir}/*.service
+%{_unitdir}/*.socket
 %attr(755,root,root) %dir %{_unitdir}/httpd.service.d
+%attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
 
 %files filesystem
 %dir %{_sysconfdir}/httpd
@@ -607,6 +617,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
 %{_libexecdir}/httpd-ssl-pass-dialog
+%{_unitdir}/httpd.socket.d/10-listen443.conf
 
 %files -n mod_proxy_html
 %defattr(-,root,root)
@@ -636,6 +647,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Jul 08 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-8
+- add support for systemd socket activation (#1111648)
+
 * Mon Jul 07 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-7
 - remove conf.modules.d from httpd-filesystem subpackage (#1081453)
 
