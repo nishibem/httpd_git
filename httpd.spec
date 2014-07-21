@@ -13,8 +13,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.9
-Release: 8%{?dist}
+Version: 2.4.10
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -63,8 +63,6 @@ Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
-Patch32: httpd-2.4.7-r1537535.patch
-Patch33: httpd-2.4.9-r1573626.patch
 Patch34: httpd-2.4.9-socket-activation.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
@@ -201,8 +199,6 @@ interface for storing and accessing per-user session data.
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
-%patch32 -p1 -b .r1537535
-%patch33 -p1 -b .r1573626
 %patch34 -p1 -b .socketactivation
 
 %patch55 -p1 -b .malformedhost
@@ -647,6 +643,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jul 21 2014 Joe Orton <jorton@redhat.com> - 2.4.10-1
+- update to 2.4.10
+
 * Tue Jul 08 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-8
 - add support for systemd socket activation (#1111648)
 
