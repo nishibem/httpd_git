@@ -319,6 +319,15 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
          $RPM_BUILD_ROOT/run/httpd/htcacheclean
 
+# Substitute in defaults which are usually done (badly) by "make install"
+sed -i \
+   "s,@@ServerRoot@@/var,%{_localstatedir}/lib/dav,;
+    s,@@ServerRoot@@/user.passwd,/etc/httpd/conf/user.passwd,;
+    s,@@ServerRoot@@/docs,%{docroot},;
+    s,@@ServerRoot@@,%{docroot},;
+    s,@@Port@@,80,;" \
+    docs/conf/extra/*.conf
+
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
          $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/proxy \
@@ -616,6 +625,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Mon Jul 21 2014 Joe Orton <jorton@redhat.com> - 2.4.10-1
 - update to 2.4.10
+- expand variables in docdir example configs
 
 * Wed Apr 09 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-1
 - update to 2.4.9
