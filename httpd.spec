@@ -631,7 +631,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Mon Jul 21 2014 Joe Orton <jorton@redhat.com> - 2.4.10-1
-- update to 2.4.10
+- update to 2.4.10 (#1120614)
 - expand variables in docdir example configs
 
 * Fri Mar 28 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-2
