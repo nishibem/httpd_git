@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -43,6 +43,7 @@ Source24: 00-systemd.conf
 Source25: 01-session.conf
 Source26: 10-listen443.conf
 Source27: httpd.socket
+Source28: 00-optional.conf
 # Documentation
 Source30: README.confd
 Source31: README.confmod
@@ -296,7 +297,7 @@ install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 00-systemd.conf 01-session.conf; do
+         01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -652,6 +653,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jul 31 2014 Joe Orton <jorton@redhat.com> - 2.4.10-2
+- enable mod_request by default for mod_auth_form
+- move disabled-by-default modules from 00-base.conf to 00-optional.conf
+
 * Mon Jul 21 2014 Joe Orton <jorton@redhat.com> - 2.4.10-1
 - update to 2.4.10
 - expand variables in docdir example configs
