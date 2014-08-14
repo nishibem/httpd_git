@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.9
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -447,6 +447,11 @@ rm -vf \
 
 rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
+%pre
+# Add the "apache" user
+/usr/sbin/useradd -c "Apache" -u 48 \
+    -s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
+
 %pre filesystem
 # Add the "apache" user
 /usr/sbin/useradd -c "Apache" -u 48 \
@@ -647,6 +652,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Aug 14 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-9
+- fix creating apache user in pre script (#1128328)
+
 * Tue Jul 08 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-8
 - add support for systemd socket activation (#1111648)
 
