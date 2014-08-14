@@ -13,8 +13,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.9
-Release: 9%{?dist}
+Version: 2.4.10
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -43,6 +43,7 @@ Source24: 00-systemd.conf
 Source25: 01-session.conf
 Source26: 10-listen443.conf
 Source27: httpd.socket
+Source28: 00-optional.conf
 # Documentation
 Source30: README.confd
 Source31: README.confmod
@@ -63,8 +64,6 @@ Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
-Patch32: httpd-2.4.7-r1537535.patch
-Patch33: httpd-2.4.9-r1573626.patch
 Patch34: httpd-2.4.9-socket-activation.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
@@ -201,8 +200,6 @@ interface for storing and accessing per-user session data.
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
-%patch32 -p1 -b .r1537535
-%patch33 -p1 -b .r1573626
 %patch34 -p1 -b .socketactivation
 
 %patch55 -p1 -b .malformedhost
@@ -300,7 +297,7 @@ install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 00-systemd.conf 01-session.conf; do
+         01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -346,6 +343,15 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
          $RPM_BUILD_ROOT/run/httpd/htcacheclean
+
+# Substitute in defaults which are usually done (badly) by "make install"
+sed -i \
+   "s,@@ServerRoot@@/var,%{_localstatedir}/lib/dav,;
+    s,@@ServerRoot@@/user.passwd,/etc/httpd/conf/user.passwd,;
+    s,@@ServerRoot@@/docs,%{docroot},;
+    s,@@ServerRoot@@,%{docroot},;
+    s,@@Port@@,80,;" \
+    docs/conf/extra/*.conf
 
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
@@ -652,8 +658,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Thu Aug 14 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-9
+* Thu Aug 14 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-3
 - fix creating apache user in pre script (#1128328)
+
+* Thu Jul 31 2014 Joe Orton <jorton@redhat.com> - 2.4.10-2
+- enable mod_request by default for mod_auth_form
+- move disabled-by-default modules from 00-base.conf to 00-optional.conf
+
+* Mon Jul 21 2014 Joe Orton <jorton@redhat.com> - 2.4.10-1
+- update to 2.4.10
+- expand variables in docdir example configs
 
 * Tue Jul 08 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.9-8
 - add support for systemd socket activation (#1111648)
