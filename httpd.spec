@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -124,6 +124,7 @@ also be found at http://httpd.apache.org/docs/2.2/.
 Group: System Environment/Daemons
 Summary: The basic directory layout for the Apache HTTP server
 BuildArch: noarch
+Requires(pre): /usr/sbin/useradd
 
 %description filesystem
 The httpd-filesystem package contains the basic directory layout
@@ -658,6 +659,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Aug 15 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-4
+- add /usr/bin/useradd dependency to -filesystem requires
+
 * Thu Aug 14 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-3
 - fix creating apache user in pre script (#1128328)
 
