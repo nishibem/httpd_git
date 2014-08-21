@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -65,6 +65,7 @@ Patch29: httpd-2.4.3-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch34: httpd-2.4.9-socket-activation.patch
+Patch35: httpd-2.4.10-sslciphdefault.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
@@ -202,6 +203,7 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
+%patch35 -p1 -b .sslciphdefault
 
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
@@ -659,6 +661,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Aug 21 2014 Joe Orton <jorton@redhat.com> - 2.4.10-6
+- mod_ssl: treat "SSLCipherSuite PROFILE=..." as special (#1109119)
+- switch default ssl.conf to use PROFILE=SYSTEM (#1109119)
+
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4.10-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
