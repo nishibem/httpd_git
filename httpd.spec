@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -55,13 +55,15 @@ Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
+# Needed for socket activation and mod_systemd patch
+Patch19: httpd-2.4.10-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch29: httpd-2.4.3-mod_systemd.patch
+Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch34: httpd-2.4.9-socket-activation.patch
@@ -69,6 +71,7 @@ Patch35: httpd-2.4.10-sslciphdefault.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
+Patch57: httpd-2.4.10-sigint.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -194,6 +197,8 @@ interface for storing and accessing per-user session data.
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
 
+%patch19 -p1 -b .detectsystemd
+
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
@@ -207,6 +212,7 @@ interface for storing and accessing per-user session data.
 
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
+%patch57 -p1 -b .sigint
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -661,6 +667,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Aug 22 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-7
+- mod_systemd: updated to the latest version
+- use -lsystemd instead of -lsystemd-daemon (#1125084)
+- fix possible crash in SIGINT handling (#958934)
+
 * Thu Aug 21 2014 Joe Orton <jorton@redhat.com> - 2.4.10-6
 - mod_ssl: treat "SSLCipherSuite PROFILE=..." as special (#1109119)
 - switch default ssl.conf to use PROFILE=SYSTEM (#1109119)
