@@ -148,10 +148,12 @@ Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
-Requires(post): openssl, /bin/cat
+Requires(post): openssl, /bin/cat, /bin/hostname
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl
+# Require an OpenSSL which supports PROFILE=SYSTEM
+Conflicts: openssl < 1:1.0.1h-4
 
 %description -n mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -669,6 +671,8 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Fri Aug 29 2014 Joe Orton <jorton@redhat.com> - 2.4.10-8
 - pull in httpd-filesystem as Requires(pre) (#1128328)
+- fix cipher selection in default ssl.conf, depend on new OpenSSL (#1134348)
+- require hostname for mod_ssl post script (#1135118)
 
 * Fri Aug 22 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-7
 - mod_systemd: updated to the latest version
