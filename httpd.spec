@@ -3,7 +3,7 @@
 %define suexec_caller apache
 %define mmn 20120211
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
-%define vstring Fedora
+%define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
 
 # Drop automatic provides for module DSOs
 %{?filter_setup:
@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -669,6 +669,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Aug 29 2014 Joe Orton <jorton@redhat.com> - 2.4.10-9
+- set vstring based on /etc/os-release (Pat Riehecky, #1114539)
+
 * Fri Aug 29 2014 Joe Orton <jorton@redhat.com> - 2.4.10-8
 - pull in httpd-filesystem as Requires(pre) (#1128328)
 - fix cipher selection in default ssl.conf, depend on new OpenSSL (#1134348)
