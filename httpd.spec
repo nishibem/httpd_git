@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -669,6 +669,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Sep 01 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-10
+- use KillMode=mixed in httpd.service (#1135122)
+
 * Fri Aug 29 2014 Joe Orton <jorton@redhat.com> - 2.4.10-9
 - set vstring based on /etc/os-release (Pat Riehecky, #1114539)
 
