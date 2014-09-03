@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -148,12 +148,12 @@ Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
-Requires(post): openssl, /bin/cat, /bin/hostname
+Requires(post): openssl, /bin/cat, hostname
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl
 # Require an OpenSSL which supports PROFILE=SYSTEM
-Conflicts: openssl < 1:1.0.1h-4
+Conflicts: openssl-libs < 1:1.0.1h-4
 
 %description -n mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -669,6 +669,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Sep 03 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-9
+- fix hostname requirement and conflict with openssl-libs
+
 * Fri Aug 29 2014 Joe Orton <jorton@redhat.com> - 2.4.10-8
 - pull in httpd-filesystem as Requires(pre) (#1128328)
 - fix cipher selection in default ssl.conf, depend on new OpenSSL (#1134348)
