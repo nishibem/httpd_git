@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 11%{?dist}
+Release: 12%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -272,7 +272,7 @@ export LYNX_PATH=/usr/bin/links
 	--without-suexec-logfile \
         --with-suexec-syslog \
 	--with-suexec-bin=%{_sbindir}/suexec \
-	--with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+	--with-suexec-uidmin=1000 --with-suexec-gidmin=1000 \
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
@@ -669,6 +669,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Sep 08 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-12
+- increase suexec minimum acceptable uid/gid to 1000 (#1136391)
+
 * Wed Sep 03 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-11
 - fix hostname requirement and conflict with openssl-libs
 
