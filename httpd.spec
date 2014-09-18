@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 12%{?dist}
+Release: 13%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -669,6 +669,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Sep 18 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-13
+- use NoDelay and DeferAcceptSec in httpd.socket
+
 * Mon Sep 08 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-12
 - increase suexec minimum acceptable uid/gid to 1000 (#1136391)
 
