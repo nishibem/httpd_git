@@ -640,7 +640,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/rpm/macros.httpd
 
 %changelog
-* Wed Dec 17 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-15
+* Wed Dec 17 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-2
 - core: fix bypassing of mod_headers rules via chunked requests (CVE-2013-5704)
 - mod_cache: fix NULL pointer dereference on empty Content-Type (CVE-2014-3581)
 - mod_proxy_fcgi: fix a potential crash with long headers (CVE-2014-3583)
