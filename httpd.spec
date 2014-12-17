@@ -282,7 +282,7 @@ export LYNX_PATH=/usr/bin/links
 	--without-suexec-logfile \
         --with-suexec-syslog \
 	--with-suexec-bin=%{_sbindir}/suexec \
-	--with-suexec-uidmin=1000 --with-suexec-gidmin=1000 \
+	--with-suexec-uidmin=500 --with-suexec-gidmin=100 \
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
@@ -691,9 +691,6 @@ rm -rf $RPM_BUILD_ROOT
 
 * Thu Sep 18 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-13
 - use NoDelay and DeferAcceptSec in httpd.socket
-
-* Mon Sep 08 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-12
-- increase suexec minimum acceptable uid/gid to 1000 (#1136391)
 
 * Wed Sep 03 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-11
 - fix hostname requirement and conflict with openssl-libs
