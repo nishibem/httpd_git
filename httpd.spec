@@ -3,7 +3,7 @@
 %define suexec_caller apache
 %define mmn 20120211
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
-%define vstring Fedora
+%define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
 
 # Drop automatic provides for module DSOs
 %{?filter_setup:
@@ -14,7 +14,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 9%{?dist}
+Release: 15%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -72,12 +72,17 @@ Patch35: httpd-2.4.10-sslciphdefault.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
+# Security fixes
+Patch100: httpd-2.4.6-CVE-2013-5704.patch
+Patch101: httpd-2.4.6-CVE-2014-3581.patch
+Patch102: httpd-2.4.10-CVE-2014-3583.patch
+Patch103: httpd-2.4.10-CVE-2014-8109.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
+BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
@@ -216,6 +221,11 @@ interface for storing and accessing per-user session data.
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
 
+%patch100 -p1 -b cve20135704
+%patch101 -p1 -b cve20143581
+%patch102 -p1 -b cve20143583
+%patch103 -p1 -b cve20148109
+
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 
@@ -272,7 +282,7 @@ export LYNX_PATH=/usr/bin/links
 	--without-suexec-logfile \
         --with-suexec-syslog \
 	--with-suexec-bin=%{_sbindir}/suexec \
-	--with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+	--with-suexec-uidmin=1000 --with-suexec-gidmin=1000 \
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
@@ -669,8 +679,30 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Wed Sep 03 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-9
+* Wed Dec 17 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-15
+- core: fix bypassing of mod_headers rules via chunked requests (CVE-2013-5704)
+- mod_cache: fix NULL pointer dereference on empty Content-Type (CVE-2014-3581)
+- mod_proxy_fcgi: fix a potential crash with long headers (CVE-2014-3583)
+- mod_lua: fix handling of the Require line when a LuaAuthzProvider is used
+  in multiple Require directives with different arguments (CVE-2014-8109)
+
+* Tue Oct 14 2014 Joe Orton <jorton@redhat.com> - 2.4.10-14
+- require apr-util 1.5.x
+
+* Thu Sep 18 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-13
+- use NoDelay and DeferAcceptSec in httpd.socket
+
+* Mon Sep 08 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-12
+- increase suexec minimum acceptable uid/gid to 1000 (#1136391)
+
+* Wed Sep 03 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-11
 - fix hostname requirement and conflict with openssl-libs
+
+* Mon Sep 01 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-10
+- use KillMode=mixed in httpd.service (#1135122)
+
+* Fri Aug 29 2014 Joe Orton <jorton@redhat.com> - 2.4.10-9
+- set vstring based on /etc/os-release (Pat Riehecky, #1114539)
 
 * Fri Aug 29 2014 Joe Orton <jorton@redhat.com> - 2.4.10-8
 - pull in httpd-filesystem as Requires(pre) (#1128328)
