@@ -5,16 +5,10 @@
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
 
-# Drop automatic provides for module DSOs
-%{?filter_setup:
-%filter_provides_in %{_libdir}/httpd/modules/.*\.so$
-%filter_setup
-}
-
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.10
-Release: 15%{?dist}
+Release: 16%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -679,6 +673,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Mar 24 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-16
+- remove filter for auto-provides of httpd modules, it is not needed since F20
+
 * Wed Dec 17 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-15
 - core: fix bypassing of mod_headers rules via chunked requests (CVE-2013-5704)
 - mod_cache: fix NULL pointer dereference on empty Content-Type (CVE-2014-3581)
