@@ -7,8 +7,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.10
-Release: 17%{?dist}
+Version: 2.4.12
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -68,10 +68,6 @@ Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
-Patch100: httpd-2.4.6-CVE-2013-5704.patch
-Patch101: httpd-2.4.6-CVE-2014-3581.patch
-Patch102: httpd-2.4.10-CVE-2014-3583.patch
-Patch103: httpd-2.4.10-CVE-2014-8109.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -216,11 +212,6 @@ interface for storing and accessing per-user session data.
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
-
-%patch100 -p1 -b cve20135704
-%patch101 -p1 -b cve20143581
-%patch102 -p1 -b cve20143583
-%patch103 -p1 -b cve20148109
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -675,6 +666,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Mar 27 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.12-1
+- update to 2.4.12
+
 * Tue Mar 24 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-17
 - fix compilation with lua-5.3
 
