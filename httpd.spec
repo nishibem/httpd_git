@@ -7,8 +7,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.12
-Release: 3%{?dist}
+Version: 2.4.16
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -49,7 +49,6 @@ Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
-Patch7: httpd-2.4.10-lua53.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.10-detect-systemd.patch
 # Features/functional changes
@@ -194,7 +193,6 @@ interface for storing and accessing per-user session data.
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
-%patch7 -p0 -b .lua53
 
 %patch19 -p1 -b .detectsystemd
 
@@ -667,6 +665,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Jul 15 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.12-4
+- update to 2.4.16
+
 * Tue Jul  7 2015 Joe Orton <jorton@redhat.com> - 2.4.12-3
 - mod_ssl: use "localhost" in the dummy SSL cert if len(FQDN) > 59 chars
 
