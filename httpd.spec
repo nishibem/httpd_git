@@ -664,6 +664,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 %{_rpmconfigdir}/macros.d/macros.httpd
 
+
 %changelog
 * Wed Jul 15 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.12-4
 - update to 2.4.16
