@@ -13,7 +13,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.12
+Version: 2.4.16
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -670,6 +670,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jul 17 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.16-1
+- update to new version 2.4.16
+
 * Fri May 29 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.12-1
 - update to new version 2.4.12
 
