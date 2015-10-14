@@ -7,7 +7,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.16
+Version: 2.4.17
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -61,7 +61,7 @@ Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch34: httpd-2.4.9-socket-activation.patch
-Patch35: httpd-2.4.10-sslciphdefault.patch
+Patch35: httpd-2.4.17-sslciphdefault.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
@@ -73,7 +73,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
-BuildRequires: systemd-devel
+BuildRequires: systemd-devel, libnghttp2-devel
 Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
@@ -204,7 +204,7 @@ interface for storing and accessing per-user session data.
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
-%patch34 -p1 -b .socketactivation
+#patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 
 %patch55 -p1 -b .malformedhost
@@ -278,7 +278,8 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap  \
+        --disable-imagemap --disable-file-cache \
+        --disable-asis
 	$*
 make %{?_smp_mflags}
 
@@ -529,6 +530,14 @@ if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
    : modules contain non-relocatable code
    exit 1
 fi
+# Ensure every mod_* that's built is loaded.
+for f in $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so; do
+  m=${f##*/}
+  if ! grep -q $m $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf; then
+    echo ERROR: Module $m not configured.  Disable it, or load it.
+    exit 1
+  fi
+done
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -665,6 +674,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Oct 13 2015 Joe Orton <jorton@redhat.com> - 2.4.17-1
+- update to 2.4.17 (#1271224)
+- build, load mod_http2
+- don't build mod_asis, mod_file_cache
+- load mod_cache_socache, mod_proxy_wstunnel by default
+- check every built mod_* is configured
+- synch ssl.conf with upstream; disable SSLv3 by default
+
 * Wed Jul 15 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.12-4
 - update to 2.4.16
 
