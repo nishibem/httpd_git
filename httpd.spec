@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.17
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -66,6 +66,7 @@ Patch35: httpd-2.4.17-sslciphdefault.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
+Patch58: httpd-2.4.17-debug-crash.patch
 # Security fixes
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -210,6 +211,7 @@ interface for storing and accessing per-user session data.
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
+%patch58 -p1 -b .debugcrash
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -674,6 +676,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Oct 26 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.17-3
+- fix crash when using -X argument (#1272234)
+
 * Wed Oct 14 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.17-2
 - rebase socket activation patch to 2.4.17
 
