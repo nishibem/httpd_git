@@ -7,7 +7,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.16
+Version: 2.4.17
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -60,12 +60,13 @@ Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
-Patch34: httpd-2.4.9-socket-activation.patch
-Patch35: httpd-2.4.10-sslciphdefault.patch
+Patch34: httpd-2.4.17-socket-activation.patch
+Patch35: httpd-2.4.17-sslciphdefault.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
+Patch58: httpd-2.4.17-debug-crash.patch
 # Security fixes
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -73,7 +74,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
-BuildRequires: systemd-devel
+BuildRequires: systemd-devel, libnghttp2-devel
 Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
@@ -204,12 +205,13 @@ interface for storing and accessing per-user session data.
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
-%patch34 -p1 -b .socketactivation
+#patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
+%patch58 -p1 -b .debugcrash
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -665,7 +667,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Wed Jul 15 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.12-4
+* Thu Oct 29 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.17-1
+- update to 2.4.17 (#1271224)
+- build, load mod_http2
+- load mod_cache_socache, mod_proxy_wstunnel by default
+- fix crash when using -X argument (#1272234)
+
+* Wed Jul 15 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.16-1
 - update to 2.4.16
 
 * Tue Jul  7 2015 Joe Orton <jorton@redhat.com> - 2.4.12-3
