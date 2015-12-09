@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.17
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -280,8 +280,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap --disable-file-cache \
-        --disable-asis
+        --disable-imagemap --disable-file-cache
 	$*
 make %{?_smp_mflags}
 
@@ -676,6 +675,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Dec  9 2015 Joe Orton <jorton@redhat.com> - 2.4.17-4
+- re-enable mod_asis due to popular demand (#1284315)
+
 * Mon Oct 26 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.17-3
 - fix crash when using -X argument (#1272234)
 
