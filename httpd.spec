@@ -7,8 +7,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.17
-Release: 4%{?dist}
+Version: 2.4.18
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -59,7 +59,7 @@ Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
-Patch31: httpd-2.4.6-sslmultiproxy.patch
+Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch35: httpd-2.4.17-sslciphdefault.patch
 # Bug fixes
@@ -675,6 +675,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Dec 14 2015 Jan Kaluza <jkaluza@redhat.com> - 2.4.18-1
+- update to new version 2.4.18
+
 * Wed Dec  9 2015 Joe Orton <jorton@redhat.com> - 2.4.17-4
 - re-enable mod_asis due to popular demand (#1284315)
 
