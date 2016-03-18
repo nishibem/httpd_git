@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.18
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -672,6 +672,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Mar 18 2016 Joe Orton <jorton@redhat.com> - 2.4.18-4
+- fix welcome page HTML validity (Ville Skyttä)
+
 * Fri Mar 18 2016 Joe Orton <jorton@redhat.com> - 2.4.18-3
 - remove httpd pre script (duplicate of httpd-filesystem's)
 - in httpd-filesystem pre script, create group/user iff non-existent
