@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.18
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -461,15 +461,12 @@ rm -vf \
 
 rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
-%pre
-# Add the "apache" user
-/usr/sbin/useradd -c "Apache" -u 48 \
-    -s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
-
 %pre filesystem
-# Add the "apache" user
-/usr/sbin/useradd -c "Apache" -u 48 \
-	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
+getent group apache >/dev/null || groupadd -g 48 -r apache
+getent passwd apache >/dev/null || \
+  useradd -r -u 48 -g apache -s /sbin/nologin \
+    -d %{contentdir} -c "Apache" apache
+exit 0
 
 %post
 %systemd_post httpd.service htcacheclean.service httpd.socket
@@ -675,6 +672,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Mar 18 2016 Joe Orton <jorton@redhat.com> - 2.4.18-3
+- remove httpd pre script (duplicate of httpd-filesystem's)
+- in httpd-filesystem pre script, create group/user iff non-existent
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.18-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
