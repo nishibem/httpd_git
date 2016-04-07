@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.18
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -672,6 +672,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Apr  7 2016 Joe Orton <jorton@redhat.com> - 2.4.18-6
+- have "apachectl graceful" start httpd if not running, per man page
+
 * Wed Apr  6 2016 Joe Orton <jorton@redhat.com> - 2.4.18-5
 - use redirects for lang-specific /manual/ URLs
 
