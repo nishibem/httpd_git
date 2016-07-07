@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.23
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -272,7 +272,7 @@ export LYNX_PATH=/usr/bin/links
         --with-pcre \
         --enable-mods-shared=all \
 	--enable-ssl --with-ssl --disable-distcache \
-	--enable-proxy \
+	--enable-proxy --enable-proxy-fdpass \
         --enable-cache \
         --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
@@ -324,7 +324,7 @@ done
 
 # Split-out extra config shipped as default in conf.d:
 for f in autoindex; do
-  mv docs/conf/extra/httpd-${f}.conf \
+  install -m 644 docs/conf/extra/httpd-${f}.conf \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/${f}.conf
 done
 
@@ -526,14 +526,26 @@ if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
    : modules contain non-relocatable code
    exit 1
 fi
+set +x
+rv=0
 # Ensure every mod_* that's built is loaded.
 for f in $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so; do
   m=${f##*/}
   if ! grep -q $m $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf; then
     echo ERROR: Module $m not configured.  Disable it, or load it.
-    exit 1
+    rv=1
   fi
 done
+# Ensure every loaded mod_* is actually built
+mods=`grep -h ^LoadModule $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf | sed 's,.*modules/,,'`
+for m in $mods; do
+  f=$RPM_BUILD_ROOT%{_libdir}/httpd/modules/${m}
+  if ! test -x $f; then
+    echo ERROR: Module $m is configured but not built.
+    rv=1
+  fi
+done
+exit $rv
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -670,6 +682,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jul  7 2016 Joe Orton <jorton@redhat.com> - 2.4.23-2
+- restore build of mod_proxy_fdpass (#1325883)
+- improve check tests to catch configured-but-not-built modules
+
 * Thu Jul  7 2016 Joe Orton <jorton@redhat.com> - 2.4.23-1
 - update to 2.4.23 (#1325883, #1353203)
 - load mod_proxy_hcheck
