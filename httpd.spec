@@ -7,8 +7,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.18
-Release: 6%{?dist}
+Version: 2.4.23
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -66,7 +66,6 @@ Patch35: httpd-2.4.17-sslciphdefault.patch
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
-Patch58: httpd-2.4.17-debug-crash.patch
 # Security fixes
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -211,7 +210,6 @@ interface for storing and accessing per-user session data.
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
-%patch58 -p1 -b .debugcrash
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -672,6 +670,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jul  7 2016 Joe Orton <jorton@redhat.com> - 2.4.23-1
+- update to 2.4.23 (#1325883, #1353203)
+- load mod_proxy_hcheck
+- recommend use of "systemctl edit" in httpd.service
+
 * Thu Apr  7 2016 Joe Orton <jorton@redhat.com> - 2.4.18-6
 - have "apachectl graceful" start httpd if not running, per man page
 
