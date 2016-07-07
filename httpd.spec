@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.23
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -682,6 +682,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jul  7 2016 Joe Orton <jorton@redhat.com> - 2.4.23-3
+- load mod_watchdog by default (#1353582)
+
 * Thu Jul  7 2016 Joe Orton <jorton@redhat.com> - 2.4.23-2
 - restore build of mod_proxy_fdpass (#1325883)
 - improve check tests to catch configured-but-not-built modules
