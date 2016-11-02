@@ -8,12 +8,11 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.23
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
 Source2: httpd.logrotate
-Source3: httpd.sysconf
 Source4: httpd-ssl-pass-dialog
 Source5: httpd.tmpfiles
 Source6: httpd.service
@@ -339,10 +338,8 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.conf \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/httpd.conf
 
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-for s in httpd htcacheclean; do
-  install -m 644 -p $RPM_SOURCE_DIR/${s}.sysconf \
-                    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/${s}
-done
+install -m 644 -p $RPM_SOURCE_DIR/htcacheclean.sysconf \
+   $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/htcacheclean
 
 # tmpfiles.d configuration
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d 
@@ -685,6 +682,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Nov  2 2016 Joe Orton <jorton@redhat.com> - 2.4.23-5
+- no longer package /etc/sysconfig/httpd
+
 * Mon Jul 18 2016 Joe Orton <jorton@redhat.com> - 2.4.23-4
 - add security fix for CVE-2016-5387
 
