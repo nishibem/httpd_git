@@ -684,6 +684,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Wed Nov  2 2016 Joe Orton <jorton@redhat.com> - 2.4.23-5
 - no longer package /etc/sysconfig/httpd
+- synch ssl.conf with upstream
 
 * Mon Jul 18 2016 Joe Orton <jorton@redhat.com> - 2.4.23-4
 - add security fix for CVE-2016-5387
