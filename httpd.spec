@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.23
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -48,6 +48,7 @@ Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
+Patch7: httpd-2.4.23-openssl11.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.10-detect-systemd.patch
 # Features/functional changes
@@ -193,6 +194,7 @@ interface for storing and accessing per-user session data.
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
+%patch7 -p1 -b .openssl11
 
 %patch19 -p1 -b .detectsystemd
 
@@ -682,6 +684,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Nov 14 2016 Joe Orton <jorton@redhat.com> - 2.4.23-6
+- fix build with OpenSSL 1.1 (#1392900)
+- fix typos in ssl.conf (josef randinger, #1379407)
+
 * Wed Nov  2 2016 Joe Orton <jorton@redhat.com> - 2.4.23-5
 - no longer package /etc/sysconfig/httpd
 - synch ssl.conf with upstream
