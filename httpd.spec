@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.23
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -68,6 +68,7 @@ Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
 Patch100: httpd-2.4.18-CVE-2016-5387.patch
+Patch101: httpd-2.4.23-CVE-2016-8740.patch
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -213,6 +214,7 @@ interface for storing and accessing per-user session data.
 %patch57 -p1 -b .sigint
 
 %patch100 -p1 -b .cve5387
+%patch101 -p1 -b .cve8740
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -685,6 +687,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Dec 05 2016 Luboš Uhliarik <luhliari@redhat.com> - 2.4.23-5
+- Resolves: #1401528 - CVE-2016-8740 httpd: Incomplete handling
+  of LimitRequestFields directive in mod_http2
+
 * Mon Jul 18 2016 Joe Orton <jorton@redhat.com> - 2.4.23-4
 - add security fix for CVE-2016-5387
 
