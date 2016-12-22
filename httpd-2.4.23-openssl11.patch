@@ -2,10 +2,11 @@
 Diff to https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x-openssl-1.1.0-compat/
 as of upstream r1769589.
 
-diff -uap httpd-2.4.23/acinclude.m4.openssl11 httpd-2.4.23/acinclude.m4
---- httpd-2.4.23/acinclude.m4.openssl11
-+++ httpd-2.4.23/acinclude.m4
-@@ -586,7 +586,7 @@
+diff --git a/acinclude.m4 b/acinclude.m4
+index dd0e2ea..907fbe8 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -579,7 +579,7 @@ AC_DEFUN([APACHE_CHECK_OPENSSL],[
        dnl Run library and function checks
        liberrors=""
        AC_CHECK_HEADERS([openssl/engine.h])
@@ -14,10 +15,11 @@ diff -uap httpd-2.4.23/acinclude.m4.openssl11 httpd-2.4.23/acinclude.m4
        AC_CHECK_FUNCS([ENGINE_init ENGINE_load_builtin_engines RAND_egd])
        if test "x$liberrors" != "x"; then
          AC_MSG_WARN([OpenSSL libraries are unusable])
-diff -uap httpd-2.4.23/modules/ssl/mod_ssl.c.openssl11 httpd-2.4.23/modules/ssl/mod_ssl.c
---- httpd-2.4.23/modules/ssl/mod_ssl.c.openssl11
-+++ httpd-2.4.23/modules/ssl/mod_ssl.c
-@@ -312,7 +312,13 @@
+diff --git a/modules/ssl/mod_ssl.c b/modules/ssl/mod_ssl.c
+index 9e63a7d..adc90d1 100644
+--- a/modules/ssl/mod_ssl.c
++++ b/modules/ssl/mod_ssl.c
+@@ -312,7 +312,13 @@ static apr_status_t ssl_cleanup_pre_config(void *data)
  #if HAVE_ENGINE_LOAD_BUILTIN_ENGINES
      ENGINE_cleanup();
  #endif
@@ -31,7 +33,7 @@ diff -uap httpd-2.4.23/modules/ssl/mod_ssl.c.openssl11 httpd-2.4.23/modules/ssl/
  
      /* Don't call ERR_free_strings in earlier versions, ERR_load_*_strings only
       * actually loaded the error strings once per process due to static
-@@ -342,7 +348,11 @@
+@@ -342,7 +348,11 @@ static int ssl_hook_pre_config(apr_pool_t *pconf,
      /* We must register the library in full, to ensure our configuration
       * code can successfully test the SSL environment.
       */
@@ -43,10 +45,11 @@ diff -uap httpd-2.4.23/modules/ssl/mod_ssl.c.openssl11 httpd-2.4.23/modules/ssl/
      ERR_load_crypto_strings();
      SSL_load_error_strings();
      SSL_library_init();
-diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modules/ssl/ssl_engine_init.c
---- httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_engine_init.c
-@@ -47,21 +47,50 @@
+diff --git a/modules/ssl/ssl_engine_init.c b/modules/ssl/ssl_engine_init.c
+index cb3efa2..ba79ef3 100644
+--- a/modules/ssl/ssl_engine_init.c
++++ b/modules/ssl/ssl_engine_init.c
+@@ -47,21 +47,50 @@ APR_IMPLEMENT_OPTIONAL_HOOK_RUN_ALL(ssl, SSL, int, init_server,
  #define KEYTYPES "RSA or DSA"
  #endif
  
@@ -102,7 +105,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
          return NULL;
      }
      return dh;
-@@ -73,12 +102,12 @@
+@@ -73,12 +102,12 @@ static struct dhparam {
      DH *dh;                           /* ...this, used for keys.... */
      const unsigned int min;           /* ...of length >= this. */
  } dhparams[] = {
@@ -121,7 +124,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
  };
  
  static void init_dh_params(void)
-@@ -86,7 +115,7 @@
+@@ -86,7 +115,7 @@ static void init_dh_params(void)
      unsigned n;
  
      for (n = 0; n < sizeof(dhparams)/sizeof(dhparams[0]); n++)
@@ -130,7 +133,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
  }
  
  static void free_dh_params(void)
-@@ -153,7 +182,7 @@
+@@ -153,7 +182,7 @@ apr_status_t ssl_init_Module(apr_pool_t *p, apr_pool_t *plog,
                       "Init: this version of mod_ssl was compiled against "
                       "a newer library (%s, version currently loaded is %s)"
                       " - may result in undefined or erroneous behavior",
@@ -139,7 +142,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
      }
  
      /* We initialize mc->pid per-process in the child init,
-@@ -228,9 +257,11 @@
+@@ -228,9 +257,11 @@ apr_status_t ssl_init_Module(apr_pool_t *p, apr_pool_t *plog,
  #endif
      }
  
@@ -151,7 +154,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
  
      /*
       * SSL external crypto device ("engine") support
-@@ -351,6 +382,9 @@
+@@ -351,6 +382,9 @@ apr_status_t ssl_init_Module(apr_pool_t *p, apr_pool_t *plog,
      modssl_init_app_data2_idx(); /* for modssl_get_app_data2() at request time */
  
      init_dh_params();
@@ -161,7 +164,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
  
      return OK;
  }
-@@ -481,6 +515,9 @@
+@@ -481,6 +515,9 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
      char *cp;
      int protocol = mctx->protocol;
      SSLSrvConfigRec *sc = mySrvConfig(s);
@@ -171,7 +174,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
  
      /*
       *  Create the new per-server SSL context
-@@ -506,6 +543,7 @@
+@@ -506,6 +543,7 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
      ap_log_error(APLOG_MARK, APLOG_TRACE3, 0, s,
                   "Creating new SSL context (protocols: %s)", cp);
  
@@ -179,7 +182,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
  #ifndef OPENSSL_NO_SSL3
      if (protocol == SSL_PROTOCOL_SSLV3) {
          method = mctx->pkp ?
-@@ -536,12 +574,18 @@
+@@ -536,12 +574,18 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
              SSLv23_client_method() : /* proxy */
              SSLv23_server_method();  /* server */
      }
@@ -198,7 +201,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
      /* always disable SSLv2, as per RFC 6176 */
      SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
  
-@@ -565,6 +609,43 @@
+@@ -565,6 +609,43 @@ static apr_status_t ssl_init_ctx_protocol(server_rec *s,
      }
  #endif
  
@@ -242,7 +245,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
  #ifdef SSL_OP_CIPHER_SERVER_PREFERENCE
      if (sc->cipher_server_pref == TRUE) {
          SSL_CTX_set_options(ctx, SSL_OP_CIPHER_SERVER_PREFERENCE);
-@@ -858,7 +939,7 @@
+@@ -858,7 +939,7 @@ static int use_certificate_chain(
      unsigned long err;
      int n;
  
@@ -251,7 +254,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
          return -1;
      if (BIO_read_filename(bio, file) <= 0) {
          BIO_free(bio);
-@@ -1200,7 +1281,7 @@
+@@ -1200,7 +1281,7 @@ static apr_status_t ssl_init_server_certs(server_rec *s,
          SSL_CTX_set_tmp_dh(mctx->ssl_ctx, dhparams);
          ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, APLOGNO(02540)
                       "Custom DH parameters (%d bits) for %s loaded from %s",
@@ -260,7 +263,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
          DH_free(dhparams);
      }
  
-@@ -1721,7 +1802,7 @@
+@@ -1721,7 +1802,7 @@ apr_status_t ssl_init_CheckServers(server_rec *base_server, apr_pool_t *p)
                       "an OpenSSL version with support for TLS extensions "
                       "(RFC 6066 - Server Name Indication / SNI), "
                       "but the currently used library version (%s) is "
@@ -269,7 +272,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
      }
  #endif
  
-@@ -1917,6 +1998,9 @@
+@@ -1917,6 +1998,9 @@ apr_status_t ssl_init_ModuleKill(void *data)
          ssl_init_ctx_cleanup(sc->server);
      }
  
@@ -279,10 +282,11 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_init.c.openssl11 httpd-2.4.23/modu
      free_dh_params();
  
      return APR_SUCCESS;
-diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/modules/ssl/ssl_engine_io.c
---- httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_engine_io.c
-@@ -149,7 +149,7 @@
+diff --git a/modules/ssl/ssl_engine_io.c b/modules/ssl/ssl_engine_io.c
+index 82953ad..b463e1a 100644
+--- a/modules/ssl/ssl_engine_io.c
++++ b/modules/ssl/ssl_engine_io.c
+@@ -149,7 +149,7 @@ static int bio_filter_out_pass(bio_filter_out_ctx_t *outctx)
   * success, -1 on failure. */
  static int bio_filter_out_flush(BIO *bio)
  {
@@ -291,7 +295,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
      apr_bucket *e;
  
      AP_DEBUG_ASSERT(APR_BRIGADE_EMPTY(outctx->bb));
-@@ -162,10 +162,16 @@
+@@ -162,10 +162,16 @@ static int bio_filter_out_flush(BIO *bio)
  
  static int bio_filter_create(BIO *bio)
  {
@@ -311,7 +315,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
  
      return 1;
  }
-@@ -190,7 +196,7 @@
+@@ -190,7 +196,7 @@ static int bio_filter_out_read(BIO *bio, char *out, int outl)
  
  static int bio_filter_out_write(BIO *bio, const char *in, int inl)
  {
@@ -320,7 +324,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
      apr_bucket *e;
      int need_flush;
  
-@@ -241,7 +247,7 @@
+@@ -241,7 +247,7 @@ static int bio_filter_out_write(BIO *bio, const char *in, int inl)
  static long bio_filter_out_ctrl(BIO *bio, int cmd, long num, void *ptr)
  {
      long ret = 1;
@@ -329,7 +333,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
  
      switch (cmd) {
      case BIO_CTRL_RESET:
-@@ -257,10 +263,10 @@
+@@ -257,10 +263,10 @@ static long bio_filter_out_ctrl(BIO *bio, int cmd, long num, void *ptr)
          ret = 0;
          break;
      case BIO_CTRL_GET_CLOSE:
@@ -342,7 +346,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
          break;
        case BIO_CTRL_FLUSH:
          ret = bio_filter_out_flush(bio);
-@@ -294,19 +300,6 @@
+@@ -294,19 +300,6 @@ static int bio_filter_out_puts(BIO *bio, const char *str)
      return -1;
  }
  
@@ -362,7 +366,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
  typedef struct {
      int length;
      char *value;
-@@ -456,7 +449,7 @@
+@@ -456,7 +449,7 @@ static apr_status_t brigade_consume(apr_bucket_brigade *bb,
  static int bio_filter_in_read(BIO *bio, char *in, int inlen)
  {
      apr_size_t inl = inlen;
@@ -371,7 +375,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
      apr_read_type_e block = inctx->block;
  
      inctx->rc = APR_SUCCESS;
-@@ -536,20 +529,86 @@
+@@ -536,20 +529,86 @@ static int bio_filter_in_read(BIO *bio, char *in, int inlen)
      return -1;
  }
  
@@ -462,16 +466,16 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
  
  static apr_status_t ssl_io_input_read(bio_filter_in_ctx_t *inctx,
                                        char *buf,
-@@ -779,7 +838,7 @@
-         return APR_EGENERAL;
-     }
+@@ -789,7 +848,7 @@ static apr_status_t ssl_filter_write(ap_filter_t *f,
+      */
+     ERR_clear_error();
  
 -    outctx = (bio_filter_out_ctx_t *)filter_ctx->pbioWrite->ptr;
 +    outctx = (bio_filter_out_ctx_t *)BIO_get_data(filter_ctx->pbioWrite);
      res = SSL_write(filter_ctx->pssl, (unsigned char *)data, len);
  
      if (res < 0) {
-@@ -1252,9 +1311,9 @@
+@@ -1267,9 +1326,9 @@ static apr_status_t ssl_io_filter_handshake(ssl_filter_ctx_t *filter_ctx)
  
      if ((n = SSL_accept(filter_ctx->pssl)) <= 0) {
          bio_filter_in_ctx_t *inctx = (bio_filter_in_ctx_t *)
@@ -483,7 +487,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
          apr_status_t rc = inctx->rc ? inctx->rc : outctx->rc ;
          ssl_err = SSL_get_error(filter_ctx->pssl, n);
  
-@@ -1667,8 +1726,8 @@
+@@ -1682,8 +1741,8 @@ static apr_status_t ssl_io_filter_output(ap_filter_t *f,
          return ap_pass_brigade(f->next, bb);
      }
  
@@ -494,7 +498,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
  
      /* When we are the writer, we must initialize the inctx
       * mode so that we block for any required ssl input, because
-@@ -1949,8 +2008,12 @@
+@@ -1964,8 +2023,12 @@ static void ssl_io_input_add_filter(ssl_filter_ctx_t *filter_ctx, conn_rec *c,
  
      filter_ctx->pInputFilter = ap_add_input_filter(ssl_io_filter, inctx, r, c);
  
@@ -508,7 +512,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
  
      inctx->ssl = ssl;
      inctx->bio_out = filter_ctx->pbioWrite;
-@@ -1980,8 +2043,12 @@
+@@ -1995,8 +2058,12 @@ void ssl_io_filter_init(conn_rec *c, request_rec *r, SSL *ssl)
      filter_ctx->pOutputFilter   = ap_add_output_filter(ssl_io_filter,
                                                         filter_ctx, r, c);
  
@@ -522,10 +526,11 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_io.c.openssl11 httpd-2.4.23/module
  
      /* write is non blocking for the benefit of async mpm */
      if (c->cs) {
-diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/modules/ssl/ssl_engine_kernel.c
---- httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_engine_kernel.c
-@@ -80,7 +80,7 @@
+diff --git a/modules/ssl/ssl_engine_kernel.c b/modules/ssl/ssl_engine_kernel.c
+index d4459a2..da2776f 100644
+--- a/modules/ssl/ssl_engine_kernel.c
++++ b/modules/ssl/ssl_engine_kernel.c
+@@ -80,7 +80,7 @@ static apr_status_t upgrade_connection(request_rec *r)
      SSL_set_accept_state(ssl);
      SSL_do_handshake(ssl);
  
@@ -534,7 +539,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
          ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(02030)
                        "TLS upgrade handshake failed");
          ssl_log_ssl_error(SSLLOG_MARK, APLOG_ERR, r->server);
-@@ -114,6 +114,7 @@
+@@ -114,6 +114,7 @@ static int has_buffered_data(request_rec *r)
      return result;
  }
  
@@ -542,7 +547,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
  static int ap_array_same_str_set(apr_array_header_t *s1, apr_array_header_t *s2)
  {
      int i;
-@@ -215,6 +216,7 @@
+@@ -215,6 +216,7 @@ static int ssl_server_compatible(server_rec *s1, server_rec *s2)
      
      return 1;
  }
@@ -550,7 +555,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
  
  /*
   *  Post Read Request Handler
-@@ -432,7 +434,7 @@
+@@ -432,7 +434,7 @@ int ssl_hook_Access(request_rec *r)
      X509 *cert;
      X509 *peercert;
      X509_STORE *cert_store = NULL;
@@ -559,7 +564,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
      STACK_OF(SSL_CIPHER) *cipher_list_old = NULL, *cipher_list = NULL;
      const SSL_CIPHER *cipher = NULL;
      int depth, verify_old, verify, n, is_slave = 0;
-@@ -456,7 +458,7 @@
+@@ -456,7 +458,7 @@ int ssl_hook_Access(request_rec *r)
           * forbidden in the latter case, let ap_die() handle
           * this recursive (same) error.
           */
@@ -568,7 +573,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
              return HTTP_FORBIDDEN;
          }
          ctx = SSL_get_SSL_CTX(ssl);
-@@ -622,7 +624,7 @@
+@@ -622,7 +624,7 @@ int ssl_hook_Access(request_rec *r)
                       !renegotiate && (n < sk_SSL_CIPHER_num(cipher_list));
                       n++)
                  {
@@ -577,7 +582,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
  
                      if (sk_SSL_CIPHER_find(cipher_list_old, value) < 0) {
                          renegotiate = TRUE;
-@@ -633,7 +635,7 @@
+@@ -633,7 +635,7 @@ int ssl_hook_Access(request_rec *r)
                       !renegotiate && (n < sk_SSL_CIPHER_num(cipher_list_old));
                       n++)
                  {
@@ -586,7 +591,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
  
                      if (sk_SSL_CIPHER_find(cipher_list, value) < 0) {
                          renegotiate = TRUE;
-@@ -914,25 +916,27 @@
+@@ -914,25 +916,27 @@ int ssl_hook_Access(request_rec *r)
                  cert = sk_X509_value(cert_stack, 0);
              }
  
@@ -620,7 +625,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
  
              if (cert_stack != SSL_get_peer_cert_chain(ssl)) {
                  /* we created this ourselves, so free it */
-@@ -940,6 +944,7 @@
+@@ -940,6 +944,7 @@ int ssl_hook_Access(request_rec *r)
              }
          }
          else {
@@ -628,7 +633,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
              const char *reneg_support;
              request_rec *id = r->main ? r->main : r;
  
-@@ -983,7 +988,7 @@
+@@ -983,7 +988,7 @@ int ssl_hook_Access(request_rec *r)
              SSL_renegotiate(ssl);
              SSL_do_handshake(ssl);
  
@@ -637,7 +642,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
                  ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(02225)
                                "Re-negotiation request failed");
                  ssl_log_ssl_error(SSLLOG_MARK, APLOG_ERR, r->server);
-@@ -999,16 +1004,15 @@
+@@ -999,16 +1004,15 @@ int ssl_hook_Access(request_rec *r)
               * However, this causes failures in perl-framework currently,
               * perhaps pre-test if we have already negotiated?
               */
@@ -660,7 +665,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
                  ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(02261)
                                "Re-negotiation handshake failed");
                  ssl_log_ssl_error(SSLLOG_MARK, APLOG_ERR, r->server);
-@@ -1513,7 +1517,11 @@
+@@ -1513,7 +1517,11 @@ DH *ssl_callback_TmpDH(SSL *ssl, int export, int keylen)
      SSL_set_current_cert(ssl, SSL_CERT_SET_SERVER);
  #endif
      pkey = SSL_get_privatekey(ssl);
@@ -672,7 +677,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
  
      /*
       * OpenSSL will call us with either keylen == 512 or keylen == 1024
-@@ -1725,11 +1733,19 @@
+@@ -1725,11 +1733,19 @@ static void modssl_proxy_info_log(conn_rec *c,
   * so we need to increment here to prevent them from
   * being freed.
   */
@@ -692,7 +697,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
  
  int ssl_callback_proxy_cert(SSL *ssl, X509 **x509, EVP_PKEY **pkey)
  {
-@@ -1823,7 +1839,7 @@
+@@ -1823,7 +1839,7 @@ int ssl_callback_proxy_cert(SSL *ssl, X509 **x509, EVP_PKEY **pkey)
  
  static void ssl_session_log(server_rec *s,
                              const char *request,
@@ -701,7 +706,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
                              unsigned int idlen,
                              const char *status,
                              const char *result,
-@@ -1863,7 +1879,7 @@
+@@ -1863,7 +1879,7 @@ int ssl_callback_NewSessionCacheEntry(SSL *ssl, SSL_SESSION *session)
      SSLSrvConfigRec *sc = mySrvConfig(s);
      long timeout        = sc->session_cache_timeout;
      BOOL rc;
@@ -710,7 +715,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
      unsigned int idlen;
  
      /*
-@@ -1907,7 +1923,7 @@
+@@ -1907,7 +1923,7 @@ int ssl_callback_NewSessionCacheEntry(SSL *ssl, SSL_SESSION *session)
   *  of our other Apache pre-forked server processes.
   */
  SSL_SESSION *ssl_callback_GetSessionCacheEntry(SSL *ssl,
@@ -719,7 +724,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
                                                 int idlen, int *do_copy)
  {
      /* Get Apache context back through OpenSSL context */
-@@ -1946,7 +1962,7 @@
+@@ -1946,7 +1962,7 @@ void ssl_callback_DelSessionCacheEntry(SSL_CTX *ctx,
  {
      server_rec *s;
      SSLSrvConfigRec *sc;
@@ -728,7 +733,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
      unsigned int idlen;
  
      /*
-@@ -2067,15 +2083,12 @@
+@@ -2067,15 +2083,12 @@ void ssl_callback_Info(const SSL *ssl, int where, int rc)
      /* If the reneg state is to reject renegotiations, check the SSL
       * state machine and move to ABORT if a Client Hello is being
       * read. */
@@ -747,7 +752,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
      }
      /* If the first handshake is complete, change state to reject any
       * subsequent client-initiated renegotiation. */
-@@ -2279,7 +2292,7 @@
+@@ -2279,7 +2292,7 @@ int ssl_callback_SessionTicket(SSL *ssl,
          }
  
          memcpy(keyname, ticket_key->key_name, 16);
@@ -756,7 +761,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
          EVP_EncryptInit_ex(cipher_ctx, EVP_aes_128_cbc(), NULL,
                             ticket_key->aes_key, iv);
          HMAC_Init_ex(hctx, ticket_key->hmac_secret, 16, tlsext_tick_md(), NULL);
-@@ -2416,17 +2429,27 @@
+@@ -2416,17 +2429,27 @@ int ssl_callback_SRPServerParams(SSL *ssl, int *ad, void *arg)
      SRP_user_pwd *u;
  
      if (username == NULL
@@ -784,10 +789,11 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_kernel.c.openssl11 httpd-2.4.23/mo
      SSL_set_verify(ssl, SSL_VERIFY_NONE,  ssl_callback_SSLVerify);
      return SSL_ERROR_NONE;
  }
-diff -uap httpd-2.4.23/modules/ssl/ssl_engine_ocsp.c.openssl11 httpd-2.4.23/modules/ssl/ssl_engine_ocsp.c
---- httpd-2.4.23/modules/ssl/ssl_engine_ocsp.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_engine_ocsp.c
-@@ -109,7 +109,7 @@
+diff --git a/modules/ssl/ssl_engine_ocsp.c b/modules/ssl/ssl_engine_ocsp.c
+index f295651..282a2a2 100644
+--- a/modules/ssl/ssl_engine_ocsp.c
++++ b/modules/ssl/ssl_engine_ocsp.c
+@@ -109,7 +109,7 @@ static OCSP_REQUEST *create_request(X509_STORE_CTX *ctx, X509 *cert,
  {
      OCSP_REQUEST *req = OCSP_REQUEST_new();
  
@@ -796,7 +802,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_ocsp.c.openssl11 httpd-2.4.23/modu
      if (!*certid || !OCSP_request_add0_id(req, *certid)) {
          ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, APLOGNO(01921)
                       "could not retrieve certificate id");
-@@ -184,7 +184,7 @@
+@@ -184,7 +184,7 @@ static int verify_ocsp_status(X509 *cert, X509_STORE_CTX *ctx, conn_rec *c,
  
      if (rc == V_OCSP_CERTSTATUS_GOOD) {
          /* TODO: allow flags configuration. */
@@ -805,7 +811,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_ocsp.c.openssl11 httpd-2.4.23/modu
              ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, APLOGNO(01925)
                          "failed to verify the OCSP response");
              ssl_log_ssl_error(SSLLOG_MARK, APLOG_ERR, s);
-@@ -262,7 +262,7 @@
+@@ -262,7 +262,7 @@ int modssl_verify_ocsp(X509_STORE_CTX *ctx, SSLSrvConfigRec *sc,
                        "No cert available to check with OCSP");
          return 1;
      }
@@ -814,10 +820,11 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_ocsp.c.openssl11 httpd-2.4.23/modu
          /* don't do OCSP checking for valid self-issued certs */
          ap_log_cerror(APLOG_MARK, APLOG_TRACE2, 0, c,
                        "Skipping OCSP check for valid self-issued cert");
-diff -uap httpd-2.4.23/modules/ssl/ssl_engine_vars.c.openssl11 httpd-2.4.23/modules/ssl/ssl_engine_vars.c
---- httpd-2.4.23/modules/ssl/ssl_engine_vars.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_engine_vars.c
-@@ -380,7 +380,7 @@
+diff --git a/modules/ssl/ssl_engine_vars.c b/modules/ssl/ssl_engine_vars.c
+index 036cb36..42c22b0 100644
+--- a/modules/ssl/ssl_engine_vars.c
++++ b/modules/ssl/ssl_engine_vars.c
+@@ -380,7 +380,7 @@ static char *ssl_var_lookup_ssl(apr_pool_t *p, SSLConnRec *sslconn,
          char buf[MODSSL_SESSION_ID_STRING_LEN];
          SSL_SESSION *pSession = SSL_get_session(ssl);
          if (pSession) {
@@ -826,7 +833,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_vars.c.openssl11 httpd-2.4.23/modu
              unsigned int idlen;
  
  #ifdef OPENSSL_NO_SSL_INTERN
-@@ -545,13 +545,25 @@
+@@ -545,13 +545,25 @@ static char *ssl_var_lookup_ssl_cert(apr_pool_t *p, request_rec *r, X509 *xs,
          resdup = FALSE;
      }
      else if (strcEQ(var, "A_SIG")) {
@@ -852,7 +859,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_vars.c.openssl11 httpd-2.4.23/modu
          result = apr_pstrdup(p,
                               (nid == NID_undef) ? "UNKNOWN" : OBJ_nid2ln(nid));
          resdup = FALSE;
-@@ -613,11 +625,8 @@
+@@ -613,11 +625,8 @@ static char *ssl_var_lookup_ssl_cert_dn(apr_pool_t *p, X509_NAME *xsname, char *
      for (i = 0; ssl_var_lookup_ssl_cert_dn_rec[i].name != NULL; i++) {
          if (strEQn(var, ssl_var_lookup_ssl_cert_dn_rec[i].name, varlen)
              && strlen(ssl_var_lookup_ssl_cert_dn_rec[i].name) == varlen) {
@@ -866,7 +873,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_vars.c.openssl11 httpd-2.4.23/modu
  
                  n =OBJ_obj2nid((ASN1_OBJECT *)X509_NAME_ENTRY_get_object(xsne));
  
-@@ -919,7 +928,6 @@
+@@ -919,7 +928,6 @@ static char *ssl_var_lookup_ssl_version(apr_pool_t *p, char *var)
  static void extract_dn(apr_table_t *t, apr_hash_t *nids, const char *pfx,
                         X509_NAME *xn, apr_pool_t *p)
  {
@@ -874,7 +881,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_vars.c.openssl11 httpd-2.4.23/modu
      X509_NAME_ENTRY *xsne;
      apr_hash_t *count;
      int i, nid;
-@@ -929,10 +937,9 @@
+@@ -929,10 +937,9 @@ static void extract_dn(apr_table_t *t, apr_hash_t *nids, const char *pfx,
      count = apr_hash_make(p);
  
      /* For each RDN... */
@@ -887,7 +894,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_vars.c.openssl11 httpd-2.4.23/modu
  
           /* Retrieve the nid, and check whether this is one of the nids
            * which are to be extracted. */
-@@ -1106,7 +1113,7 @@
+@@ -1106,7 +1113,7 @@ apr_array_header_t *ssl_ext_list(apr_pool_t *p, conn_rec *c, int peer,
      for (j = 0; j < count; j++) {
          X509_EXTENSION *ext = X509_get_ext(xs, j);
  
@@ -896,9 +903,10 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_engine_vars.c.openssl11 httpd-2.4.23/modu
              BIO *bio = BIO_new(BIO_s_mem());
  
              /* We want to obtain a string representation of the extensions
-diff -uap httpd-2.4.23/modules/ssl/ssl_private.h.openssl11 httpd-2.4.23/modules/ssl/ssl_private.h
---- httpd-2.4.23/modules/ssl/ssl_private.h.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_private.h
+diff --git a/modules/ssl/ssl_private.h b/modules/ssl/ssl_private.h
+index 7813e41..08de3a1 100644
+--- a/modules/ssl/ssl_private.h
++++ b/modules/ssl/ssl_private.h
 @@ -135,6 +135,13 @@
  #define HAVE_SSL_CONF_CMD
  #endif
@@ -969,7 +977,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_private.h.openssl11 httpd-2.4.23/modules/
  /* mod_ssl headers */
  #include "ssl_util_ssl.h"
  
-@@ -454,12 +494,12 @@
+@@ -454,12 +494,12 @@ typedef struct {
       * partial fix for CVE-2009-3555. */
      enum {
          RENEG_INIT = 0, /* Before initial handshake */
@@ -988,7 +996,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_private.h.openssl11 httpd-2.4.23/modules/
      } reneg_state;
  
      server_rec *server;
-@@ -810,7 +850,7 @@
+@@ -810,7 +850,7 @@ int          ssl_callback_SSLVerify(int, X509_STORE_CTX *);
  int          ssl_callback_SSLVerify_CRL(int, X509_STORE_CTX *, conn_rec *);
  int          ssl_callback_proxy_cert(SSL *ssl, X509 **x509, EVP_PKEY **pkey);
  int          ssl_callback_NewSessionCacheEntry(SSL *, SSL_SESSION *);
@@ -997,7 +1005,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_private.h.openssl11 httpd-2.4.23/modules/
  void         ssl_callback_DelSessionCacheEntry(SSL_CTX *, SSL_SESSION *);
  void         ssl_callback_Info(const SSL *, int, int);
  #ifdef HAVE_TLSEXT
-@@ -831,10 +871,10 @@
+@@ -831,10 +871,10 @@ int ssl_callback_alpn_select(SSL *ssl, const unsigned char **out,
  apr_status_t ssl_scache_init(server_rec *, apr_pool_t *);
  void         ssl_scache_status_register(apr_pool_t *p);
  void         ssl_scache_kill(server_rec *);
@@ -1011,7 +1019,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_private.h.openssl11 httpd-2.4.23/modules/
                                 apr_pool_t *);
  
  /** Proxy Support */
-@@ -882,7 +922,9 @@
+@@ -882,7 +922,9 @@ void         ssl_util_ppclose(server_rec *, apr_pool_t *, apr_file_t *);
  char        *ssl_util_readfilter(server_rec *, apr_pool_t *, const char *,
                                   const char * const *);
  BOOL         ssl_util_path_check(ssl_pathcheck_t, const char *, apr_pool_t *);
@@ -1021,10 +1029,11 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_private.h.openssl11 httpd-2.4.23/modules/
  int          ssl_init_ssl_connection(conn_rec *c, request_rec *r);
  
  BOOL         ssl_util_vhost_matches(const char *servername, server_rec *s);
-diff -uap httpd-2.4.23/modules/ssl/ssl_scache.c.openssl11 httpd-2.4.23/modules/ssl/ssl_scache.c
---- httpd-2.4.23/modules/ssl/ssl_scache.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_scache.c
-@@ -110,7 +110,7 @@
+diff --git a/modules/ssl/ssl_scache.c b/modules/ssl/ssl_scache.c
+index 70d1877..7b4a203 100644
+--- a/modules/ssl/ssl_scache.c
++++ b/modules/ssl/ssl_scache.c
+@@ -110,7 +110,7 @@ void ssl_scache_kill(server_rec *s)
  
  }
  
@@ -1033,7 +1042,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_scache.c.openssl11 httpd-2.4.23/modules/s
                        apr_time_t expiry, SSL_SESSION *sess,
                        apr_pool_t *p)
  {
-@@ -144,7 +144,7 @@
+@@ -144,7 +144,7 @@ BOOL ssl_scache_store(server_rec *s, UCHAR *id, int idlen,
      return rv == APR_SUCCESS ? TRUE : FALSE;
  }
  
@@ -1042,7 +1051,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_scache.c.openssl11 httpd-2.4.23/modules/s
                                   apr_pool_t *p)
  {
      SSLModConfigRec *mc = myModConfig(s);
-@@ -173,7 +173,7 @@
+@@ -173,7 +173,7 @@ SSL_SESSION *ssl_scache_retrieve(server_rec *s, UCHAR *id, int idlen,
      return d2i_SSL_SESSION(NULL, &ptr, destlen);
  }
  
@@ -1051,10 +1060,11 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_scache.c.openssl11 httpd-2.4.23/modules/s
                         apr_pool_t *p)
  {
      SSLModConfigRec *mc = myModConfig(s);
-diff -uap httpd-2.4.23/modules/ssl/ssl_util.c.openssl11 httpd-2.4.23/modules/ssl/ssl_util.c
---- httpd-2.4.23/modules/ssl/ssl_util.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_util.c
-@@ -247,6 +247,7 @@
+diff --git a/modules/ssl/ssl_util.c b/modules/ssl/ssl_util.c
+index ddde3c7..052d23e 100644
+--- a/modules/ssl/ssl_util.c
++++ b/modules/ssl/ssl_util.c
+@@ -247,6 +247,7 @@ void ssl_asn1_table_unset(apr_hash_t *table,
  }
  
  #if APR_HAS_THREADS
@@ -1062,7 +1072,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util.c.openssl11 httpd-2.4.23/modules/ssl
  /*
   * To ensure thread-safetyness in OpenSSL - work in progress
   */
-@@ -362,6 +363,28 @@
+@@ -362,6 +363,28 @@ static void ssl_dyn_destroy_function(struct CRYPTO_dynlock_value *l,
      apr_pool_destroy(l->pool);
  }
  
@@ -1091,7 +1101,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util.c.openssl11 httpd-2.4.23/modules/ssl
  static unsigned long ssl_util_thr_id(void)
  {
      /* OpenSSL needs this to return an unsigned long.  On OS/390, the pthread
-@@ -380,10 +403,16 @@
+@@ -380,10 +403,16 @@ static unsigned long ssl_util_thr_id(void)
  #endif
  }
  
@@ -1108,7 +1118,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util.c.openssl11 httpd-2.4.23/modules/ssl
  
      CRYPTO_set_dynlock_create_callback(NULL);
      CRYPTO_set_dynlock_lock_callback(NULL);
-@@ -407,7 +436,11 @@
+@@ -407,7 +436,11 @@ void ssl_util_thread_setup(apr_pool_t *p)
          apr_thread_mutex_create(&(lock_cs[i]), APR_THREAD_MUTEX_DEFAULT, p);
      }
  
@@ -1120,17 +1130,18 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util.c.openssl11 httpd-2.4.23/modules/ssl
  
      CRYPTO_set_locking_callback(ssl_util_thr_lock);
  
-@@ -422,4 +455,5 @@
+@@ -422,4 +455,5 @@ void ssl_util_thread_setup(apr_pool_t *p)
      apr_pool_cleanup_register(p, NULL, ssl_util_thread_cleanup,
                                         apr_pool_cleanup_null);
  }
 -#endif
 +#endif /* #if OPENSSL_VERSION_NUMBER < 0x10100000L */
 +#endif /* #if APR_HAS_THREADS */
-diff -uap httpd-2.4.23/modules/ssl/ssl_util_ssl.c.openssl11 httpd-2.4.23/modules/ssl/ssl_util_ssl.c
---- httpd-2.4.23/modules/ssl/ssl_util_ssl.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_util_ssl.c
-@@ -488,7 +488,7 @@
+diff --git a/modules/ssl/ssl_util_ssl.c b/modules/ssl/ssl_util_ssl.c
+index a7607c7..9807592 100644
+--- a/modules/ssl/ssl_util_ssl.c
++++ b/modules/ssl/ssl_util_ssl.c
+@@ -488,7 +488,7 @@ EC_GROUP *ssl_ec_GetParamFromFile(const char *file)
  **  _________________________________________________________________
  */
  
@@ -1139,9 +1150,10 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util_ssl.c.openssl11 httpd-2.4.23/modules
                                 char *str, int strsize)
  {
      if (idlen > SSL_MAX_SSL_SESSION_ID_LENGTH)
-diff -uap httpd-2.4.23/modules/ssl/ssl_util_ssl.h.openssl11 httpd-2.4.23/modules/ssl/ssl_util_ssl.h
---- httpd-2.4.23/modules/ssl/ssl_util_ssl.h.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_util_ssl.h
+diff --git a/modules/ssl/ssl_util_ssl.h b/modules/ssl/ssl_util_ssl.h
+index 5f74831..4f18f91 100644
+--- a/modules/ssl/ssl_util_ssl.h
++++ b/modules/ssl/ssl_util_ssl.h
 @@ -41,7 +41,11 @@
  #define MODSSL_LIBRARY_VERSION OPENSSL_VERSION_NUMBER
  #define MODSSL_LIBRARY_NAME    "OpenSSL"
@@ -1154,7 +1166,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util_ssl.h.openssl11 httpd-2.4.23/modules
  
  /**
   *  Maximum length of a DER encoded session.
-@@ -67,7 +71,7 @@
+@@ -67,7 +71,7 @@ char       *modssl_X509_NAME_ENTRY_to_string(apr_pool_t *p, X509_NAME_ENTRY *xsn
  char       *modssl_X509_NAME_to_string(apr_pool_t *, X509_NAME *, int);
  BOOL        modssl_X509_getSAN(apr_pool_t *, X509 *, int, const char *, int, apr_array_header_t **);
  BOOL        modssl_X509_match_name(apr_pool_t *, X509 *, const char *, BOOL, server_rec *);
@@ -1163,10 +1175,11 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util_ssl.h.openssl11 httpd-2.4.23/modules
  
  #endif /* __SSL_UTIL_SSL_H__ */
  /** @} */
-diff -uap httpd-2.4.23/modules/ssl/ssl_util_stapling.c.openssl11 httpd-2.4.23/modules/ssl/ssl_util_stapling.c
---- httpd-2.4.23/modules/ssl/ssl_util_stapling.c.openssl11
-+++ httpd-2.4.23/modules/ssl/ssl_util_stapling.c
-@@ -79,7 +79,7 @@
+diff --git a/modules/ssl/ssl_util_stapling.c b/modules/ssl/ssl_util_stapling.c
+index 413e40f..718a291 100644
+--- a/modules/ssl/ssl_util_stapling.c
++++ b/modules/ssl/ssl_util_stapling.c
+@@ -79,7 +79,7 @@ static X509 *stapling_get_issuer(modssl_ctx_t *mctx, X509 *x)
      X509 *issuer = NULL;
      int i;
      X509_STORE *st = SSL_CTX_get_cert_store(mctx->ssl_ctx);
@@ -1175,7 +1188,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util_stapling.c.openssl11 httpd-2.4.23/mo
      STACK_OF(X509) *extra_certs = NULL;
  
  #ifdef OPENSSL_NO_SSL_INTERN
-@@ -91,18 +91,23 @@
+@@ -91,18 +91,23 @@ static X509 *stapling_get_issuer(modssl_ctx_t *mctx, X509 *x)
      for (i = 0; i < sk_X509_num(extra_certs); i++) {
          issuer = sk_X509_value(extra_certs, i);
          if (X509_check_issued(issuer, x) == X509_V_OK) {
@@ -1203,7 +1216,7 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util_stapling.c.openssl11 httpd-2.4.23/mo
  }
  
  int ssl_stapling_init_cert(server_rec *s, apr_pool_t *p, apr_pool_t *ptemp,
-@@ -398,7 +403,9 @@
+@@ -398,7 +403,9 @@ static int stapling_check_response(server_rec *s, modssl_ctx_t *mctx,
  
              if (bio) {
                  int n;
@@ -1214,10 +1227,11 @@ diff -uap httpd-2.4.23/modules/ssl/ssl_util_stapling.c.openssl11 httpd-2.4.23/mo
                      ((n = BIO_read(bio, snum, sizeof snum - 1)) > 0))
                      snum[n] = '\0';
                  BIO_free(bio);
-diff -uap httpd-2.4.23/support/ab.c.openssl11 httpd-2.4.23/support/ab.c
---- httpd-2.4.23/support/ab.c.openssl11
-+++ httpd-2.4.23/support/ab.c
-@@ -2133,6 +2133,14 @@
+diff --git a/support/ab.c b/support/ab.c
+index 072d2e6..3d61b2d 100644
+--- a/support/ab.c
++++ b/support/ab.c
+@@ -2165,6 +2165,14 @@ int main(int argc, const char * const argv[])
      apr_getopt_t *opt;
      const char *opt_arg;
      char c;
@@ -1232,7 +1246,7 @@ diff -uap httpd-2.4.23/support/ab.c.openssl11 httpd-2.4.23/support/ab.c
  #ifdef USE_SSL
      AB_SSL_METHOD_CONST SSL_METHOD *meth = SSLv23_client_method();
  #endif
-@@ -2350,6 +2358,7 @@
+@@ -2391,6 +2399,7 @@ int main(int argc, const char * const argv[])
                  method_str[CUSTOM_METHOD] = strdup(opt_arg);
                  break;
              case 'f':
@@ -1240,7 +1254,7 @@ diff -uap httpd-2.4.23/support/ab.c.openssl11 httpd-2.4.23/support/ab.c
                  if (strncasecmp(opt_arg, "ALL", 3) == 0) {
                      meth = SSLv23_client_method();
  #ifndef OPENSSL_NO_SSL2
-@@ -2369,6 +2378,31 @@
+@@ -2416,6 +2425,31 @@ int main(int argc, const char * const argv[])
                  } else if (strncasecmp(opt_arg, "TLS1", 4) == 0) {
                      meth = TLSv1_client_method();
                  }
@@ -1270,9 +1284,9 @@ diff -uap httpd-2.4.23/support/ab.c.openssl11 httpd-2.4.23/support/ab.c
 +                }
 +#endif /* #if OPENSSL_VERSION_NUMBER < 0x10100000L */
                  break;
- #endif
-         }
-@@ -2413,7 +2447,11 @@
+ #ifdef HAVE_TLSEXT
+             case 'I':
+@@ -2465,7 +2499,11 @@ int main(int argc, const char * const argv[])
  #ifdef RSAREF
      R_malloc_init();
  #else
@@ -1284,7 +1298,7 @@ diff -uap httpd-2.4.23/support/ab.c.openssl11 httpd-2.4.23/support/ab.c
  #endif
      SSL_load_error_strings();
      SSL_library_init();
-@@ -2426,6 +2464,10 @@
+@@ -2478,6 +2516,10 @@ int main(int argc, const char * const argv[])
          exit(1);
      }
      SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL);
