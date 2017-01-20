@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.25
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -65,6 +65,7 @@ Patch35: httpd-2.4.17-sslciphdefault.patch
 # Bug fixes
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
+Patch58: httpd-2.4.25-r1778319+.patch
 # Security fixes
 
 License: ASL 2.0
@@ -210,6 +211,7 @@ interface for storing and accessing per-user session data.
 
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
+%patch58 -p1 -b .r1778319+
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -545,6 +547,7 @@ for m in $mods; do
     rv=1
   fi
 done
+set -x
 exit $rv
 
 %clean
@@ -682,6 +685,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jan 12 2017 Joe Orton <jorton@redhat.com> - 2.4.25-3
+- mod_watchdog: restrict thread lifetime (#1410883)
+
 * Thu Dec 22 2016 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-2
 - Resolves: #1358875 - require nghttp2 >= 1.5.0
 
