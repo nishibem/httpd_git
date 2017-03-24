@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.25
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -50,11 +50,11 @@ Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch7: httpd-2.4.23-openssl11.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.10-detect-systemd.patch
+Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
-Patch25: httpd-2.4.1-selinux.patch
+Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
@@ -684,6 +684,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Mar 24 2017 Joe Orton <jorton@redhat.com> - 2.4.25-5
+- link only httpd, not support/* against -lselinux -lsystemd
+
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.25-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
