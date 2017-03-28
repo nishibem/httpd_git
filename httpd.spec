@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.25
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -66,6 +66,8 @@ Patch35: httpd-2.4.17-sslciphdefault.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 Patch58: httpd-2.4.25-r1778319+.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1434916
+Patch59: httpd-2.4.25-r1787141.patch
 # Security fixes
 
 License: ASL 2.0
@@ -213,6 +215,7 @@ interface for storing and accessing per-user session data.
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
 %patch58 -p1 -b .r1778319+
+%patch59 -p1 -b .č1787141
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -684,6 +687,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Mar 28 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-6
+- Resolves: #1434916 - httpd.service: Failed with result timeout
+
 * Fri Mar 24 2017 Joe Orton <jorton@redhat.com> - 2.4.25-5
 - link only httpd, not support/* against -lselinux -lsystemd
 
