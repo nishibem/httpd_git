@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.25
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -68,6 +68,8 @@ Patch57: httpd-2.4.10-sigint.patch
 Patch58: httpd-2.4.25-r1778319+.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1434916
 Patch59: httpd-2.4.25-r1787141.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1397243
+Patch60: httpd-2.4.25-r1738878.patch
 # Security fixes
 
 License: ASL 2.0
@@ -215,7 +217,8 @@ interface for storing and accessing per-user session data.
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
 %patch58 -p1 -b .r1778319+
-%patch59 -p1 -b .č1787141
+%patch59 -p1 -b .r1787141
+%patch60 -p1 -b .r1738878
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -687,6 +690,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Mar 29 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-7
+- Resolves: #1397243 - Backport Apache Bug 53098 - mod_proxy_ajp:
+  patch to set worker secret passed to tomcat
+
 * Tue Mar 28 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-6
 - Resolves: #1434916 - httpd.service: Failed with result timeout
 
