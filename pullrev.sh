@@ -6,7 +6,7 @@ if [ $# -lt 1 ]; then
 fi
 
 repo="https://svn.apache.org/repos/asf/httpd/httpd/trunk"
-#repo="https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x"
+repo="https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x"
 ver=2.4.25
 prefix="httpd-${ver}"
 suffix="r$1${2:++}"
