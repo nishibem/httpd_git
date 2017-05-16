@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.25
-Release: 5%{?dist}
+Release: 8%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -50,11 +50,11 @@ Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch7: httpd-2.4.23-openssl11.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.10-detect-systemd.patch
+Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
-Patch25: httpd-2.4.1-selinux.patch
+Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
@@ -66,7 +66,10 @@ Patch35: httpd-2.4.17-sslciphdefault.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 Patch58: httpd-2.4.25-r1778319+.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1434916
 Patch59: httpd-2.4.25-r1787141.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1397243
+Patch60: httpd-2.4.25-r1738878.patch
 # Security fixes
 
 License: ASL 2.0
@@ -75,7 +78,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, perl-generators, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
-BuildRequires: systemd-devel, libnghttp2-devel
+BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
@@ -83,7 +86,7 @@ Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires: httpd-filesystem = %{version}-%{release}
-Requires: nghttp2 >= 1.5.0
+Requires: mod_http2
 Requires(pre): httpd-filesystem
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -215,6 +218,7 @@ interface for storing and accessing per-user session data.
 %patch57 -p1 -b .sigint
 %patch58 -p1 -b .r1778319+
 %patch59 -p1 -b .r1787141
+%patch60 -p1 -b .r1738878
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -283,7 +287,8 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap --disable-file-cache
+        --disable-imagemap --disable-file-cache \
+        --disable-http2 \
 	$*
 make %{?_smp_mflags}
 
@@ -686,8 +691,18 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Tue Mar 28 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-5
+* Tue May 16 2017 Joe Orton <jorton@redhat.com> - 2.4.25-8
+- require mod_http2, now packaged separately
+
+* Wed Mar 29 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-7
+- Resolves: #1397243 - Backport Apache Bug 53098 - mod_proxy_ajp:
+  patch to set worker secret passed to tomcat
+
+* Tue Mar 28 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-6
 - Resolves: #1434916 - httpd.service: Failed with result timeout
+
+* Fri Mar 24 2017 Joe Orton <jorton@redhat.com> - 2.4.25-5
+- link only httpd, not support/* against -lselinux -lsystemd
 
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.25-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
