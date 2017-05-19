@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.25
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -40,6 +40,7 @@ Source28: 00-optional.conf
 # Documentation
 Source30: README.confd
 Source31: README.confmod
+Source32: httpd.service.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 # build/scripts patches
@@ -233,6 +234,8 @@ if test "x${vmmn}" != "x%{mmn}"; then
    : Update the mmn macro and rebuild.
    exit 1
 fi
+
+xmlto man $RPM_SOURCE_DIR/httpd.service.xml
 
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa} and vendor string '%{vstring}'
 
@@ -435,6 +438,11 @@ mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
+# Install systemd service man pages
+mkdir -p $RPM_BUILD_ROOT%{_mandir}/man5
+install -m 644 -p httpd.service.5 httpd.socket.5 \
+        $RPM_BUILD_ROOT%{_mandir}/man5
+
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/mime.types|/etc/mime.types|" \
@@ -625,6 +633,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
 
 %{_mandir}/man8/*
+%{_mandir}/man5/*
 
 %{_unitdir}/*.service
 %{_unitdir}/*.socket
@@ -691,6 +700,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri May 19 2017 Joe Orton <jorton@redhat.com> - 2.4.25-9
+- add httpd.service(5) and httpd.socket(5) man pages
+
 * Tue May 16 2017 Joe Orton <jorton@redhat.com> - 2.4.25-8
 - require mod_http2, now packaged separately
 

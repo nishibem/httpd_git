@@ -24,3 +24,5 @@ x86_64
 /httpd-2.4.18.tar.bz2
 /httpd-2.4.23.tar.bz2
 /httpd-2.4.25.tar.bz2
+/httpd.socket.5
+/httpd.service.5
