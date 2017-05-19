@@ -40,6 +40,7 @@ Source28: 00-optional.conf
 # Documentation
 Source30: README.confd
 Source31: README.confmod
+Source32: httpd.service.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 # build/scripts patches
