@@ -1,3 +1,5 @@
+# See httpd.socket(5) for more information on using the httpd service.
+
 [Unit]
 Description=Apache httpd Server Socket
 
