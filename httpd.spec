@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.25
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -439,9 +439,8 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
 # Install systemd service man pages
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man5
-install -m 644 -p httpd.service.5 httpd.socket.5 \
-        $RPM_BUILD_ROOT%{_mandir}/man5
+install -m 644 -p httpd.service.8 httpd.socket.8 \
+        $RPM_BUILD_ROOT%{_mandir}/man8
 
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
@@ -633,7 +632,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
 
 %{_mandir}/man8/*
-%{_mandir}/man5/*
 
 %{_unitdir}/*.service
 %{_unitdir}/*.socket
@@ -700,6 +698,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jun  5 2017 Joe Orton <jorton@redhat.com> - 2.4.25-10
+- move unit man pages to section 8, add as Documentation= in units
+
 * Fri May 19 2017 Joe Orton <jorton@redhat.com> - 2.4.25-9
 - add httpd.service(5) and httpd.socket(5) man pages
 
