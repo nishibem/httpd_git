@@ -7,13 +7,12 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.25
+Version: 2.4.26
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
 Source2: httpd.logrotate
-Source3: httpd.sysconf
 Source4: httpd-ssl-pass-dialog
 Source5: httpd.tmpfiles
 Source6: httpd.service
@@ -41,6 +40,7 @@ Source28: 00-optional.conf
 # Documentation
 Source30: README.confd
 Source31: README.confmod
+Source32: httpd.service.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 # build/scripts patches
@@ -50,11 +50,11 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.10-detect-systemd.patch
+Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
-Patch25: httpd-2.4.1-selinux.patch
+Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
@@ -65,6 +65,8 @@ Patch35: httpd-2.4.17-sslciphdefault.patch
 # Bug fixes
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1397243
+Patch58: httpd-2.4.25-r1738878.patch
 # Security fixes
 
 License: ASL 2.0
@@ -73,7 +75,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, perl-generators, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
-BuildRequires: systemd-devel, libnghttp2-devel
+BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
@@ -81,6 +83,7 @@ Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires: httpd-filesystem = %{version}-%{release}
+Requires: nghttp2 >= 1.5.0
 Requires(pre): httpd-filesystem
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -209,7 +212,7 @@ interface for storing and accessing per-user session data.
 
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
-
+%patch58 -p1 -b .r1738878
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 
@@ -223,6 +226,8 @@ if test "x${vmmn}" != "x%{mmn}"; then
    : Update the mmn macro and rebuild.
    exit 1
 fi
+
+xmlto man $RPM_SOURCE_DIR/httpd.service.xml
 
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa} and vendor string '%{vstring}'
 
@@ -277,7 +282,8 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap --disable-file-cache
+        --disable-imagemap --disable-file-cache \
+        --disable-http2 \
 	$*
 make %{?_smp_mflags}
 
@@ -335,10 +341,8 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.conf \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/httpd.conf
 
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-for s in httpd htcacheclean; do
-  install -m 644 -p $RPM_SOURCE_DIR/${s}.sysconf \
-                    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/${s}
-done
+install -m 644 -p $RPM_SOURCE_DIR/htcacheclean.sysconf \
+   $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/htcacheclean
 
 # tmpfiles.d configuration
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d 
@@ -425,6 +429,10 @@ done
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
+
+# Install systemd service man pages
+install -m 644 -p httpd.service.8 httpd.socket.8 \
+        $RPM_BUILD_ROOT%{_mandir}/man8
 
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
@@ -544,6 +552,7 @@ for m in $mods; do
     rv=1
   fi
 done
+set -x
 exit $rv
 
 %clean
@@ -681,12 +690,51 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jun 19 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.26-1
+- new version 2.4.26
+
+* Mon Jun  5 2017 Joe Orton <jorton@redhat.com> - 2.4.25-10
+- move unit man pages to section 8, add as Documentation= in units
+
+* Fri May 19 2017 Joe Orton <jorton@redhat.com> - 2.4.25-9
+- add httpd.service(5) and httpd.socket(5) man pages
+
+* Tue May 16 2017 Joe Orton <jorton@redhat.com> - 2.4.25-8
+- require mod_http2, now packaged separately
+
+* Wed Mar 29 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-7
+- Resolves: #1397243 - Backport Apache Bug 53098 - mod_proxy_ajp:
+  patch to set worker secret passed to tomcat
+
+* Tue Mar 28 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-6
+- Resolves: #1434916 - httpd.service: Failed with result timeout
+
+* Fri Mar 24 2017 Joe Orton <jorton@redhat.com> - 2.4.25-5
+- link only httpd, not support/* against -lselinux -lsystemd
+
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.25-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Thu Jan 12 2017 Joe Orton <jorton@redhat.com> - 2.4.25-3
+- mod_watchdog: restrict thread lifetime (#1410883)
+
+* Thu Dec 22 2016 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-2
+- Resolves: #1358875 - require nghttp2 >= 1.5.0
+
 * Thu Dec 22 2016 Luboš Uhliarik <luhliari@redhat.com> - 2.4.25-1
 - new version 2.4.25
 
-* Mon Dec 05 2016 Luboš Uhliarik <luhliari@redhat.com> - 2.4.23-5
-- Resolves: #1401528 - CVE-2016-8740 httpd: Incomplete handling
-  of LimitRequestFields directive in mod_http2
+* Mon Dec 05 2016 Luboš Uhliarik <luhliari@redhat.com> - 2.4.23-7
+- Resolves: #1401530 - CVE-2016-8740 httpd: Incomplete handling of
+  LimitRequestFields directive in mod_http2
+
+* Mon Nov 14 2016 Joe Orton <jorton@redhat.com> - 2.4.23-6
+- fix build with OpenSSL 1.1 (#1392900)
+- fix typos in ssl.conf (josef randinger, #1379407)
+
+* Wed Nov  2 2016 Joe Orton <jorton@redhat.com> - 2.4.23-5
+- no longer package /etc/sysconfig/httpd
+- synch ssl.conf with upstream
 
 * Mon Jul 18 2016 Joe Orton <jorton@redhat.com> - 2.4.23-4
 - add security fix for CVE-2016-5387
