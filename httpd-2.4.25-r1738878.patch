@@ -73,12 +73,12 @@ index 67353a7..680a8f3 100644
          ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(00988)
                 "ajp_send_header: ajp_marshal_into_msgb failed");
 diff --git a/modules/proxy/mod_proxy.c b/modules/proxy/mod_proxy.c
-index d6e6500..2fe71b9 100644
+index f6fb473..f693f63 100644
 --- a/modules/proxy/mod_proxy.c
 +++ b/modules/proxy/mod_proxy.c
-@@ -308,6 +308,12 @@ static const char *set_worker_param(apr_pool_t *p,
-                     (int)sizeof(worker->s->flusher));
-         PROXY_STRNCPY(worker->s->flusher, val);
+@@ -314,6 +314,12 @@ static const char *set_worker_param(apr_pool_t *p,
+                                 (int)sizeof(worker->s->upgrade));
+         }
      }
 +    else if (!strcasecmp(key, "secret")) {
 +        if (PROXY_STRNCPY(worker->s->secret, val) != APR_SUCCESS) {
@@ -90,7 +90,7 @@ index d6e6500..2fe71b9 100644
          if (set_worker_hc_param_f) {
              return set_worker_hc_param_f(p, s, worker, key, val, NULL);
 diff --git a/modules/proxy/mod_proxy.h b/modules/proxy/mod_proxy.h
-index 281a776..b416db4 100644
+index 8a0ad10..f92c185 100644
 --- a/modules/proxy/mod_proxy.h
 +++ b/modules/proxy/mod_proxy.h
 @@ -352,6 +352,7 @@ PROXY_WORKER_HC_FAIL )
@@ -101,10 +101,10 @@ index 281a776..b416db4 100644
  
  /* RFC-1035 mentions limits of 255 for host-names and 253 for domain-names,
   * dotted together(?) this would fit the below size (+ trailing NUL).
-@@ -442,6 +443,7 @@ typedef struct {
-     int             fcount;     /* current count of failures */
+@@ -443,6 +444,7 @@ typedef struct {
      hcmethod_t      method;     /* method to use for health check */
      apr_interval_time_t interval;
+     char      upgrade[PROXY_WORKER_MAX_SCHEME_SIZE];/* upgrade protocol used by mod_proxy_wstunnel */
 +    char      secret[PROXY_WORKER_MAX_SECRET_SIZE]; /* authentication secret (e.g. AJP13) */
  } proxy_worker_shared;
  

@@ -7,8 +7,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.25
-Release: 10%{?dist}
+Version: 2.4.26
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -49,7 +49,6 @@ Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
-Patch7: httpd-2.4.23-openssl11.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
@@ -66,11 +65,8 @@ Patch35: httpd-2.4.17-sslciphdefault.patch
 # Bug fixes
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
-Patch58: httpd-2.4.25-r1778319+.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1434916
-Patch59: httpd-2.4.25-r1787141.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
-Patch60: httpd-2.4.25-r1738878.patch
+Patch58: httpd-2.4.25-r1738878.patch
 # Security fixes
 
 License: ASL 2.0
@@ -200,7 +196,6 @@ interface for storing and accessing per-user session data.
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
-%patch7 -p1 -b .openssl11
 
 %patch19 -p1 -b .detectsystemd
 
@@ -217,9 +212,7 @@ interface for storing and accessing per-user session data.
 
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
-%patch58 -p1 -b .r1778319+
-%patch59 -p1 -b .r1787141
-%patch60 -p1 -b .r1738878
+%patch58 -p1 -b .r1738878
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -698,6 +691,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jun 19 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.26-1
+- new version 2.4.26
+
 * Mon Jun  5 2017 Joe Orton <jorton@redhat.com> - 2.4.25-10
 - move unit man pages to section 8, add as Documentation= in units
 
