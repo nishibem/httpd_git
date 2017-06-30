@@ -1,0 +1,86 @@
+# ./pullrev.sh 1800306
+
+http://svn.apache.org/viewvc?view=revision&revision=1800306
+
+diff -uap httpd-2.4.26/modules/mappers/mod_actions.c.r1800306 httpd-2.4.26/modules/mappers/mod_actions.c
+--- httpd-2.4.26/modules/mappers/mod_actions.c.r1800306
++++ httpd-2.4.26/modules/mappers/mod_actions.c
+@@ -186,8 +186,7 @@
+         ap_field_noparam(r->pool, r->content_type);
+ 
+     if (action && (t = apr_table_get(conf->action_types, action))) {
+-        int virtual = (*t++ == '0' ? 0 : 1);
+-        if (!virtual && r->finfo.filetype == APR_NOFILE) {
++        if (*t++ == '0' && r->finfo.filetype == APR_NOFILE) {
+             ap_log_rerror(APLOG_MARK, APLOG_INFO, 0, r, APLOGNO(00652)
+                           "File does not exist: %s", r->filename);
+             return HTTP_NOT_FOUND;
+@@ -198,9 +197,6 @@
+          * (will be REDIRECT_HANDLER there)
+          */
+         apr_table_setn(r->subprocess_env, "HANDLER", action);
+-        if (virtual) {
+-            apr_table_setn(r->notes, "virtual_script", "1");
+-        }
+     }
+ 
+     if (script == NULL)
+diff -uap httpd-2.4.26/modules/proxy/mod_proxy_fcgi.c.r1800306 httpd-2.4.26/modules/proxy/mod_proxy_fcgi.c
+--- httpd-2.4.26/modules/proxy/mod_proxy_fcgi.c.r1800306
++++ httpd-2.4.26/modules/proxy/mod_proxy_fcgi.c
+@@ -321,7 +321,6 @@
+     apr_status_t rv;
+     apr_size_t avail_len, len, required_len;
+     int next_elem, starting_elem;
+-    int fpm = 0;
+     fcgi_req_config_t *rconf = ap_get_module_config(r->request_config, &proxy_fcgi_module);
+     fcgi_dirconf_t *dconf = ap_get_module_config(r->per_dir_config, &proxy_fcgi_module);
+ 
+@@ -354,8 +353,6 @@
+                     *qs = '\0';
+                 }
+             }
+-        } else {
+-            fpm = 1;
+         }
+ 
+         if (newfname) {
+@@ -364,38 +361,9 @@
+         }
+     }
+ 
+-#if 0
+-    ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(09999)
+-                  "r->filename: %s", (r->filename ? r->filename : "nil"));
+-    ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(09999)
+-                  "r->uri: %s", (r->uri ? r->uri : "nil"));
+-    ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(09999)
+-                  "r->path_info: %s", (r->path_info ? r->path_info : "nil"));
+-#endif
+-
+     ap_add_common_vars(r);
+     ap_add_cgi_vars(r);
+ 
+-    if (fpm || apr_table_get(r->notes, "virtual_script")) {
+-        /*
+-         * Adjust SCRIPT_NAME, PATH_INFO and PATH_TRANSLATED for PHP-FPM
+-         * TODO: Right now, PATH_INFO and PATH_TRANSLATED look OK...
+-         */
+-        const char *pend;
+-        const char *script_name = apr_table_get(r->subprocess_env, "SCRIPT_NAME");
+-        pend = script_name + strlen(script_name);
+-        if (r->path_info && *r->path_info) {
+-            pend = script_name + ap_find_path_info(script_name, r->path_info) - 1;
+-        }
+-        while (pend != script_name && *pend != '/') {
+-            pend--;
+-        }
+-        apr_table_setn(r->subprocess_env, "SCRIPT_NAME", pend);
+-        ap_log_rerror(APLOG_MARK, APLOG_TRACE4, 0, r,
+-                      "fpm:virtual_script: Modified SCRIPT_NAME to: %s",
+-                      pend);
+-    }
+-
+     /* XXX are there any FastCGI specific env vars we need to send? */
+ 
+     /* Give admins final option to fine-tune env vars */
