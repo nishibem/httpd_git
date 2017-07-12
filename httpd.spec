@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -585,7 +585,8 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
-%config(noreplace) %{_sysconfdir}/sysconfig/ht*
+%config(noreplace) %{_sysconfdir}/sysconfig/htcacheclean
+%ghost %{_sysconfdir}/sysconfig/httpd
 %{_prefix}/lib/tmpfiles.d/httpd.conf
 
 %dir %{_libexecdir}/initscripts/legacy-actions/httpd
@@ -690,6 +691,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Jul 12 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.27-2
+- Resolves: #1469959 - httpd update cleaned out /etc/sysconfig
+
 * Mon Jul 10 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.27-1
 - new version 2.4.27
 
