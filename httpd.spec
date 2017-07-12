@@ -7,7 +7,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.26
+Version: 2.4.27
 Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -690,6 +690,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jul 10 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.27-1
+- new version 2.4.27
+
+* Fri Jun 30 2017 Joe Orton <jorton@redhat.com> - 2.4.26-2
+- mod_proxy_fcgi: fix further regressions (PR 61202)
+
 * Mon Jun 19 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.26-1
 - new version 2.4.26
 
