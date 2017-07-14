@@ -1,9 +1,8 @@
 # See httpd.service(8) for more information on using the httpd service.
 
 # Modifying this file in-place is not recommended, because changes
-# will be overwritten during package upgrades.  If you want to
-# customize the behaviour, the best way is to use "systemctl edit"
-# to create an override unit.
+# will be overwritten during package upgrades.  To customize the
+# behaviour, run "systemctl edit httpd" to create an override unit.
 
 # For example, to pass additional options (such as -D definitions) to
 # the httpd binary at startup, create an override unit (as is done by
