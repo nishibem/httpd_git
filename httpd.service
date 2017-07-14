@@ -3,7 +3,7 @@
 # Modifying this file in-place is not recommended, because changes
 # will be overwritten during package upgrades.  If you want to
 # customize the behaviour, the best way is to use "systemctl edit"
-# command to create an override unit.
+# to create an override unit.
 
 # For example, to pass additional options (such as -D definitions) to
 # the httpd binary at startup, create an override unit (as is done by
