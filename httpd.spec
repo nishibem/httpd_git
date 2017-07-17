@@ -4,11 +4,16 @@
 %define mmn 20120211
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
+%if 0%{?fedora} < 27
+%global mpm prefork
+%else
+%global mpm event
+%endif
 
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -230,7 +235,8 @@ fi
 
 xmlto man $RPM_SOURCE_DIR/httpd.service.xml
 
-: Building with MMN %{mmn}, MMN-ISA %{mmnisa} and vendor string '%{vstring}'
+: Building with MMN %{mmn}, MMN-ISA %{mmnisa}
+: Default MPM is %{mpm}, vendor string is '%{vstring}'
 
 %build
 # forcibly prevent use of bundled apr, apr-util, pcre
@@ -313,6 +319,11 @@ for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
+
+sed -i '/^#LoadModule mpm_%{mpm}_module /s/^#//' \
+     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
+touch -r $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf \
+     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
 
 # install systemd override drop directory
 # Web application packages can drop snippets into this location if
@@ -692,6 +703,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jul 17 2017 Joe Orton <jorton@redhat.com> - 2.4.27-3
+- switch to event by default for Fedora 27 and later (#1471708)
+
 * Wed Jul 12 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.27-2
 - Resolves: #1469959 - httpd update cleaned out /etc/sysconfig
 
