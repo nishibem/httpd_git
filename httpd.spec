@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -83,7 +83,7 @@ Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires: httpd-filesystem = %{version}-%{release}
-Requires: nghttp2 >= 1.5.0
+Requires: mod_http2
 Requires(pre): httpd-filesystem
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -692,6 +692,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jul 17 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.27-3
+- Resolves: #1471791 - httpd package does not require mod_http2
+
 * Wed Jul 12 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.27-2
 - Resolves: #1469959 - httpd update cleaned out /etc/sysconfig
 
