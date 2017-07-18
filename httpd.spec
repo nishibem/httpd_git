@@ -57,7 +57,7 @@ Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch29: httpd-2.4.10-mod_systemd.patch
+Patch29: httpd-2.4.27-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
@@ -699,6 +699,7 @@ rm -rf $RPM_BUILD_ROOT
 * Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-3.1
 - move httpd.service.d, httpd.socket.d dirs to -filesystem
 - add new content-length filter (upstream PR 61222)
+- update mod_systemd (r1802251)
 
 * Thu Sep 21 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.4.27-3
 - Address CVE-2017-9798 by applying patch from upstream (#1490344)
