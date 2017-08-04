@@ -8,9 +8,9 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 3%{?dist}
-URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
+Release: 6%{?dist}
+URL: https://httpd.apache.org/
+Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
 Source2: httpd.logrotate
 Source4: httpd-ssl-pass-dialog
