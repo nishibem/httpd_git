@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -72,6 +72,7 @@ Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.25-r1738878.patch
+Patch59: httpd-2.4.27-r1808230.patch
 # Security fixes
 
 License: ASL 2.0
@@ -218,6 +219,7 @@ interface for storing and accessing per-user session data.
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
 %patch58 -p1 -b .r1738878
+%patch59 -p1 -b .r1808230
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -703,6 +705,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Sep 13 2017 Joe Orton <jorton@redhat.com> - 2.4.27-7
+- add new content-length filter (upstream PR 61222)
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.27-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
