@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -68,6 +68,7 @@ Patch57: httpd-2.4.10-sigint.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.25-r1738878.patch
 Patch59: httpd-2.4.27-CVE-2017-9798.patch
+Patch60: httpd-2.4.27-r1808230.patch
 # Security fixes
 
 License: ASL 2.0
@@ -215,6 +216,7 @@ interface for storing and accessing per-user session data.
 %patch57 -p1 -b .sigint
 %patch58 -p1 -b .r1738878
 %patch59 -p4 -b .cve-2017-9798
+%patch60 -p1 -b .r1808230
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -694,8 +696,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-8.1
+* Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-3.1
 - move httpd.service.d, httpd.socket.d dirs to -filesystem
+- add new content-length filter (upstream PR 61222)
 
 * Thu Sep 21 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.4.27-3
 - Address CVE-2017-9798 by applying patch from upstream (#1490344)
