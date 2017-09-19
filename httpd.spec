@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -642,8 +642,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_unitdir}/*.service
 %{_unitdir}/*.socket
-%attr(755,root,root) %dir %{_unitdir}/httpd.service.d
-%attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
 
 %files filesystem
 %dir %{_sysconfdir}/httpd
@@ -705,6 +703,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-8
+- move httpd.service.d, httpd.socket.d dirs to -filesystem
+
 * Wed Sep 13 2017 Joe Orton <jorton@redhat.com> - 2.4.27-7
 - add new content-length filter (upstream PR 61222)
 
