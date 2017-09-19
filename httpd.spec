@@ -644,8 +644,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_unitdir}/*.service
 %{_unitdir}/*.socket
-%attr(755,root,root) %dir %{_unitdir}/httpd.service.d
-%attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
 
 %files filesystem
 %dir %{_sysconfdir}/httpd
@@ -707,6 +705,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-8.1
+- move httpd.service.d, httpd.socket.d dirs to -filesystem
+
 * Thu Sep 21 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.4.27-8
 - Address CVE-2017-9798 by applying patch from upstream (#1490344)
 
