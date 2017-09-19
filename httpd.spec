@@ -652,6 +652,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{docroot}/html
 %dir %{contentdir}
 %dir %{contentdir}/icons
+%attr(755,root,root) %dir %{_unitdir}/httpd.service.d
+%attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
 
 %files tools
 %defattr(-,root,root)
