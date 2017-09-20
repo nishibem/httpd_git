@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+
+set -e
+
+FQDN=`hostname`
+# A >59 char FQDN means "root@FQDN" exceeds 64-char max length for emailAddress
+if [ "x${FQDN}" = "x" -o ${#FQDN} -gt 59 ]; then
+   FQDN=localhost.localdomain
+fi
+
+sscg -q                                                             \
+     --cert-file           /etc/pki/tls/certs/localhost.crt         \
+     --cert-key-file       /etc/pki/tls/private/localhost.key       \
+     --ca-file             /etc/pki/tls/certs/localhost-ca.crt      \
+     --hash-alg            sha256                                   \
+     --key-strength        2048                                     \
+     --lifetime            365                                      \
+     --country             "--"                                     \
+     --state               SomeState                                \
+     --locality            SomeCity                                 \
+     --organization        SomeOrganization                         \
+     --organizational-unit SomeOrganizationalUnit                   \
+     --hostname            $FQDN                                    \
+     --email               root@$FQDN

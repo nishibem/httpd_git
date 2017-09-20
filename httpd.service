@@ -13,7 +13,8 @@
 
 [Unit]
 Description=The Apache HTTP Server
-After=network.target remote-fs.target nss-lookup.target
+Wants=httpd-init.service
+After=network.target remote-fs.target nss-lookup.target httpd-init.service
 Documentation=man:httpd.service(8)
 
 [Service]

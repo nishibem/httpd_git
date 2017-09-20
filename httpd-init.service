@@ -1,0 +1,12 @@
+[Unit]
+Description=One-time configuration for httpd.service
+
+ConditionPathExists=|!/etc/pki/tls/certs/localhost.crt
+ConditionPathExists=|!/etc/pki/tls/certs/localhost-ca.crt
+ConditionPathExists=|!/etc/pki/tls/private/localhost.key
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+
+ExecStart=/usr/libexec/httpd-ssl-gencerts
