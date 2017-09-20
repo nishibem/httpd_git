@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 8%{?dist}
+Release: 8.4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -48,6 +48,8 @@ Source31: README.confmod
 Source32: httpd.service.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
+Source42: httpd-init.service
+Source43: httpd-ssl-gencerts
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
@@ -155,6 +157,7 @@ BuildRequires: openssl-devel
 Requires(post): openssl, /bin/cat, hostname
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: sscg >= 2.1.0
 Obsoletes: stronghold-mod_ssl
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
@@ -303,7 +306,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 
 # Install systemd service files
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-for s in httpd.service htcacheclean.service httpd.socket; do
+for s in httpd.service htcacheclean.service httpd.socket httpd-init.service; do
   install -p -m 644 $RPM_SOURCE_DIR/${s} \
                     $RPM_BUILD_ROOT%{_unitdir}/${s}
 done
@@ -432,6 +435,10 @@ mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
 	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
 
+# install http-ssl-gencerts
+install -m755 $RPM_SOURCE_DIR/httpd-ssl-gencerts \
+	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-gencerts
+
 # Install action scripts
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
 for f in graceful configtest; do
@@ -510,36 +517,6 @@ exit 0
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
   /bin/systemctl try-restart httpd.service htcacheclean.service >/dev/null 2>&1 || :
-
-%define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
-%define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
-
-%post -n mod_ssl
-umask 077
-
-if [ -f %{sslkey} -o -f %{sslcert} ]; then
-   exit 0
-fi
-
-%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 2048 > %{sslkey} 2> /dev/null
-
-FQDN=`hostname`
-# A >59 char FQDN means "root@FQDN" exceeds 64-char max length for emailAddress
-if [ "x${FQDN}" = "x" -o ${#FQDN} -gt 59 ]; then
-   FQDN=localhost.localdomain
-fi
-
-cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
-         -x509 -sha256 -days 365 -set_serial $RANDOM -extensions v3_req \
-         -out %{sslcert} 2>/dev/null
---
-SomeState
-SomeCity
-SomeOrganization
-SomeOrganizationalUnit
-${FQDN}
-root@${FQDN}
-EOF
 
 %check
 # Check the built modules are all PIC
@@ -640,7 +617,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_mandir}/man8/*
 
-%{_unitdir}/*.service
+%{_unitdir}/httpd.service
+%{_unitdir}/htcacheclean.service
 %{_unitdir}/*.socket
 
 %files filesystem
@@ -674,7 +652,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
+%{_unitdir}/httpd-init.service
 %{_libexecdir}/httpd-ssl-pass-dialog
+%{_libexecdir}/httpd-ssl-gencerts
 %{_unitdir}/httpd.socket.d/10-listen443.conf
 
 %files -n mod_proxy_html
@@ -705,6 +685,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Sep 20 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.4.27-8.1
+- Generate SSL certificates on service start, not %posttrans
+
 * Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-8
 - move httpd.service.d, httpd.socket.d dirs to -filesystem
 
