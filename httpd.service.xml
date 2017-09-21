@@ -37,12 +37,14 @@
   <refnamediv>
     <refname>httpd.service</refname>
     <refname>httpd.socket</refname>
+    <refname>httpd-init.service</refname>
     <refpurpose>httpd unit files for systemd</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
     <para>
       <filename>/usr/lib/systemd/system/httpd.service</filename>, 
+      <filename>/usr/lib/systemd/system/httpd-init.service</filename>,
       <filename>/usr/lib/systemd/system/httpd.socket</filename>
     </para>
   </refsynopsisdiv>
@@ -121,6 +123,20 @@ Wants=network-online.target</programlisting>
       See <ulink
       url="https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/"/>
       for more information on startup ordering with systemd.</para>
+
+    </refsect2>
+
+    <refsect2>
+      <title>SSL/TLS certificate generation</title>
+
+      <para>The <command>httpd-init.service</command> unit is provided
+      with the mod_ssl package. This oneshot unit automatically
+      creates a TLS server certificate and key (using a generated
+      self-signed CA certificate and key) for testing purposes before
+      httpd is started. To inhibit certificate generation, use
+      <command>systemctl mask httpd-init.service</command> after
+      installing mod_ssl, and adjust the mod_ssl configuration to use
+      an appropriate certicate and key.</para>
 
     </refsect2>
 

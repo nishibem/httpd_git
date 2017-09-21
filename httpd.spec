@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 8.4%{?dist}
+Release: 9%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -454,7 +454,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
 # Install systemd service man pages
-install -m 644 -p httpd.service.8 httpd.socket.8 \
+install -m 644 -p httpd.service.8 httpd-init.service.8 httpd.socket.8 \
         $RPM_BUILD_ROOT%{_mandir}/man8
 
 # fix man page paths
@@ -618,6 +618,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
 
 %{_mandir}/man8/*
+%exclude %{_mandir}/man8/httpd-init.*
 
 %{_unitdir}/httpd.service
 %{_unitdir}/htcacheclean.service
@@ -658,6 +659,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libexecdir}/httpd-ssl-pass-dialog
 %{_libexecdir}/httpd-ssl-gencerts
 %{_unitdir}/httpd.socket.d/10-listen443.conf
+%{_mandir}/man8/httpd-init.*
 
 %files -n mod_proxy_html
 %defattr(-,root,root)
@@ -687,6 +689,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Sep 21 2017 Joe Orton <jorton@redhat.com> - 2.4.27-9
+- use sscg defaults; append CA cert to generated cert
+- document httpd-init.service in httpd-init.service(8)
+
 * Wed Sep 20 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.4.27-8.1
 - Generate SSL certificates on service start, not %posttrans
 
