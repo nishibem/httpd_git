@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -689,6 +689,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Sep 21 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.4.27-10
+- Address CVE-2017-9798 by applying patch from upstream (#1490344)
+
 * Thu Sep 21 2017 Joe Orton <jorton@redhat.com> - 2.4.27-9
 - use sscg defaults; append CA cert to generated cert
 - document httpd-init.service in httpd-init.service(8)
