@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -158,7 +158,7 @@ BuildRequires: openssl-devel
 Requires(post): openssl, /bin/cat, hostname
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-Requires: sscg >= 2.1.0
+Requires: sscg >= 2.2.0
 Obsoletes: stronghold-mod_ssl
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
@@ -689,6 +689,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Sep 21 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.4.27-11
+- Require sscg 2.2.0 for creating service and CA certificates together
+
 * Thu Sep 21 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.4.27-10
 - Address CVE-2017-9798 by applying patch from upstream (#1490344)
 
