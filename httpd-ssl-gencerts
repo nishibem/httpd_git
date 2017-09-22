@@ -5,18 +5,15 @@ set -e
 FQDN=`hostname`
 
 if test -f /etc/pki/tls/certs/localhost.crt -o \
-        -f /etc/pki/tls/private/localhost.key -o \
-        -f /etc/pki/tls/certs/localhost-ca.crt; then
+        -f /etc/pki/tls/private/localhost.key; then
     exit 1
 fi
 
 sscg -q                                                             \
      --cert-file           /etc/pki/tls/certs/localhost.crt         \
      --cert-key-file       /etc/pki/tls/private/localhost.key       \
-     --ca-file             /etc/pki/tls/certs/localhost-ca.crt      \
+     --ca-file             /etc/pki/tls/certs/localhost.crt         \
      --lifetime            365                                      \
      --hostname            $FQDN                                    \
      --email               root@$FQDN
 
-# mod_ssl will send the CA cert if it's appended to the server cert.
-cat /etc/pki/tls/certs/localhost-ca.crt >> /etc/pki/tls/certs/localhost.crt
