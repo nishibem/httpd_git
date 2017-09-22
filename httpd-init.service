@@ -1,9 +1,8 @@
 [Unit]
-Description=One-time configuration for httpd.service
+Description=One-time temporary TLS key generation for httpd.service
 Documentation=man:httpd-init.service(8)
 
 ConditionPathExists=|!/etc/pki/tls/certs/localhost.crt
-ConditionPathExists=|!/etc/pki/tls/certs/localhost-ca.crt
 ConditionPathExists=|!/etc/pki/tls/private/localhost.key
 
 [Service]
