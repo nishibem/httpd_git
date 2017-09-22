@@ -4,10 +4,10 @@
 %define mmn 20120211
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
-%if 0%{?fedora} < 27 || %{?rhel} <= 7
-%global mpm prefork
-%else
+%if 0%{?fedora} > 26 || 0%{?rhel} > 7
 %global mpm event
+%else
+%global mpm prefork
 %endif
 
 Summary: Apache HTTP Server
