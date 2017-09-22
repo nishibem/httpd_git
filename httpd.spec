@@ -4,7 +4,7 @@
 %define mmn 20120211
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
-%if 0%{?fedora} < 27
+%if 0%{?fedora} < 27 || %{?rhel} <= 7
 %global mpm prefork
 %else
 %global mpm event
@@ -329,7 +329,7 @@ done
 
 sed -i '/^#LoadModule mpm_%{mpm}_module /s/^#//' \
      $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
-touch -r $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf \
+touch -r $RPM_SOURCE_DIR/00-mpm.conf \
      $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-mpm.conf
 
 # install systemd override drop directory
