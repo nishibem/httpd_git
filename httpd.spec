@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 12%{?dist}
+Release: 13%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -155,7 +155,6 @@ Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
-Requires(post): openssl, /bin/cat, hostname
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: sscg >= 2.2.0
@@ -689,6 +688,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Sep 22 2017 Joe Orton <jorton@redhat.com> - 2.4.27-13
+- drop Requires(post) for mod_ssl
+
 * Fri Sep 22 2017 Joe Orton <jorton@redhat.com> - 2.4.27-12
 - better error handling in httpd-ssl-gencerts (#1494556)
 
