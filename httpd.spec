@@ -710,11 +710,11 @@ rm -rf $RPM_BUILD_ROOT
 - use sscg defaults; append CA cert to generated cert
 - document httpd-init.service in httpd-init.service(8)
 
-* Wed Sep 20 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.4.27-8.1
-- Generate SSL certificates on service start, not %%posttrans
-
 * Thu Sep 21 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.4.27-8
 - Address CVE-2017-9798 by applying patch from upstream (#1490344)
+
+* Wed Sep 20 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.4.27-8.1
+- Generate SSL certificates on service start, not %%posttrans
 
 * Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-8.1
 - move httpd.service.d, httpd.socket.d dirs to -filesystem
