@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 13%{?dist}
+Release: 14%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -239,7 +239,10 @@ if test "x${vmmn}" != "x%{mmn}"; then
    exit 1
 fi
 
-xmlto man $RPM_SOURCE_DIR/httpd.service.xml
+sed 's/@MPM@/%{mpm}/' < $RPM_SOURCE_DIR/httpd.service.xml \
+    > httpd.service.xml
+
+xmlto man ./httpd.service.xml
 
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa}
 : Default MPM is %{mpm}, vendor string is '%{vstring}'
@@ -688,6 +691,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Oct  3 2017 Joe Orton <jorton@redhat.com> - 2.4.27-14
+- add notes on enabling httpd_graceful_shutdown boolean for prefork
+
 * Fri Sep 22 2017 Joe Orton <jorton@redhat.com> - 2.4.27-13
 - drop Requires(post) for mod_ssl
 
