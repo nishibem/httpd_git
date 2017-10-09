@@ -696,7 +696,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-3.1
+* Mon Oct  9 2017 Joe Orton <jorton@redhat.com> - 2.4.27-7
 - move httpd.service.d, httpd.socket.d dirs to -filesystem
 - add new content-length filter (upstream PR 61222)
 - update mod_systemd (r1802251)
