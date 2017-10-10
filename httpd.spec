@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.28
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -106,8 +106,7 @@ web server.
 
 %package devel
 Group: Development/Libraries
-Summary: Development interfaces for the Apache HTTP server
-Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
+Summary: Development interfaces for the Apache HTTP Server
 Requires: apr-devel, apr-util-devel, pkgconfig
 Requires: httpd = %{version}-%{release}
 
@@ -116,31 +115,30 @@ The httpd-devel package contains the APXS binary and other files
 that you need to build Dynamic Shared Objects (DSOs) for the
 Apache HTTP Server.
 
-If you are installing the Apache HTTP server and you want to be
+If you are installing the Apache HTTP Server and you want to be
 able to compile or develop additional modules for Apache, you need
 to install this package.
 
 %package manual
 Group: Documentation
-Summary: Documentation for the Apache HTTP server
+Summary: Documentation for the Apache HTTP Server
 Requires: httpd = %{version}-%{release}
-Obsoletes: secureweb-manual, apache-manual
 BuildArch: noarch
 
 %description manual
 The httpd-manual package contains the complete manual and
-reference guide for the Apache HTTP server. The information can
-also be found at http://httpd.apache.org/docs/2.2/.
+reference guide for the Apache HTTP Server. The information can
+also be found at https://httpd.apache.org/docs/2.4/.
 
 %package filesystem
 Group: System Environment/Daemons
-Summary: The basic directory layout for the Apache HTTP server
+Summary: The basic directory layout for the Apache HTTP Server
 BuildArch: noarch
 Requires(pre): /usr/sbin/useradd
 
 %description filesystem
 The httpd-filesystem package contains the basic directory layout
-for the Apache HTTP server including the correct permissions
+for the Apache HTTP Server including the correct permissions
 for the directories.
 
 %package tools
@@ -159,7 +157,6 @@ BuildRequires: openssl-devel
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: sscg >= 2.2.0
-Obsoletes: stronghold-mod_ssl
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
 
@@ -692,6 +689,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Oct 10 2017 Joe Orton <jorton@redhat.com> - 2.4.28-3
+- drop obsolete Obsoletes
+- update docs, Summary
+- trim %%changelog
+
 * Tue Oct 10 2017 Patrick Uiterwijk <patrick@puiterwijk.org> - 2.4.28-2
 - Backport patch for fixing ticket key usage
 
@@ -718,7 +720,7 @@ rm -rf $RPM_BUILD_ROOT
 - document httpd-init.service in httpd-init.service(8)
 
 * Wed Sep 20 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.4.27-8.1
-- Generate SSL certificates on service start, not %posttrans
+- Generate SSL certificates on service start, not %%posttrans
 
 * Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-8
 - move httpd.service.d, httpd.socket.d dirs to -filesystem
@@ -1203,124 +1205,3 @@ rm -rf $RPM_BUILD_ROOT
 - split all LoadModules to conf.modules.d/*.conf
 - include conf.d/*.conf at end of httpd.conf
 - trim %%changelog
-
-* Mon Feb 13 2012 Joe Orton <jorton@redhat.com> - 2.2.22-2
-- fix build against PCRE 8.30
-
-* Mon Feb 13 2012 Joe Orton <jorton@redhat.com> - 2.2.22-1
-- update to 2.2.22
-
-* Fri Feb 10 2012 Petr Pisar <ppisar@redhat.com> - 2.2.21-8
-- Rebuild against PCRE 8.30
-
-* Mon Jan 23 2012 Jan Kaluza <jkaluza@redhat.com> - 2.2.21-7
-- fix #783629 - start httpd after named
-
-* Mon Jan 16 2012 Joe Orton <jorton@redhat.com> - 2.2.21-6
-- complete conversion to systemd, drop init script (#770311)
-- fix comments in /etc/sysconfig/httpd (#771024)
-- enable PrivateTmp in service file (#781440)
-- set LANG=C in /etc/sysconfig/httpd
-
-* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.21-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
-
-* Tue Dec 06 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.21-4
-- fix #751591 - start httpd after remote-fs
-
-* Mon Oct 24 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.21-3
-- allow change state of BalancerMember in mod_proxy_balancer web interface
-
-* Thu Sep 22 2011 Ville Skyttä <ville.skytta@iki.fi> - 2.2.21-2
-- Make mmn available as %%{_httpd_mmn}.
-- Add .svgz to AddEncoding x-gzip example in httpd.conf.
-
-* Tue Sep 13 2011 Joe Orton <jorton@redhat.com> - 2.2.21-1
-- update to 2.2.21
-
-* Mon Sep  5 2011 Joe Orton <jorton@redhat.com> - 2.2.20-1
-- update to 2.2.20
-- fix MPM stub man page generation
-
-* Wed Aug 10 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-5
-- fix #707917 - add httpd-ssl-pass-dialog to ask for SSL password using systemd
-
-* Fri Jul 22 2011 Iain Arnell <iarnell@gmail.com> 1:2.2.19-4
-- rebuild while rpm-4.9.1 is untagged to remove trailing slash in provided
-  directory names
-
-* Wed Jul 20 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-3
-- fix #716621 - suexec now works without setuid bit
-
-* Thu Jul 14 2011 Jan Kaluza <jkaluza@redhat.com> - 2.2.19-2
-- fix #689091 - backported patch from 2.3 branch to support IPv6 in logresolve
-
-* Fri Jul  1 2011 Joe Orton <jorton@redhat.com> - 2.2.19-1
-- update to 2.2.19
-- enable dbd, authn_dbd in default config
-
-* Thu Apr 14 2011 Joe Orton <jorton@redhat.com> - 2.2.17-13
-- fix path expansion in service files
-
-* Tue Apr 12 2011 Joe Orton <jorton@redhat.com> - 2.2.17-12
-- add systemd service files (#684175, thanks to Jóhann B. Guðmundsson)
-
-* Wed Mar 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-11
-- minor updates to httpd.conf
-- drop old patches
-
-* Wed Mar  2 2011 Joe Orton <jorton@redhat.com> - 2.2.17-10
-- rebuild
-
-* Wed Feb 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-9
-- use arch-specific mmn
-
-* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.17-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
-
-* Mon Jan 31 2011 Joe Orton <jorton@redhat.com> - 2.2.17-7
-- generate dummy mod_ssl cert with CA:FALSE constraint (#667841)
-- add man page stubs for httpd.event, httpd.worker
-- drop distcache support
-- add STOP_TIMEOUT support to init script
-
-* Sat Jan  8 2011 Joe Orton <jorton@redhat.com> - 2.2.17-6
-- update default SSLCipherSuite per upstream trunk
-
-* Wed Jan  5 2011 Joe Orton <jorton@redhat.com> - 2.2.17-5
-- fix requires (#667397)
-
-* Wed Jan  5 2011 Joe Orton <jorton@redhat.com> - 2.2.17-4
-- de-ghost /var/run/httpd
-
-* Tue Jan  4 2011 Joe Orton <jorton@redhat.com> - 2.2.17-3
-- add tmpfiles.d configuration, ghost /var/run/httpd (#656600)
-
-* Sat Nov 20 2010 Joe Orton <jorton@redhat.com> - 2.2.17-2
-- drop setuid bit, use capabilities for suexec binary
-
-* Wed Oct 27 2010 Joe Orton <jorton@redhat.com> - 2.2.17-1
-- update to 2.2.17
-
-* Fri Sep 10 2010 Joe Orton <jorton@redhat.com> - 2.2.16-2
-- link everything using -z relro and -z now
-
-* Mon Jul 26 2010 Joe Orton <jorton@redhat.com> - 2.2.16-1
-- update to 2.2.16
-
-* Fri Jul  9 2010 Joe Orton <jorton@redhat.com> - 2.2.15-3
-- default config tweaks:
- * harden httpd.conf w.r.t. .htaccess restriction (#591293)
- * load mod_substitute, mod_version by default
- * drop proxy_ajp.conf, load mod_proxy_ajp in httpd.conf
- * add commented list of shipped-but-unloaded modules
- * bump up worker defaults a little
- * drop KeepAliveTimeout to 5 secs per upstream
-- fix LSB compliance in init script (#522074)
-- bundle NOTICE in -tools
-- use init script in logrotate postrotate to pick up PIDFILE
-- drop some old Obsoletes/Conflicts
-
-* Sun Apr 04 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1
-- update to 2.2.15 (#572404, #579311)
-
