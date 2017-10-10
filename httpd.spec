@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.27
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -70,6 +70,9 @@ Patch58: httpd-2.4.25-r1738878.patch
 Patch59: httpd-2.4.27-CVE-2017-9798.patch
 Patch60: httpd-2.4.27-r1808230.patch
 # Security fixes
+
+# https://github.com/apache/httpd/commit/4171fbfcb249e63f934471054d7a0752272fb8ee
+Patch61: httpd-2.4.27-fixticketkeys.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -217,6 +220,8 @@ interface for storing and accessing per-user session data.
 %patch58 -p1 -b .r1738878
 %patch59 -p4 -b .cve-2017-9798
 %patch60 -p1 -b .r1808230
+
+%patch61 -p1 -b .ticketkeys
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -696,6 +701,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Oct 10 2017 Patrick Uiterwijk <patrick@puiterwijk.org> - 2.4.27-8
+- Backport patch for fixing ticket key usage
+
 * Mon Oct  9 2017 Joe Orton <jorton@redhat.com> - 2.4.27-7
 - move httpd.service.d, httpd.socket.d dirs to -filesystem
 - add new content-length filter (upstream PR 61222)
