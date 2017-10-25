@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.28
-Release: 3%{?dist}
+Version: 2.4.29
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -689,6 +689,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Oct 25 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.29-1
+- new version 2.4.29
+
 * Tue Oct 10 2017 Joe Orton <jorton@redhat.com> - 2.4.28-3
 - drop obsolete Obsoletes
 - update docs, Summary
