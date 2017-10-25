@@ -7,8 +7,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.27
-Release: 4%{?dist}
+Version: 2.4.29
+Release: 1%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -63,11 +63,8 @@ Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch35: httpd-2.4.17-sslciphdefault.patch
 # Bug fixes
-Patch56: httpd-2.4.4-mod_unique_id.patch
-Patch57: httpd-2.4.10-sigint.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.25-r1738878.patch
-Patch59: httpd-2.4.27-CVE-2017-9798.patch
 # Security fixes
 
 License: ASL 2.0
@@ -211,10 +208,7 @@ interface for storing and accessing per-user session data.
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 
-%patch56 -p1 -b .uniqueid
-%patch57 -p1 -b .sigint
 %patch58 -p1 -b .r1738878
-%patch59 -p4 -b .cve-2017-9798
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -694,6 +688,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Oct 25 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.29-1
+- new version 2.4.29
+
 * Thu Sep 21 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.4.27-4
 - Address CVE-2017-9798 by applying patch from upstream (#1490344)
 
