@@ -7,7 +7,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.28
+Version: 2.4.29
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -63,14 +63,9 @@ Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch35: httpd-2.4.17-sslciphdefault.patch
 # Bug fixes
-Patch56: httpd-2.4.4-mod_unique_id.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.25-r1738878.patch
-Patch60: httpd-2.4.27-r1808230.patch
 # Security fixes
-
-# https://github.com/apache/httpd/commit/4171fbfcb249e63f934471054d7a0752272fb8ee
-Patch61: httpd-2.4.27-fixticketkeys.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -213,11 +208,7 @@ interface for storing and accessing per-user session data.
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 
-%patch56 -p1 -b .uniqueid
 %patch58 -p1 -b .r1738878
-%patch60 -p1 -b .r1808230
-
-%patch61 -p1 -b .ticketkeys
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -697,6 +688,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Oct 25 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.29-1
+- new version 2.4.29
+
 * Tue Oct 10 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.28-1
 - new version 2.4.28
 
