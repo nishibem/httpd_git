@@ -104,124 +104,124 @@ index a8e9e6f..996b019 100644
      return APR_SUCCESS;
  }
  
-++
-++#ifdef HAVE_SYSTEMD
-++
-++static int find_systemd_socket(process_rec * process, apr_port_t port) {
-++    int fdcount, fd;
-++    int sdc = sd_listen_fds(0);
-++
-++    if (sdc < 0) {
-++        ap_log_perror(APLOG_MARK, APLOG_CRIT, sdc, process->pool, APLOGNO(02486)
-++                      "find_systemd_socket: Error parsing enviroment, sd_listen_fds returned %d",
-++                      sdc);
-++        return -1;
-++    }
-++
-++    if (sdc == 0) {
-++        ap_log_perror(APLOG_MARK, APLOG_CRIT, sdc, process->pool, APLOGNO(02487)
-++                      "find_systemd_socket: At least one socket must be set.");
-++        return -1;
-++    }
-++
-++    fdcount = atoi(getenv("LISTEN_FDS"));
-++    for (fd = SD_LISTEN_FDS_START; fd < SD_LISTEN_FDS_START + fdcount; fd++) {
-++        if (sd_is_socket_inet(fd, 0, 0, -1, port) > 0) {
-++            return fd;
-++        }
-++    }
-++
-++    return -1;
-++}
-++
-++static apr_status_t alloc_systemd_listener(process_rec * process,
-++                                           int fd, const char *proto,
-++                                           ap_listen_rec **out_rec)
-++{
-++    apr_status_t rv;
-++    struct sockaddr sa;
-++    socklen_t len = sizeof(struct sockaddr);
-++    apr_os_sock_info_t si;
-++    ap_listen_rec *rec;
-++    *out_rec = NULL;
-++
-++    memset(&si, 0, sizeof(si));
-++
-++    rv = getsockname(fd, &sa, &len);
-++
-++    if (rv != 0) {
-++        rv = apr_get_netos_error();
-++        ap_log_perror(APLOG_MARK, APLOG_CRIT, rv, process->pool, APLOGNO(02489)
-++                      "getsockname on %d failed.", fd);
-++        return rv;
-++    }
-++
-++    si.os_sock = &fd;
-++    si.family = sa.sa_family;
-++    si.local = &sa;
-++    si.type = SOCK_STREAM;
-++    si.protocol = APR_PROTO_TCP;
-++
-++    rec = apr_palloc(process->pool, sizeof(ap_listen_rec));
-++    rec->active = 0;
-++    rec->next = 0;
-++
-++
-++    rv = apr_os_sock_make(&rec->sd, &si, process->pool);
-++    if (rv != APR_SUCCESS) {
-++        ap_log_perror(APLOG_MARK, APLOG_CRIT, rv, process->pool, APLOGNO(02490)
-++                      "apr_os_sock_make on %d failed.", fd);
-++        return rv;
-++    }
-++
-++    rv = apr_socket_addr_get(&rec->bind_addr, APR_LOCAL, rec->sd);
-++    if (rv != APR_SUCCESS) {
-++        ap_log_perror(APLOG_MARK, APLOG_CRIT, rv, process->pool, APLOGNO(02491)
-++                      "apr_socket_addr_get on %d failed.", fd);
-++        return rv;
-++    }
-++
-++    rec->protocol = apr_pstrdup(process->pool, proto);
-++
-++    *out_rec = rec;
-++
-++    return make_sock(process->pool, rec, 0);
-++}
-++
-++static const char *set_systemd_listener(process_rec *process, apr_port_t port,
-++                                        const char *proto)
-++{
-++    ap_listen_rec *last, *new;
-++    apr_status_t rv;
-++    int fd = find_systemd_socket(process, port);
-++    if (fd < 0) {
-++        return "Systemd socket activation is used, but this port is not "
-++                "configured in systemd";
-++    }
-++
-++    last = ap_listeners;
-++    while (last && last->next) {
-++        last = last->next;
-++    }
-++
-++    rv = alloc_systemd_listener(process, fd, proto, &new);
-++    if (rv != APR_SUCCESS) {
-++        return "Failed to setup socket passed by systemd using socket activation";
-++    }
-++
-++    if (last == NULL) {
-++        ap_listeners = last = new;
-++    }
-++    else {
-++        last->next = new;
-++        last = new;
-++    }
-++
-++    return NULL;
-++}
-++
-++#endif /* HAVE_SYSTEMD */
-++
++
++#ifdef HAVE_SYSTEMD
++
++static int find_systemd_socket(process_rec * process, apr_port_t port) {
++    int fdcount, fd;
++    int sdc = sd_listen_fds(0);
++
++    if (sdc < 0) {
++        ap_log_perror(APLOG_MARK, APLOG_CRIT, sdc, process->pool, APLOGNO(02486)
++                      "find_systemd_socket: Error parsing enviroment, sd_listen_fds returned %d",
++                      sdc);
++        return -1;
++    }
++
++    if (sdc == 0) {
++        ap_log_perror(APLOG_MARK, APLOG_CRIT, sdc, process->pool, APLOGNO(02487)
++                      "find_systemd_socket: At least one socket must be set.");
++        return -1;
++    }
++
++    fdcount = atoi(getenv("LISTEN_FDS"));
++    for (fd = SD_LISTEN_FDS_START; fd < SD_LISTEN_FDS_START + fdcount; fd++) {
++        if (sd_is_socket_inet(fd, 0, 0, -1, port) > 0) {
++            return fd;
++        }
++    }
++
++    return -1;
++}
++
++static apr_status_t alloc_systemd_listener(process_rec * process,
++                                           int fd, const char *proto,
++                                           ap_listen_rec **out_rec)
++{
++    apr_status_t rv;
++    struct sockaddr sa;
++    socklen_t len = sizeof(struct sockaddr);
++    apr_os_sock_info_t si;
++    ap_listen_rec *rec;
++    *out_rec = NULL;
++
++    memset(&si, 0, sizeof(si));
++
++    rv = getsockname(fd, &sa, &len);
++
++    if (rv != 0) {
++        rv = apr_get_netos_error();
++        ap_log_perror(APLOG_MARK, APLOG_CRIT, rv, process->pool, APLOGNO(02489)
++                      "getsockname on %d failed.", fd);
++        return rv;
++    }
++
++    si.os_sock = &fd;
++    si.family = sa.sa_family;
++    si.local = &sa;
++    si.type = SOCK_STREAM;
++    si.protocol = APR_PROTO_TCP;
++
++    rec = apr_palloc(process->pool, sizeof(ap_listen_rec));
++    rec->active = 0;
++    rec->next = 0;
++
++
++    rv = apr_os_sock_make(&rec->sd, &si, process->pool);
++    if (rv != APR_SUCCESS) {
++        ap_log_perror(APLOG_MARK, APLOG_CRIT, rv, process->pool, APLOGNO(02490)
++                      "apr_os_sock_make on %d failed.", fd);
++        return rv;
++    }
++
++    rv = apr_socket_addr_get(&rec->bind_addr, APR_LOCAL, rec->sd);
++    if (rv != APR_SUCCESS) {
++        ap_log_perror(APLOG_MARK, APLOG_CRIT, rv, process->pool, APLOGNO(02491)
++                      "apr_socket_addr_get on %d failed.", fd);
++        return rv;
++    }
++
++    rec->protocol = apr_pstrdup(process->pool, proto);
++
++    *out_rec = rec;
++
++    return make_sock(process->pool, rec, 0);
++}
++
++static const char *set_systemd_listener(process_rec *process, apr_port_t port,
++                                        const char *proto)
++{
++    ap_listen_rec *last, *new;
++    apr_status_t rv;
++    int fd = find_systemd_socket(process, port);
++    if (fd < 0) {
++        return "Systemd socket activation is used, but this port is not "
++                "configured in systemd";
++    }
++
++    last = ap_listeners;
++    while (last && last->next) {
++        last = last->next;
++    }
++
++    rv = alloc_systemd_listener(process, fd, proto, &new);
++    if (rv != APR_SUCCESS) {
++        return "Failed to setup socket passed by systemd using socket activation";
++    }
++
++    if (last == NULL) {
++        ap_listeners = last = new;
++    }
++    else {
++        last->next = new;
++        last = new;
++    }
++
++    return NULL;
++}
++
++#endif /* HAVE_SYSTEMD */
++
 +
  static int find_listeners(ap_listen_rec **from, ap_listen_rec **to,
                            const char *addr, apr_port_t port)
