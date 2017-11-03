@@ -69,10 +69,10 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch35: httpd-2.4.17-sslciphdefault.patch
+
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.25-r1738878.patch
-# Security fixes
 
 License: ASL 2.0
 Group: System Environment/Daemons
