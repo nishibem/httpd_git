@@ -221,6 +221,31 @@ Wants=network-online.target</programlisting>
 
     </refsect2>
 
+    <refsect2>
+      <title>Socket activation</title>
+
+      <para>Socket activation (see
+      <citerefentry><refentrytitle>systemd.socket</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+      for more information) can be used with <command>httpd</command>
+      by enabling the <command>httpd.socket</command> unit.  The
+      <command>httpd</command> listener configuration must exactly
+      match the <literal>ListenStream</literal> options configured for
+      the <command>httpd.socket</command> unit.  The default
+      <command>httpd.socket</command> has a
+      <literal>ListenStream=80</literal> and, if mod_ssl is installed,
+      <literal>ListenStream=443</literal> by a drop-in file. If
+      additional <literal>Listen</literal> directives are added to the
+      httpd configuration, corresponding
+      <literal>ListenStream</literal> options should be added via
+      drop-in files, for example via <command>systemctl edit
+      httpd.socket</command>.</para>
+
+      <para>If using socket activation with httpd, only one listener
+      on any given TCP port is supported; a configuration with both
+      "<literal>Listen 127.0.0.1:80</literal>" and "<literal>Listen
+      192.168.1.2:80</literal>" will not work.</para>
+    </refsect2>
+
   </refsect1>
 
   <refsect1>
@@ -240,6 +265,7 @@ Wants=network-online.target</programlisting>
     <citerefentry><refentrytitle>systemctl</refentrytitle><manvolnum>1</manvolnum></citerefentry>, 
     <citerefentry><refentrytitle>systemd.service</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>systemd.exec</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemd.socket</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>httpd_selinux</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>semanage</refentrytitle><manvolnum>8</manvolnum></citerefentry>
     </para>
