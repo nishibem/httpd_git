@@ -1,0 +1,15 @@
+---
+# Tests that run in all contexts
+- hosts: localhost
+  vars:
+    use_beakerlib_libraries: true
+  roles:
+  - role: standard-test-rhts
+    tags:
+    - classic
+    - container
+    tests:
+    - httpd-php-mysql-sanity-test
+    required_packages:
+    - findutils         # beakerlib needs find command
+    - which             # smoke requires which command
