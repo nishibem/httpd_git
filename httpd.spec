@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.29
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -80,7 +80,7 @@ License: ASL 2.0
 Group: System Environment/Daemons
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl-interpreter, perl-generators, pkgconfig, findutils, xmlto
-BuildRequires: zlib-devel, libselinux-devel, lua-devel
+BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos-httpd
@@ -278,6 +278,7 @@ export LYNX_PATH=/usr/bin/links
         --with-suexec-syslog \
 	--with-suexec-bin=%{_sbindir}/suexec \
 	--with-suexec-uidmin=1000 --with-suexec-gidmin=1000 \
+        --with-brotli \
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
@@ -681,6 +682,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Nov 23 2017 Joe Orton <jorton@redhat.com> - 2.4.29-2
+- build and load mod_brotli
+
 * Wed Oct 25 2017 Luboš Uhliarik <luhliari@redhat.com> - 2.4.29-1
 - new version 2.4.29
 
