@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.29
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -682,6 +682,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 2.4.29-3
+- Rebuilt for switch to libxcrypt
+
 * Thu Nov 23 2017 Joe Orton <jorton@redhat.com> - 2.4.29-2
 - build and load mod_brotli
 
