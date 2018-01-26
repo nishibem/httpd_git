@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.29
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -682,6 +682,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jan 26 2018 Paul Howarth <paul@city-fan.org> - 2.4.29-4
+- Rebuild with updated flags to work around compiler issues on i686
+  (#1538648, #1538693)
+
 * Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 2.4.29-3
 - Rebuilt for switch to libxcrypt
 
