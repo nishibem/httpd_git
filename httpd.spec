@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.29
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -56,6 +56,7 @@ Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
+Patch7: httpd-2.4.27-r1822305.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
@@ -200,6 +201,7 @@ interface for storing and accessing per-user session data.
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
+%patch7 -p1 -b .r1822305
 
 %patch19 -p1 -b .detectsystemd
 
@@ -682,6 +684,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Sat Jan 27 2018 Joe Orton <jorton@redhat.com> - 2.4.29-5
+- link mod_lua against -lcrypt (#1538992)
+
 * Fri Jan 26 2018 Paul Howarth <paul@city-fan.org> - 2.4.29-4
 - Rebuild with updated flags to work around compiler issues on i686
   (#1538648, #1538693)
