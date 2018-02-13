@@ -79,7 +79,6 @@ Patch58: httpd-2.4.25-r1738878.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl-interpreter, perl-generators, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
