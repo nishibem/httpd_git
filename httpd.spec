@@ -542,9 +542,6 @@ done
 set -x
 exit $rv
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root)
 
