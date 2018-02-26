@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.29
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -57,6 +57,7 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch7: httpd-2.4.27-r1822305.patch
+Patch8: httpd-2.4.27-r1825147.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
@@ -201,6 +202,7 @@ interface for storing and accessing per-user session data.
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
 %patch7 -p1 -b .r1822305
+%patch8 -p1 -b .r1825147
 
 %patch19 -p1 -b .detectsystemd
 
@@ -680,6 +682,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Feb 26 2018 Joe Orton <jorton@redhat.com> - 2.4.29-7
+- simplify liblua detection in configure
+
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.29-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
