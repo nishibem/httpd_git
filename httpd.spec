@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.29
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -682,6 +682,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Mar 05 2018 Jitka Plesnikova <jplesnik@redhat.com> - 2.4.29-8
+- Rebuilt with brotli 1.0.3
+
 * Mon Feb 26 2018 Joe Orton <jorton@redhat.com> - 2.4.29-7
 - simplify liblua detection in configure
 
