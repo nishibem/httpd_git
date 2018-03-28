@@ -167,6 +167,20 @@ Wants=network-online.target</programlisting>
     </refsect2>
 
     <refsect2>
+      <title>Automated service restarts</title>
+
+      <para>System packages (including the httpd package itself) may
+      restart the httpd service automatically after packages are
+      upgraded, installed, or removed. This is done using the
+      <command>systemctl reload httpd.service</command>, which
+      produces a <emphasis>graceful</emphasis> restart by default as
+      described above.</para>
+
+      <para>To suppress automatic reloads entirely, create the file
+      <filename>/etc/sysconfig/httpd-disable-posttrans</filename>.</para>
+    </refsect2>
+
+    <refsect2>
       <title>Changing the default MPM (Multi-Processing Module)</title>
 
       <para>httpd offers a choice of multi-processing modules (MPMs),
