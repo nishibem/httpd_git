@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.29
-Release: 2%{?dist}
+Version: 2.4.33
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -42,6 +42,7 @@ Source25: 01-session.conf
 Source26: 10-listen443.conf
 Source27: httpd.socket
 Source28: 00-optional.conf
+Source29: 01-md.conf
 # Documentation
 Source30: README.confd
 Source31: README.confmod
@@ -59,7 +60,7 @@ Patch6: httpd-2.4.3-apctl-systemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
-Patch23: httpd-2.4.4-export.patch
+Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
@@ -68,15 +69,16 @@ Patch29: httpd-2.4.27-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
-Patch35: httpd-2.4.17-sslciphdefault.patch
+Patch35: httpd-2.4.33-sslciphdefault.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
-Patch58: httpd-2.4.25-r1738878.patch
+Patch58: httpd-2.4.33-r1738878.patch
+
+# Security fixes
 
 License: ASL 2.0
 Group: System Environment/Daemons
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl-interpreter, perl-generators, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
@@ -160,6 +162,19 @@ The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
+%package -n mod_md
+Group: System Environment/Daemons
+Summary: Certificate provisioning using ACME for the Apache HTTP Server
+Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+BuildRequires: jansson-devel, libcurl-devel
+
+%description -n mod_md
+This module manages common properties of domains for one or more
+virtual hosts. Specifically it can use the ACME protocol (RFC Draft)
+to automate certificate provisioning. These will be configured for
+managed domains and their virtual hosts automatically. This includes
+renewal of certificates before they expire.
+
 %package -n mod_proxy_html
 Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
@@ -208,7 +223,7 @@ interface for storing and accessing per-user session data.
 %patch27 -p1 -b .icons
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
-%patch31 -p1 -b .sslmultiproxy
+#patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 %patch58 -p1 -b .r1738878
@@ -313,7 +328,8 @@ install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf; do
+         01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf \
+         01-md.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -361,6 +377,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
+         $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd \
          $RPM_BUILD_ROOT/run/httpd/htcacheclean
 
 # Substitute in defaults which are usually done (badly) by "make install"
@@ -420,6 +437,7 @@ ln -s ../../pixmaps/poweredby.png \
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
+ln -s ../..%{_localstatedir}/lib/httpd $RPM_BUILD_ROOT/etc/httpd/state
 ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
@@ -539,9 +557,6 @@ done
 set -x
 exit $rv
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root)
 
@@ -550,6 +565,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_sysconfdir}/httpd/modules
 %{_sysconfdir}/httpd/logs
+%{_sysconfdir}/httpd/state
 %{_sysconfdir}/httpd/run
 %dir %{_sysconfdir}/httpd/conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/httpd.conf
@@ -587,6 +603,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/modules/mod*.so
 %exclude %{_libdir}/httpd/modules/mod_auth_form.so
 %exclude %{_libdir}/httpd/modules/mod_ssl.so
+%exclude %{_libdir}/httpd/modules/mod_md.so
 %exclude %{_libdir}/httpd/modules/mod_*ldap.so
 %exclude %{_libdir}/httpd/modules/mod_proxy_html.so
 %exclude %{_libdir}/httpd/modules/mod_xml2enc.so
@@ -605,6 +622,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,apache,apache) %dir /run/httpd/htcacheclean
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
+%attr(0700,apache,apache) %dir %{_localstatedir}/lib/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
 
@@ -669,6 +687,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/modules/mod_auth_form.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
+%files -n mod_md
+%defattr(-,root,root)
+%{_libdir}/httpd/modules/mod_md.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-md.conf
+
 %files devel
 %defattr(-,root,root)
 %{_includedir}/httpd
@@ -680,6 +703,29 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Mar 28 2018 Joe Orton <jorton@redhat.com> - 2.4.33-1
+- rebase to 2.4.33 (#1560174)
+- add mod_md subpackage; load mod_proxy_uwsgi by default
+
+* Mon Mar 05 2018 Jitka Plesnikova <jplesnik@redhat.com> - 2.4.29-8
+- Rebuilt with brotli 1.0.3
+
+* Mon Feb 26 2018 Joe Orton <jorton@redhat.com> - 2.4.29-7
+- simplify liblua detection in configure
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.29-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Sat Jan 27 2018 Joe Orton <jorton@redhat.com> - 2.4.29-5
+- link mod_lua against -lcrypt (#1538992)
+
+* Fri Jan 26 2018 Paul Howarth <paul@city-fan.org> - 2.4.29-4
+- Rebuild with updated flags to work around compiler issues on i686
+  (#1538648, #1538693)
+
+* Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 2.4.29-3
+- Rebuilt for switch to libxcrypt
+
 * Thu Nov 23 2017 Joe Orton <jorton@redhat.com> - 2.4.29-2
 - build and load mod_brotli
 
@@ -716,11 +762,7 @@ rm -rf $RPM_BUILD_ROOT
 - use sscg defaults; append CA cert to generated cert
 - document httpd-init.service in httpd-init.service(8)
 
-* Thu Sep 21 2017 Jeroen van Meeuwen <kanarip@fedoraproject.org> - 2.4.27-8
-- Address CVE-2017-9798 by applying patch from upstream (#1490344)
-
 * Wed Sep 20 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.4.27-8.1
-- Generate SSL certificates on service start, not %%posttrans
 - Generate SSL certificates on service start, not %%posttrans
 
 * Tue Sep 19 2017 Joe Orton <jorton@redhat.com> - 2.4.27-8
