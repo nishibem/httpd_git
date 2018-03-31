@@ -8,7 +8,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.33
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -601,6 +601,7 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
+%exclude %{_sysconfdir}/httpd/conf.modules.d/01-md.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/htcacheclean
 %ghost %{_sysconfdir}/sysconfig/httpd
@@ -715,6 +716,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Mar 30 2018 Adam Williamson <awilliam@redhat.com> - 2.4.33-2
+- Exclude mod_md config file from main package (#1562413)
+
 * Wed Mar 28 2018 Joe Orton <jorton@redhat.com> - 2.4.33-1
 - rebase to 2.4.33 (#1560174)
 - add mod_md subpackage; load mod_proxy_uwsgi by default
