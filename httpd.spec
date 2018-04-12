@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.33
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -74,6 +74,8 @@ Patch35: httpd-2.4.33-sslciphdefault.patch
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.33-r1738878.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1564537
+Patch59: httpd-2.4.33-sslmerging.patch
 
 # Security fixes
 
@@ -227,6 +229,7 @@ interface for storing and accessing per-user session data.
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 %patch58 -p1 -b .r1738878
+%patch59 -p1 -b .sslmerging
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -704,6 +707,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Apr 12 2018 Joe Orton <jorton@redhat.com> - 2.4.33-3
+- mod_ssl: drop implicit 'SSLEngine on' for vhost w/o certs (#1564537)
+
 * Fri Mar 30 2018 Adam Williamson <awilliam@redhat.com> - 2.4.33-2
 - Exclude mod_md config file from main package (#1562413)
 
