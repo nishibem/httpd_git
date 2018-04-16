@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.33
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -60,6 +60,7 @@ Patch6: httpd-2.4.3-apctl-systemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
+Patch21: httpd-2.4.33-mddefault.patch
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
@@ -218,6 +219,7 @@ interface for storing and accessing per-user session data.
 
 %patch19 -p1 -b .detectsystemd
 
+%patch21 -p1 -b .mddefault
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
@@ -225,7 +227,7 @@ interface for storing and accessing per-user session data.
 %patch27 -p1 -b .icons
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
-#patch31 -p1 -b .sslmultiproxy
+%patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 %patch58 -p1 -b .r1738878
@@ -707,6 +709,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Apr 16 2018 Joe Orton <jorton@redhat.com> - 2.4.33-4
+- mod_ssl: fix mod_nss compat patch (Rob Crittenden, #1566511)
+- mod_md: change hard-coded default MdStoreDir to state/md (#1563846)
+
 * Thu Apr 12 2018 Joe Orton <jorton@redhat.com> - 2.4.33-3
 - mod_ssl: drop implicit 'SSLEngine on' for vhost w/o certs (#1564537)
 
