@@ -1,0 +1,140 @@
+From 11f3375333ca795939d90e14a761f2f288034704 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Fri, 13 Apr 2018 11:14:57 -0400
+Subject: [PATCH] Update sslmultiproxy patch to work with 2.4.33
+
+---
+ httpd-2.4.18-sslmultiproxy.patch | 85 +++++++++++++++++++++++++++-------------
+ 1 file changed, 58 insertions(+), 27 deletions(-)
+
+diff --git a/httpd-2.4.18-sslmultiproxy.patch b/httpd-2.4.18-sslmultiproxy.patch
+index 3f00f3f..9e311ea 100644
+--- a/httpd-2.4.18-sslmultiproxy.patch
++++ b/httpd-2.4.18-sslmultiproxy.patch
+@@ -1,53 +1,81 @@
++From ce2d1d7d4b2bebe34cf37fdeb30d35050092c5b5 Mon Sep 17 00:00:00 2001
++From: Rob Crittenden <rcrit@cow.greyoak.com>
++Date: Thu, 12 Apr 2018 14:36:28 -0400
++Subject: [PATCH] httpd-2.4.18-sslmultiproxy.patch
++
++---
++ modules/ssl/mod_ssl.c         | 24 ++++++++++++++++++++++--
++ modules/ssl/ssl_engine_vars.c | 18 +++++++++++++++++-
++ 2 files changed, 39 insertions(+), 3 deletions(-)
++
+ diff --git a/modules/ssl/mod_ssl.c b/modules/ssl/mod_ssl.c
+-index 717a694..a3ce718 100644
++index 48d64cb..42e85a3 100644
+ --- a/modules/ssl/mod_ssl.c
+ +++ b/modules/ssl/mod_ssl.c
+-@@ -395,6 +395,9 @@ static SSLConnRec *ssl_init_connection_ctx(conn_rec *c)
+-     return sslconn;
++@@ -444,12 +444,19 @@ static int ssl_hook_pre_config(apr_pool_t *pconf,
++     return OK;
+  }
+  
+-+static typeof(ssl_proxy_enable) *othermod_proxy_enable;
+ +static typeof(ssl_engine_disable) *othermod_engine_disable;
+++static typeof(ssl_engine_set) *othermod_engine_set;
+ +
+- int ssl_proxy_enable(conn_rec *c)
++ static SSLConnRec *ssl_init_connection_ctx(conn_rec *c,
++                                            ap_conf_vector_t *per_dir_config)
+  {
+-     SSLSrvConfigRec *sc;
+-@@ -403,6 +406,12 @@ int ssl_proxy_enable(conn_rec *c)
+-     sc = mySrvConfig(sslconn->server);
+- 
+-     if (!sc->proxy_enabled) {
+-+        if (othermod_proxy_enable) {
+-+            ap_log_cerror(APLOG_MARK, APLOG_DEBUG, 0, c,
+-+                          "mod_ssl proxy not configured, passing through to other module.");
+-+            return othermod_proxy_enable(c);
+-+        }
+-+
+-         ap_log_cerror(APLOG_MARK, APLOG_ERR, 0, c, APLOGNO(01961)
+-                       "SSL Proxy requested for %s but not enabled "
+-                       "[Hint: SSLProxyEngine]", sc->vhost_id);
+-@@ -422,6 +431,10 @@ int ssl_engine_disable(conn_rec *c)
+- 
+      SSLConnRec *sslconn = myConnConfig(c);
++     SSLSrvConfigRec *sc;
+  
+ +    if (othermod_engine_disable) {
+ +        othermod_engine_disable(c);
+ +    }
+ +
+      if (sslconn) {
+-         sc = mySrvConfig(sslconn->server);
++         return sslconn;
+      }
+-@@ -621,6 +634,9 @@ static void ssl_register_hooks(apr_pool_t *p)
+-     ap_hook_post_read_request(ssl_hook_ReadReq, pre_prr,NULL, APR_HOOK_MIDDLE);
++@@ -508,6 +515,10 @@ static int ssl_engine_set(conn_rec *c,
++ {
++     SSLConnRec *sslconn;
++     int status;
+++
+++    if (othermod_engine_set) {
+++        return othermod_engine_set(c, per_dir_config, proxy, enable);
+++    }
++     
++     if (proxy) {
++         sslconn = ssl_init_connection_ctx(c, per_dir_config);
++@@ -537,12 +548,18 @@ static int ssl_engine_set(conn_rec *c,
++ 
++ static int ssl_proxy_enable(conn_rec *c)
++ {
++-    return ssl_engine_set(c, NULL, 1, 1);
+++    if (othermod_engine_set)
+++        return othermod_engine_set(c, NULL, 1, 1);
+++    else
+++        return ssl_engine_set(c, NULL, 1, 1);
++ }
++ 
++ static int ssl_engine_disable(conn_rec *c)
++ {
++-    return ssl_engine_set(c, NULL, 0, 0);
+++    if (othermod_engine_set)
+++        return othermod_engine_set(c, NULL, 0, 0);
+++    else
+++        return ssl_engine_set(c, NULL, 0, 0);
++ }
++ 
++ int ssl_init_ssl_connection(conn_rec *c, request_rec *r)
++@@ -730,6 +747,9 @@ static void ssl_register_hooks(apr_pool_t *p)
++                       APR_HOOK_MIDDLE);
+  
+      ssl_var_register(p);
+ +    
+-+    othermod_proxy_enable = APR_RETRIEVE_OPTIONAL_FN(ssl_proxy_enable);
+ +    othermod_engine_disable = APR_RETRIEVE_OPTIONAL_FN(ssl_engine_disable);
+++    othermod_engine_set = APR_RETRIEVE_OPTIONAL_FN(ssl_engine_set);
+  
+      APR_REGISTER_OPTIONAL_FN(ssl_proxy_enable);
+      APR_REGISTER_OPTIONAL_FN(ssl_engine_disable);
+ diff --git a/modules/ssl/ssl_engine_vars.c b/modules/ssl/ssl_engine_vars.c
+-index a6b0d0d..24fd8c7 100644
++index a28d4dd..caf7131 100644
+ --- a/modules/ssl/ssl_engine_vars.c
+ +++ b/modules/ssl/ssl_engine_vars.c
+ @@ -54,6 +54,8 @@ static char *ssl_var_lookup_ssl_cipher(apr_pool_t *p, SSLConnRec *sslconn, char
+@@ -80,7 +108,7 @@ index a6b0d0d..24fd8c7 100644
+      APR_REGISTER_OPTIONAL_FN(ssl_is_https);
+      APR_REGISTER_OPTIONAL_FN(ssl_var_lookup);
+      APR_REGISTER_OPTIONAL_FN(ssl_ext_list);
+-@@ -272,6 +279,15 @@ char *ssl_var_lookup(apr_pool_t *p, server_rec *s, conn_rec *c, request_rec *r,
++@@ -271,6 +278,15 @@ char *ssl_var_lookup(apr_pool_t *p, server_rec *s, conn_rec *c, request_rec *r,
+       */
+      if (result == NULL && c != NULL) {
+          SSLConnRec *sslconn = ssl_get_effective_config(c);
+@@ -96,3 +124,6 @@ index a6b0d0d..24fd8c7 100644
+          if (strlen(var) > 4 && strcEQn(var, "SSL_", 4)
+              && sslconn && sslconn->ssl)
+              result = ssl_var_lookup_ssl(p, sslconn, r, var+4);
++-- 
++2.14.3
++
+-- 
+2.13.6
+
