@@ -4,7 +4,7 @@
 
 ]>
 <!--
- Copyright 2017 Red Hat, Inc.
+ Copyright 2018 Red Hat, Inc.
 
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements.  See the NOTICE file distributed with
@@ -36,6 +36,7 @@
   
   <refnamediv>
     <refname>httpd.service</refname>
+    <refname>httpd@.service</refname>
     <refname>httpd.socket</refname>
     <refname>httpd-init.service</refname>
     <refpurpose>httpd unit files for systemd</refpurpose>
@@ -44,6 +45,7 @@
   <refsynopsisdiv>
     <para>
       <filename>/usr/lib/systemd/system/httpd.service</filename>, 
+      <filename>/usr/lib/systemd/system/httpd@.service</filename>,
       <filename>/usr/lib/systemd/system/httpd-init.service</filename>,
       <filename>/usr/lib/systemd/system/httpd.socket</filename>
     </para>
@@ -82,8 +84,9 @@
       directly, since such changes would be lost over package
       upgrades. Running <command>systemctl edit
       httpd.service</command> or <command>systemctl edit
-      httpd.socket</command> as root will create a drop-in file in
-      <filename>/etc/systemd/system/httpd.service.d</filename> which
+      httpd.socket</command> as root will create a drop-in file (in
+      the former case, in
+      <filename>/etc/systemd/system/httpd.service.d</filename>) which
       over-rides the system defaults.</para>
 
       <para>For example, to set the <option>LD_LIBRARY_PATH</option>
@@ -258,6 +261,48 @@ Wants=network-online.target</programlisting>
       on any given TCP port is supported; a configuration with both
       "<literal>Listen 127.0.0.1:80</literal>" and "<literal>Listen
       192.168.1.2:80</literal>" will not work.</para>
+    </refsect2>
+
+    <refsect2>
+      <title>Instatiated services</title>
+
+      <para>The <command>httpd@.service</command> unit is an
+      instatiated template service. An instance of this unit will be
+      started using the configuration file
+      <filename>/etc/httpd/conf/INSTANCE.conf</filename>, where
+      <emphasis>INSTANCE</emphasis> is replaced with the instance
+      name.  For example, <command>systemctl start
+      httpd@foobar.service</command> will start httpd using the
+      configuration file
+      <filename>/etc/httpd/conf/foobar.conf</filename>.  The
+      <option>HTTPD_INSTANCE</option> environment variable is set to
+      the instance name by the unit and is available name for use
+      within the configuration file.</para>
+
+      <para>To allow multiple instances of httpd to run
+      simultaneously, a number of configuration directives must be
+      changed; such as <command>PidFile</command> and
+      <command>DefaultRuntimeDir</command> to pick non-conflict paths,
+      and <command>Listen</command> to choose ports.  The example
+      configuration file
+      <filename>/usr/share/doc/httpd/instance.conf</filename>
+      demonstrates how to make such changes using
+      <option>HTTPD_INSTANCE</option> variable.</para>
+
+      <para>It can be useful to configure instances of
+      <command>httpd@.service</command> to reload when
+      <command>httpd.service</command> is reloaded; for example,
+      <command>logrotate</command> will reload only
+      <command>httpd.service</command> when logs are rotated. If this
+      behaviour is required, create a drop-in file for the instance as
+      follows:
+
+      <programlisting>[Unit]
+ReloadPropagatedFrom=httpd.service</programlisting>
+
+      As with normal units, drop-in files for instances can be created
+      using <command>systemctl edit</command>, e.g. <command>systemctl edit
+      httpd@foobar.service</command>.</para>
     </refsect2>
 
   </refsect1>

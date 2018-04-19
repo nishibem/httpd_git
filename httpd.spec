@@ -13,11 +13,12 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.33
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
 Source2: httpd.logrotate
+Source3: instance.conf
 Source4: httpd-ssl-pass-dialog
 Source5: httpd.tmpfiles
 Source6: httpd.service
@@ -51,6 +52,7 @@ Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 Source42: httpd-init.service
 Source43: httpd-ssl-gencerts
+Source44: httpd@.service
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
@@ -239,6 +241,16 @@ sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 # Prevent use of setcap in "install-suexec-caps" target.
 sed -i '/suexec/s,setcap ,echo Skipping setcap for ,' Makefile.in
 
+# Example conf for instances
+cp $RPM_SOURCE_DIR/instance.conf .
+sed < $RPM_SOURCE_DIR/httpd.conf >> instance.conf '
+0,/^ServerRoot/d;
+/# Supplemental configuration/,$d
+/^ *CustomLog .logs/s,logs/,logs/${HTTPD_INSTANCE}_,
+/^ *ErrorLog .logs/s,logs/,logs/${HTTPD_INSTANCE}_,
+'
+touch -r $RPM_SOURCE_DIR/instance.conf instance.conf
+
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
 if test "x${vmmn}" != "x%{mmn}"; then
@@ -319,7 +331,8 @@ make DESTDIR=$RPM_BUILD_ROOT install
 
 # Install systemd service files
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-for s in httpd.service htcacheclean.service httpd.socket httpd-init.service; do
+for s in httpd.service htcacheclean.service httpd.socket \
+         httpd@.service httpd-init.service; do
   install -p -m 644 $RPM_SOURCE_DIR/${s} \
                     $RPM_BUILD_ROOT%{_unitdir}/${s}
 done
@@ -469,6 +482,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 
 # Install systemd service man pages
 install -m 644 -p httpd.service.8 httpd-init.service.8 httpd.socket.8 \
+        httpd@.service.8 \
         $RPM_BUILD_ROOT%{_mandir}/man8
 
 # fix man page paths
@@ -567,6 +581,7 @@ exit $rv
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
 %doc docs/conf/extra/*.conf
+%doc instance.conf
 
 %{_sysconfdir}/httpd/modules
 %{_sysconfdir}/httpd/logs
@@ -636,6 +651,7 @@ exit $rv
 %exclude %{_mandir}/man8/httpd-init.*
 
 %{_unitdir}/httpd.service
+%{_unitdir}/httpd@.service
 %{_unitdir}/htcacheclean.service
 %{_unitdir}/*.socket
 
@@ -709,6 +725,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Apr 19 2018 Joe Orton <jorton@redhat.com> - 2.4.33-5
+- add httpd@.service; update httpd.service(8) and add new stub
+
 * Mon Apr 16 2018 Joe Orton <jorton@redhat.com> - 2.4.33-4
 - mod_md: change hard-coded default MdStoreDir to state/md (#1563846)
 
