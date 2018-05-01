@@ -224,7 +224,7 @@ interface for storing and accessing per-user session data.
 %patch27 -p1 -b .icons
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
-%patch31 -p1 -b .sslmultiproxy
+#patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 
@@ -722,7 +722,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Mon Apr 16 2018 Joe Orton <jorton@redhat.com> - 2.4.33-4
-- mod_ssl: fix mod_nss compat patch (Rob Crittenden, #1566511)
 - mod_md: change hard-coded default MdStoreDir to state/md (#1563846)
 
 * Thu Apr 12 2018 Joe Orton <jorton@redhat.com> - 2.4.33-3
