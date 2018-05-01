@@ -139,7 +139,7 @@ Wants=network-online.target</programlisting>
       httpd is started. To inhibit certificate generation, use
       <command>systemctl mask httpd-init.service</command> after
       installing mod_ssl, and adjust the mod_ssl configuration to use
-      an appropriate certicate and key.</para>
+      an appropriate certificate and key.</para>
 
     </refsect2>
 
@@ -276,15 +276,15 @@ Wants=network-online.target</programlisting>
       configuration file
       <filename>/etc/httpd/conf/foobar.conf</filename>.  The
       <option>HTTPD_INSTANCE</option> environment variable is set to
-      the instance name by the unit and is available name for use
-      within the configuration file.</para>
+      the instance name by the unit and is available for use within
+      the configuration file.</para>
 
       <para>To allow multiple instances of httpd to run
       simultaneously, a number of configuration directives must be
-      changed; such as <command>PidFile</command> and
-      <command>DefaultRuntimeDir</command> to pick non-conflict paths,
-      and <command>Listen</command> to choose ports.  The example
-      configuration file
+      changed, such as <command>PidFile</command> and
+      <command>DefaultRuntimeDir</command> to pick non-conflicting
+      paths, and <command>Listen</command> to choose different ports.
+      The example configuration file
       <filename>/usr/share/doc/httpd/instance.conf</filename>
       demonstrates how to make such changes using
       <option>HTTPD_INSTANCE</option> variable.</para>
@@ -312,6 +312,7 @@ ReloadPropagatedFrom=httpd.service</programlisting>
 
     <para><filename>/usr/lib/systemd/system/httpd.service</filename>,
     <filename>/usr/lib/systemd/system/httpd.socket</filename>,
+    <filename>/usr/lib/systemd/system/httpd@.service</filename>,
     <filename>/etc/systemd/systemd/httpd.service.d</filename></para>
   </refsect1>
   
