@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.33
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -725,6 +725,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Jun 12 2018 Joe Orton <jorton@redhat.com> - 2.4.33-6
+- mod_systemd: show bound ports in status and log to journal
+  at startup.
+
 * Thu Apr 19 2018 Joe Orton <jorton@redhat.com> - 2.4.33-5
 - add httpd@.service; update httpd.service(8) and add new stub
 
