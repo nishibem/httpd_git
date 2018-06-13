@@ -29,7 +29,7 @@ export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE mysql.php php_mysql_test.sql php_mysql_test.conf
+FILES=$(METADATA) runtest.sh Makefile PURPOSE new_mysql.php old_mysql.php php_mysql_test.sql php_mysql_test.conf
 
 .PHONY: all install download clean
 
