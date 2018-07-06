@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.33
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -80,6 +80,7 @@ Patch36: httpd-2.4.33-r1830819+.patch
 Patch58: httpd-2.4.33-r1738878.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1564537
 Patch59: httpd-2.4.33-sslmerging.patch
+Patch60: httpd-2.4.33-r1833841.patch
 
 # Security fixes
 
@@ -237,6 +238,7 @@ interface for storing and accessing per-user session data.
 
 %patch58 -p1 -b .r1738878
 %patch59 -p1 -b .sslmerging
+%patch60 -p1 -b .r1833841
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -728,6 +730,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jul  6 2018 Joe Orton <jorton@redhat.com> - 2.4.33-8
+- add per-request memory leak fix (upstream r1833014)
+
 * Fri Jul  6 2018 Joe Orton <jorton@redhat.com> - 2.4.33-7
 - mod_ssl: add PKCS#11 cert/key support (Anderson Sasaki)
 
