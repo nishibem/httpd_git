@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.33
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -73,6 +73,7 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch35: httpd-2.4.33-sslciphdefault.patch
+Patch36: httpd-2.4.33-r1830819+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -232,6 +233,8 @@ interface for storing and accessing per-user session data.
 %patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
+%patch36 -p1 -b .r1830819+
+
 %patch58 -p1 -b .r1738878
 %patch59 -p1 -b .sslmerging
 
@@ -725,6 +728,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jul  6 2018 Joe Orton <jorton@redhat.com> - 2.4.33-7
+- mod_ssl: add PKCS#11 cert/key support (Anderson Sasaki)
+
 * Tue Jun 12 2018 Joe Orton <jorton@redhat.com> - 2.4.33-6
 - mod_systemd: show bound ports in status and log to journal
   at startup.
