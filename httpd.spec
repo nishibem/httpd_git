@@ -582,7 +582,6 @@ set -x
 exit $rv
 
 %files
-%defattr(-,root,root)
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
 %doc docs/conf/extra/*.conf
@@ -673,7 +672,6 @@ exit $rv
 %attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
 
 %files tools
-%defattr(-,root,root)
 %{_bindir}/*
 %{_mandir}/man1/*
 %doc LICENSE NOTICE
@@ -681,12 +679,10 @@ exit $rv
 %exclude %{_mandir}/man1/apxs.1*
 
 %files manual
-%defattr(-,root,root)
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %files -n mod_ssl
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
@@ -698,29 +694,24 @@ exit $rv
 %{_mandir}/man8/httpd-init.*
 
 %files -n mod_proxy_html
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_proxy_html.so
 %{_libdir}/httpd/modules/mod_xml2enc.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 
 %files -n mod_ldap
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_*ldap.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
 %files -n mod_session
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_session*.so
 %{_libdir}/httpd/modules/mod_auth_form.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %files -n mod_md
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_md.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-md.conf
 
 %files devel
-%defattr(-,root,root)
 %{_includedir}/httpd
 %{_bindir}/apxs
 %{_mandir}/man1/apxs.1*
