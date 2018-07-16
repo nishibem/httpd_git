@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.33
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -24,6 +24,7 @@ Source5: httpd.tmpfiles
 Source6: httpd.service
 Source7: action-graceful.sh
 Source8: action-configtest.sh
+Source9: server-status.conf
 Source10: httpd.conf
 Source11: 00-base.conf
 Source12: 00-mpm.conf
@@ -255,6 +256,7 @@ sed < $RPM_SOURCE_DIR/httpd.conf >> instance.conf '
 /^ *ErrorLog .logs/s,logs/,logs/${HTTPD_INSTANCE}_,
 '
 touch -r $RPM_SOURCE_DIR/instance.conf instance.conf
+cp -p $RPM_SOURCE_DIR/server-status.conf server-status.conf
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
@@ -430,9 +432,12 @@ cat > $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d/macros.httpd <<EOF
 EOF
 
 # Handle contentdir
-mkdir $RPM_BUILD_ROOT%{contentdir}/noindex
+mkdir $RPM_BUILD_ROOT%{contentdir}/noindex \
+      $RPM_BUILD_ROOT%{contentdir}/server-status
 install -m 644 -p $RPM_SOURCE_DIR/index.html \
         $RPM_BUILD_ROOT%{contentdir}/noindex/index.html
+install -m 644 -p docs/server-status/* \
+        $RPM_BUILD_ROOT%{contentdir}/server-status
 rm -rf %{contentdir}/htdocs
 
 # remove manual sources
@@ -585,7 +590,7 @@ exit $rv
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
 %doc docs/conf/extra/*.conf
-%doc instance.conf
+%doc instance.conf server-status.conf
 
 %{_sysconfdir}/httpd/modules
 %{_sysconfdir}/httpd/logs
@@ -637,11 +642,13 @@ exit $rv
 %dir %{contentdir}/error
 %dir %{contentdir}/error/include
 %dir %{contentdir}/noindex
+%dir %{contentdir}/server-status
 %{contentdir}/icons/*
 %{contentdir}/error/README
 %{contentdir}/error/*.var
 %{contentdir}/error/include/*.html
 %{contentdir}/noindex/index.html
+%{contentdir}/server-status/*
 
 %attr(0710,root,apache) %dir /run/httpd
 %attr(0700,apache,apache) %dir /run/httpd/htcacheclean
@@ -721,6 +728,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jul 16 2018 Joe Orton <jorton@redhat.com> - 2.4.33-10
+- add Lua-based /server-status example page to docs
+
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.33-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
