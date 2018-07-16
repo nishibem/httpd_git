@@ -104,6 +104,8 @@ Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires(post): systemd-units
 Conflicts: apr < 1.5.0-1
+Provides: mod_proxy_uwsgi = %{version}-%{release}
+Obsoletes: mod_proxy_uwsgi < 2.0.17-1
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -731,6 +733,7 @@ exit $rv
 * Mon Jul 16 2018 Joe Orton <jorton@redhat.com> - 2.4.33-10
 - don't block on service try-restart in posttrans scriptlet
 - add Lua-based /server-status example page to docs
+- obsoletes: and provides: for mod_proxy_uswgi (#1599113)
 
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.33-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
