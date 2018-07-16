@@ -87,10 +87,10 @@ Patch60: httpd-2.4.33-r1833841.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
-BuildRequires: autoconf, perl-interpreter, perl-generators, pkgconfig, findutils, xmlto
+BuildRequires: gcc, autoconf, pkgconfig, findutils, xmlto
+BuildRequires: perl-interpreter, perl-generators, systemd-devel
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
-BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
