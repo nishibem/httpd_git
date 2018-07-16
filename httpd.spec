@@ -556,7 +556,7 @@ exit 0
 
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
-  /bin/systemctl try-restart httpd.service htcacheclean.service >/dev/null 2>&1 || :
+  /bin/systemctl try-restart --no-block httpd.service htcacheclean.service >/dev/null 2>&1 || :
 
 %check
 # Check the built modules are all PIC
@@ -729,6 +729,7 @@ exit $rv
 
 %changelog
 * Mon Jul 16 2018 Joe Orton <jorton@redhat.com> - 2.4.33-10
+- don't block on service try-restart in posttrans scriptlet
 - add Lua-based /server-status example page to docs
 
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.33-9
