@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -102,7 +102,7 @@ Requires(postun): systemd-units
 Requires(post): systemd-units
 Conflicts: apr < 1.5.0-1
 Provides: mod_proxy_uwsgi = %{version}-%{release}
-Obsoletes: mod_proxy_uwsgi < 2.0.17-1
+Obsoletes: mod_proxy_uwsgi < 2.0.17.1-2
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -725,6 +725,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Jul 18 2018 Joe Orton <jorton@redhat.com> - 2.4.34-2
+- update Obsoletes for mod_proxy_uswgi (#1599113)
+
 * Wed Jul 18 2018 Joe Orton <jorton@redhat.com> - 2.4.34-1
 - update to 2.4.34 (#1601160)
 
