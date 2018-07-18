@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.33
-Release: 10%{?dist}
+Version: 2.4.34
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -78,10 +78,7 @@ Patch36: httpd-2.4.33-r1830819+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
-Patch58: httpd-2.4.33-r1738878.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1564537
-Patch59: httpd-2.4.33-sslmerging.patch
-Patch60: httpd-2.4.33-r1833841.patch
+Patch58: httpd-2.4.34-r1738878.patch
 
 # Security fixes
 
@@ -230,7 +227,7 @@ interface for storing and accessing per-user session data.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
-%patch26 -p1 -b .r1337344+
+#patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
@@ -240,8 +237,6 @@ interface for storing and accessing per-user session data.
 %patch36 -p1 -b .r1830819+
 
 %patch58 -p1 -b .r1738878
-%patch59 -p1 -b .sslmerging
-%patch60 -p1 -b .r1833841
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -730,6 +725,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Jul 18 2018 Joe Orton <jorton@redhat.com> - 2.4.34-1
+- update to 2.4.34 (#1601160)
+
 * Mon Jul 16 2018 Joe Orton <jorton@redhat.com> - 2.4.33-10
 - don't block on service try-restart in posttrans scriptlet
 - add Lua-based /server-status example page to docs
