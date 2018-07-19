@@ -58,7 +58,6 @@ Source44: httpd@.service
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
-Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
@@ -218,7 +217,6 @@ interface for storing and accessing per-user session data.
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
-%patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
 
 %patch19 -p1 -b .detectsystemd
