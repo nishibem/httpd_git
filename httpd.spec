@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -78,6 +78,7 @@ Patch36: httpd-2.4.33-r1830819+.patch
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.34-r1738878.patch
+Patch59: httpd-2.4.34-r1555631.patch
 
 # Security fixes
 
@@ -235,6 +236,7 @@ interface for storing and accessing per-user session data.
 %patch36 -p1 -b .r1830819+
 
 %patch58 -p1 -b .r1738878
+%patch59 -p1 -b .r1555631
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -723,6 +725,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jul 20 2018 Joe Orton <jorton@redhat.com> - 2.4.34-3
+- mod_ssl: fix OCSP regression (upstream r1555631)
+
 * Wed Jul 18 2018 Joe Orton <jorton@redhat.com> - 2.4.34-2
 - update Obsoletes for mod_proxy_uswgi (#1599113)
 
