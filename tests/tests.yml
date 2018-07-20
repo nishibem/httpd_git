@@ -1,13 +1,10 @@
 ---
 # Tests that run in all contexts
 - hosts: localhost
-  vars:
-    use_beakerlib_libraries: true
   roles:
-  - role: standard-test-rhts
+  - role: standard-test-beakerlib
     tags:
     - classic
-    - container
     tests:
     - httpd-php-mysql-sanity-test
     required_packages:
