@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.33
-Release: 5%{?dist}
+Version: 2.4.34
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -24,6 +24,7 @@ Source5: httpd.tmpfiles
 Source6: httpd.service
 Source7: action-graceful.sh
 Source8: action-configtest.sh
+Source9: server-status.conf
 Source10: httpd.conf
 Source11: 00-base.conf
 Source12: 00-mpm.conf
@@ -57,7 +58,6 @@ Source44: httpd@.service
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
-Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
@@ -68,26 +68,26 @@ Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch29: httpd-2.4.27-systemd.patch
+Patch29: httpd-2.4.33-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch35: httpd-2.4.33-sslciphdefault.patch
+Patch36: httpd-2.4.33-r1830819+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
-Patch58: httpd-2.4.33-r1738878.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1564537
-Patch59: httpd-2.4.33-sslmerging.patch
+Patch58: httpd-2.4.34-r1738878.patch
+Patch59: httpd-2.4.34-r1555631.patch
 
 # Security fixes
 
 License: ASL 2.0
 Group: System Environment/Daemons
-BuildRequires: autoconf, perl-interpreter, perl-generators, pkgconfig, findutils, xmlto
+BuildRequires: gcc, autoconf, pkgconfig, findutils, xmlto
+BuildRequires: perl-interpreter, perl-generators, systemd-devel
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
-BuildRequires: systemd-devel
 Requires: /etc/mime.types, system-logos-httpd
 Obsoletes: httpd-suexec
 Provides: webserver
@@ -101,6 +101,8 @@ Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires(post): systemd-units
 Conflicts: apr < 1.5.0-1
+Provides: mod_proxy_uwsgi = %{version}-%{release}
+Obsoletes: mod_proxy_uwsgi < 2.0.17.1-2
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -216,7 +218,6 @@ interface for storing and accessing per-user session data.
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
-%patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
 
 %patch19 -p1 -b .detectsystemd
@@ -225,15 +226,17 @@ interface for storing and accessing per-user session data.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
-%patch26 -p1 -b .r1337344+
+#patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 #patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
+%patch36 -p1 -b .r1830819+
+
 %patch58 -p1 -b .r1738878
-%patch59 -p1 -b .sslmerging
+%patch59 -p1 -b .r1555631
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -250,6 +253,7 @@ sed < $RPM_SOURCE_DIR/httpd.conf >> instance.conf '
 /^ *ErrorLog .logs/s,logs/,logs/${HTTPD_INSTANCE}_,
 '
 touch -r $RPM_SOURCE_DIR/instance.conf instance.conf
+cp -p $RPM_SOURCE_DIR/server-status.conf server-status.conf
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
@@ -425,9 +429,12 @@ cat > $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d/macros.httpd <<EOF
 EOF
 
 # Handle contentdir
-mkdir $RPM_BUILD_ROOT%{contentdir}/noindex
+mkdir $RPM_BUILD_ROOT%{contentdir}/noindex \
+      $RPM_BUILD_ROOT%{contentdir}/server-status
 install -m 644 -p $RPM_SOURCE_DIR/index.html \
         $RPM_BUILD_ROOT%{contentdir}/noindex/index.html
+install -m 644 -p docs/server-status/* \
+        $RPM_BUILD_ROOT%{contentdir}/server-status
 rm -rf %{contentdir}/htdocs
 
 # remove manual sources
@@ -546,7 +553,7 @@ exit 0
 
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
-  /bin/systemctl try-restart httpd.service htcacheclean.service >/dev/null 2>&1 || :
+  /bin/systemctl try-restart --no-block httpd.service htcacheclean.service >/dev/null 2>&1 || :
 
 %check
 # Check the built modules are all PIC
@@ -577,11 +584,10 @@ set -x
 exit $rv
 
 %files
-%defattr(-,root,root)
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
 %doc docs/conf/extra/*.conf
-%doc instance.conf
+%doc instance.conf server-status.conf
 
 %{_sysconfdir}/httpd/modules
 %{_sysconfdir}/httpd/logs
@@ -633,11 +639,13 @@ exit $rv
 %dir %{contentdir}/error
 %dir %{contentdir}/error/include
 %dir %{contentdir}/noindex
+%dir %{contentdir}/server-status
 %{contentdir}/icons/*
 %{contentdir}/error/README
 %{contentdir}/error/*.var
 %{contentdir}/error/include/*.html
 %{contentdir}/noindex/index.html
+%{contentdir}/server-status/*
 
 %attr(0710,root,apache) %dir /run/httpd
 %attr(0700,apache,apache) %dir /run/httpd/htcacheclean
@@ -668,7 +676,6 @@ exit $rv
 %attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
 
 %files tools
-%defattr(-,root,root)
 %{_bindir}/*
 %{_mandir}/man1/*
 %doc LICENSE NOTICE
@@ -676,12 +683,10 @@ exit $rv
 %exclude %{_mandir}/man1/apxs.1*
 
 %files manual
-%defattr(-,root,root)
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %files -n mod_ssl
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
@@ -693,29 +698,24 @@ exit $rv
 %{_mandir}/man8/httpd-init.*
 
 %files -n mod_proxy_html
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_proxy_html.so
 %{_libdir}/httpd/modules/mod_xml2enc.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 
 %files -n mod_ldap
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_*ldap.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
 %files -n mod_session
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_session*.so
 %{_libdir}/httpd/modules/mod_auth_form.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %files -n mod_md
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_md.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-md.conf
 
 %files devel
-%defattr(-,root,root)
 %{_includedir}/httpd
 %{_bindir}/apxs
 %{_mandir}/man1/apxs.1*
@@ -725,6 +725,33 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jul 20 2018 Joe Orton <jorton@redhat.com> - 2.4.34-3
+- mod_ssl: fix OCSP regression (upstream r1555631)
+
+* Wed Jul 18 2018 Joe Orton <jorton@redhat.com> - 2.4.34-2
+- update Obsoletes for mod_proxy_uswgi (#1599113)
+
+* Wed Jul 18 2018 Joe Orton <jorton@redhat.com> - 2.4.34-1
+- update to 2.4.34 (#1601160)
+
+* Mon Jul 16 2018 Joe Orton <jorton@redhat.com> - 2.4.33-10
+- don't block on service try-restart in posttrans scriptlet
+- add Lua-based /server-status example page to docs
+- obsoletes: and provides: for mod_proxy_uswgi (#1599113)
+
+* Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.33-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Fri Jul  6 2018 Joe Orton <jorton@redhat.com> - 2.4.33-8
+- add per-request memory leak fix (upstream r1833014)
+
+* Fri Jul  6 2018 Joe Orton <jorton@redhat.com> - 2.4.33-7
+- mod_ssl: add PKCS#11 cert/key support (Anderson Sasaki)
+
+* Tue Jun 12 2018 Joe Orton <jorton@redhat.com> - 2.4.33-6
+- mod_systemd: show bound ports in status and log to journal
+  at startup.
+
 * Thu Apr 19 2018 Joe Orton <jorton@redhat.com> - 2.4.33-5
 - add httpd@.service; update httpd.service(8) and add new stub
 

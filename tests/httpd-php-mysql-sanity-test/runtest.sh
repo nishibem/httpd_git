@@ -57,7 +57,7 @@ rlJournalStart
         rlRun "rm -rvf $httpROOTDIR/php_mysql_test"
         rlRun "mkdir -v $httpROOTDIR/php_mysql_test"
         rlRun "cp -v php_mysql_test.conf $httpCONFDIR/conf.d/"
-        rlRun "php_version=`rlCheckRpm php`"
+        php_version=`rlCheckRpm php`
         if [[ $php_version =~ php-7* ]] || [[ $php_version =~ php-5.[5-6]* ]]; then
             rlRun "cp -v new_mysql.php $httpROOTDIR/php_mysql_test/mysql.php"
         else
