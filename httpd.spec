@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -58,6 +58,7 @@ Source44: httpd@.service
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
+Patch4: httpd-2.4.34-layfix.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
@@ -74,6 +75,7 @@ Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch35: httpd-2.4.33-sslciphdefault.patch
 Patch36: httpd-2.4.33-r1830819+.patch
+Patch37: httpd-2.4.34-r1827912+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -218,6 +220,7 @@ interface for storing and accessing per-user session data.
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
+%patch4 -p1 -b .layfix
 %patch6 -p1 -b .apctlsystemd
 
 %patch19 -p1 -b .detectsystemd
@@ -234,6 +237,7 @@ interface for storing and accessing per-user session data.
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 %patch36 -p1 -b .r1830819+
+%patch37 -p1 -b .r1827912+
 
 %patch58 -p1 -b .r1738878
 %patch59 -p1 -b .r1555631
@@ -725,6 +729,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Aug 13 2018 Joe Orton <jorton@redhat.com> - 2.4.34-4
+- mod_ssl: backport TLSv1.3 support changes from upstream (#1615059)
+
 * Fri Jul 20 2018 Joe Orton <jorton@redhat.com> - 2.4.34-3
 - mod_ssl: fix OCSP regression (upstream r1555631)
 
