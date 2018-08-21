@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -729,6 +729,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Aug 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-5
+- mod_ssl: further TLSv1.3 fix (#1619389)
+
 * Mon Aug 13 2018 Joe Orton <jorton@redhat.com> - 2.4.34-4
 - mod_ssl: backport TLSv1.3 support changes from upstream (#1615059)
 
