@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -81,6 +81,7 @@ Patch37: httpd-2.4.34-r1827912+.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.34-r1738878.patch
 Patch59: httpd-2.4.34-r1555631.patch
+Patch60: httpd-2.4.34-enable-sslv3.patch
 
 # Security fixes
 
@@ -241,6 +242,7 @@ interface for storing and accessing per-user session data.
 
 %patch58 -p1 -b .r1738878
 %patch59 -p1 -b .r1555631
+%patch60 -p1 -b .enablesslv3
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -729,6 +731,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Aug 28 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.34-6
+- mod_ssl: enable SSLv3 and change behavior of "SSLProtocol All"
+  configuration (#1624777)
+
 * Tue Aug 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-5
 - mod_ssl: further TLSv1.3 fix (#1619389)
 
