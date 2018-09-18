@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -73,9 +73,9 @@ Patch29: httpd-2.4.33-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
-Patch35: httpd-2.4.33-sslciphdefault.patch
 Patch36: httpd-2.4.33-r1830819+.patch
 Patch37: httpd-2.4.34-r1827912+.patch
+Patch38: httpd-2.4.34-sslciphdefault.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -235,9 +235,9 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 #patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
-%patch35 -p1 -b .sslciphdefault
 %patch36 -p1 -b .r1830819+
 %patch37 -p1 -b .r1827912+
+%patch38 -p1 -b .sslciphdefault
 
 %patch58 -p1 -b .r1738878
 %patch59 -p1 -b .r1555631
@@ -729,6 +729,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Sep 18 2018 Joe Orton <jorton@redhat.com> - 2.4.34-6
+- mod_ssl: more TLSv1.3 fixes (#1619389)
+
 * Tue Aug 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-5
 - mod_ssl: further TLSv1.3 fix (#1619389)
 

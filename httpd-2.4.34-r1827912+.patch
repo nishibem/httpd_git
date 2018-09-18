@@ -1,15 +1,7 @@
-# ./pullrev.sh 1827912 1827924 1827992 1828220 1828222 1828720 1828723 1828790 1828791 1828792
-http://svn.apache.org/viewvc?view=revision&revision=1827912
-http://svn.apache.org/viewvc?view=revision&revision=1827924
-http://svn.apache.org/viewvc?view=revision&revision=1827992
-http://svn.apache.org/viewvc?view=revision&revision=1828220
-http://svn.apache.org/viewvc?view=revision&revision=1828222
-http://svn.apache.org/viewvc?view=revision&revision=1828720
-http://svn.apache.org/viewvc?view=revision&revision=1828723
-http://svn.apache.org/viewvc?view=revision&revision=1828790
-http://svn.apache.org/viewvc?view=revision&revision=1828791
-http://svn.apache.org/viewvc?view=revision&revision=1828792
-http://svn.apache.org/viewvc?view=revision&revision=1833588
+
+Pull all changes from upstream integration branch:
+
+svn diff -r1840105:1841219 https://svn.apache.org/repos/asf/httpd/httpd/branches/tlsv1.3-for-2.4.x
 
 --- httpd-2.4.34/modules/ssl/mod_ssl.c.r1827912+
 +++ httpd-2.4.34/modules/ssl/mod_ssl.c
@@ -65,7 +57,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
  
      cfgMergeInt(ocsp_mask);
      cfgMergeBool(ocsp_force_default);
-@@ -761,24 +763,39 @@
+@@ -761,22 +763,37 @@
  
  const char *ssl_cmd_SSLCipherSuite(cmd_parms *cmd,
                                     void *dcfg,
@@ -75,28 +67,21 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
      SSLSrvConfigRec *sc = mySrvConfig(cmd->server);
      SSLDirConfigRec *dc = (SSLDirConfigRec *)dcfg;
  
--    /* Disable null and export ciphers by default, except for PROFILE=
--     * configs where the parser doesn't cope. */
--    if (strncmp(arg, "PROFILE=", 8) != 0)
--        arg = apr_pstrcat(cmd->pool, arg, ":!aNULL:!eNULL:!EXP", NULL);
+-    /* always disable null and export ciphers */
+-    arg = apr_pstrcat(cmd->pool, arg, ":!aNULL:!eNULL:!EXP", NULL);
 -
 -    if (cmd->path) {
 -        dc->szCipherSuite = arg;
--    }
--    else {
--        sc->server->auth.cipher_suite = arg;
 +    if (arg2 == NULL) {
 +        arg2 = arg1;
 +        arg1 = "SSL";
      }
--
--    return NULL;
+-    else {
+-        sc->server->auth.cipher_suite = arg;
 +    
 +    if (!strcmp("SSL", arg1)) {
-+        /* Disable null and export ciphers by default, except for PROFILE=
-+         * configs where the parser doesn't cope. */
-+        if (strncmp(arg2, "PROFILE=", 8) != 0)
-+            arg2 = apr_pstrcat(cmd->pool, arg2, ":!aNULL:!eNULL:!EXP", NULL);
++        /* always disable null and export ciphers */
++        arg2 = apr_pstrcat(cmd->pool, arg2, ":!aNULL:!eNULL:!EXP", NULL);
 +        if (cmd->path) {
 +            dc->szCipherSuite = arg2;
 +        }
@@ -104,21 +89,23 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 +            sc->server->auth.cipher_suite = arg2;
 +        }
 +        return NULL;
-+     }
-+#ifdef SSL_OP_NO_TLSv1_3
+     }
+-
+-    return NULL;
++#if SSL_HAVE_PROTOCOL_TLSV1_3
 +    else if (!strcmp("TLSv1.3", arg1)) {
 +        if (cmd->path) {
 +            return "TLSv1.3 ciphers cannot be set inside a directory context";
 +        }
 +        sc->server->auth.tls13_ciphers = arg2;
 +        return NULL;
-+     }
++    }
 +#endif
 +    return apr_pstrcat(cmd->pool, "procotol '", arg1, "' not supported", NULL);
  }
  
  #define SSL_FLAGS_CHECK_FILE \
-@@ -1451,6 +1468,9 @@
+@@ -1449,6 +1466,9 @@
          else if (strcEQ(w, "TLSv1.2")) {
              thisopt = SSL_PROTOCOL_TLSV1_2;
          }
@@ -128,7 +115,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
  #endif
          else if (strcEQ(w, "all")) {
              thisopt = SSL_PROTOCOL_ALL;
-@@ -1512,18 +1532,30 @@
+@@ -1510,16 +1530,28 @@
  
  const char *ssl_cmd_SSLProxyCipherSuite(cmd_parms *cmd,
                                          void *dcfg,
@@ -137,10 +124,8 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
  {
      SSLDirConfigRec *dc = (SSLDirConfigRec *)dcfg;
 -
--    /* Disable null and export ciphers by default, except for PROFILE=
--     * configs where the parser doesn't cope. */
--    if (strncmp(arg, "PROFILE=", 8) != 0)
--        arg = apr_pstrcat(cmd->pool, arg, ":!aNULL:!eNULL:!EXP", NULL);
+-    /* always disable null and export ciphers */
+-    arg = apr_pstrcat(cmd->pool, arg, ":!aNULL:!eNULL:!EXP", NULL);
 -
 -    dc->proxy->auth.cipher_suite = arg;
 -
@@ -152,14 +137,12 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 +    }
 +    
 +    if (!strcmp("SSL", arg1)) {
-+        /* Disable null and export ciphers by default, except for PROFILE=
-+         * configs where the parser doesn't cope. */
-+        if (strncmp(arg2, "PROFILE=", 8) != 0)
-+            arg2 = apr_pstrcat(cmd->pool, arg2, ":!aNULL:!eNULL:!EXP", NULL);
++        /* always disable null and export ciphers */
++        arg2 = apr_pstrcat(cmd->pool, arg2, ":!aNULL:!eNULL:!EXP", NULL);
 +        dc->proxy->auth.cipher_suite = arg2;
 +        return NULL;
 +    }
-+#ifdef SSL_OP_NO_TLSv1_3
++#if SSL_HAVE_PROTOCOL_TLSV1_3
 +    else if (!strcmp("TLSv1.3", arg1)) {
 +        dc->proxy->auth.tls13_ciphers = arg2;
 +        return NULL;
@@ -185,7 +168,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
              TLSv1_2_client_method() : /* proxy */
              TLSv1_2_server_method();  /* server */
      }
-+#ifdef SSL_OP_NO_TLSv1_3
++#if SSL_HAVE_PROTOCOL_TLSV1_3
 +    else if (protocol == SSL_PROTOCOL_TLSV1_3) {
 +        method = mctx->pkp ?
 +            TLSv1_3_client_method() : /* proxy */
@@ -205,31 +188,31 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
      /* always disable SSLv2, as per RFC 6176 */
      SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2);
  
-@@ -640,9 +651,19 @@
+@@ -639,10 +650,19 @@
+     if (!(protocol & SSL_PROTOCOL_TLSV1_2)) {
          SSL_CTX_set_options(ctx, SSL_OP_NO_TLSv1_2);
      }
- #endif
-+#ifdef SSL_OP_NO_TLSv1_3
-+    if (!(protocol & SSL_PROTOCOL_TLSV1_3)) {
-+        SSL_CTX_set_options(ctx, SSL_OP_NO_TLSv1_3);
-+    }
++#if SSL_HAVE_PROTOCOL_TLSV1_3
++    ssl_set_ctx_protocol_option(s, ctx, SSL_OP_NO_TLSv1_3,
++                                protocol & SSL_PROTOCOL_TLSV1_3, "TLSv1.3");
 +#endif
+ #endif
  
  #else /* #if OPENSSL_VERSION_NUMBER < 0x10100000L */
      /* We first determine the maximum protocol version we should provide */
-+#ifdef SSL_OP_NO_TLSv1_3
++#if SSL_HAVE_PROTOCOL_TLSV1_3
 +    if (SSL_HAVE_PROTOCOL_TLSV1_3 && (protocol & SSL_PROTOCOL_TLSV1_3)) {
 +        prot = TLS1_3_VERSION;
-+    } else
++    } else  
 +#endif
      if (protocol & SSL_PROTOCOL_TLSV1_2) {
          prot = TLS1_2_VERSION;
      } else if (protocol & SSL_PROTOCOL_TLSV1_1) {
-@@ -664,6 +685,11 @@
+@@ -664,6 +684,11 @@
  
      /* Next we scan for the minimal protocol version we should provide,
       * but we do not allow holes between max and min */
-+#ifdef SSL_OP_NO_TLSv1_3
++#if SSL_HAVE_PROTOCOL_TLSV1_3
 +    if (prot == TLS1_3_VERSION && protocol & SSL_PROTOCOL_TLSV1_2) {
 +        prot = TLS1_2_VERSION;
 +    }
@@ -237,12 +220,26 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
      if (prot == TLS1_2_VERSION && protocol & SSL_PROTOCOL_TLSV1_1) {
          prot = TLS1_1_VERSION;
      }
-@@ -888,7 +914,15 @@
+@@ -736,6 +761,13 @@
+         SSL_CTX_set_mode(ctx, SSL_MODE_RELEASE_BUFFERS);
+ #endif
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x1010100fL
++    /* For OpenSSL >=1.1.1, disable auto-retry mode so it's possible
++     * to consume handshake records without blocking for app-data.
++     * https://github.com/openssl/openssl/issues/7178 */
++    SSL_CTX_clear_mode(ctx, SSL_MODE_AUTO_RETRY);
++#endif
++    
+     return APR_SUCCESS;
+ }
+ 
+@@ -888,7 +920,15 @@
          ssl_log_ssl_error(SSLLOG_MARK, APLOG_EMERG, s);
          return ssl_die(s);
      }
 -
-+#ifdef SSL_OP_NO_TLSv1_3
++#if SSL_HAVE_PROTOCOL_TLSV1_3
 +    if (mctx->auth.tls13_ciphers 
 +        && !SSL_CTX_set_ciphersuites(ctx, mctx->auth.tls13_ciphers)) {
 +        ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO()
@@ -253,6 +250,20 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 +#endif
      return APR_SUCCESS;
  }
+ 
+@@ -1493,6 +1533,13 @@
+     X509_STORE_CTX *sctx;
+     X509_STORE *store = SSL_CTX_get_cert_store(mctx->ssl_ctx);
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x1010100fL
++    /* For OpenSSL >=1.1.1, turn on client cert support which is
++     * otherwise turned off by default (by design).
++     * https://github.com/openssl/openssl/issues/6933 */
++    SSL_CTX_set_post_handshake_auth(mctx->ssl_ctx, 1);
++#endif
++    
+     SSL_CTX_set_client_cert_cb(mctx->ssl_ctx,
+                                ssl_callback_proxy_cert);
  
 --- httpd-2.4.34/modules/ssl/ssl_engine_kernel.c.r1827912+
 +++ httpd-2.4.34/modules/ssl/ssl_engine_kernel.c
@@ -269,77 +280,38 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
      return 1;
  }
  
-@@ -424,21 +430,55 @@
+@@ -424,87 +430,70 @@
      }
  }
  
-+static int ssl_check_post_client_verify(request_rec *r, SSLSrvConfigRec *sc, 
-+                                        SSLDirConfigRec *dc, SSL *ssl)
-+{
-+    /*
-+     * Finally check for acceptable renegotiation results
-+     */
-+    if ((dc->nVerifyClient != SSL_CVERIFY_NONE) ||
-+        (sc->server->auth.verify_mode != SSL_CVERIFY_NONE)) {
-+        BOOL do_verify = ((dc->nVerifyClient == SSL_CVERIFY_REQUIRE) ||
-+                          (sc->server->auth.verify_mode == SSL_CVERIFY_REQUIRE));
-+
-+        if (do_verify && (SSL_get_verify_result(ssl) != X509_V_OK)) {
-+            ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(02262)
-+                          "Re-negotiation handshake failed: "
-+                          "Client verification failed");
-+
-+            return HTTP_FORBIDDEN;
-+        }
-+
-+        if (do_verify) {
-+            X509 *peercert;
-+
-+            if ((peercert = SSL_get_peer_certificate(ssl)) == NULL) {
-+                ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(02263)
-+                              "Re-negotiation handshake failed: "
-+                              "Client certificate missing");
-+
-+                return HTTP_FORBIDDEN;
-+            }
-+
-+            X509_free(peercert);
-+        }
-+    }
-+    return OK;
-+}
-+
- /*
+-/*
 - *  Access Handler
-+ *  Access Handler, classic flavour, for SSL/TLS up to v1.2 
-+ *  where everything can be renegotiated and no one is happy.
-  */
+- */
 -int ssl_hook_Access(request_rec *r)
-+static int ssl_hook_Access_classic(request_rec *r, SSLSrvConfigRec *sc, SSLDirConfigRec *dc,
-+                                   SSLConnRec *sslconn, SSL *ssl)
++static int ssl_check_post_client_verify(request_rec *r, SSLSrvConfigRec *sc, 
++                                        SSLDirConfigRec *dc, SSLConnRec *sslconn,
++                                        SSL *ssl)
  {
 -    SSLDirConfigRec *dc         = myDirConfig(r);
 -    SSLSrvConfigRec *sc         = mySrvConfig(r->server);
 -    SSLConnRec *sslconn         = myConnConfig(r->connection);
 -    SSL *ssl                    = sslconn ? sslconn->ssl : NULL;
-     server_rec *handshakeserver = sslconn ? sslconn->server : NULL;
-     SSLSrvConfigRec *hssc       = handshakeserver? mySrvConfig(handshakeserver) : NULL;
-     SSL_CTX *ctx = NULL;
-     apr_array_header_t *requires;
-     ssl_require_t *ssl_requires;
+-    server_rec *handshakeserver = sslconn ? sslconn->server : NULL;
+-    SSLSrvConfigRec *hssc       = handshakeserver? mySrvConfig(handshakeserver) : NULL;
+-    SSL_CTX *ctx = NULL;
+-    apr_array_header_t *requires;
+-    ssl_require_t *ssl_requires;
 -    int ok, i;
-+    int ok, i, rc;
-     BOOL renegotiate = FALSE, renegotiate_quick = FALSE;
+-    BOOL renegotiate = FALSE, renegotiate_quick = FALSE;
      X509 *cert;
-     X509 *peercert;
-@@ -446,66 +486,9 @@
-     X509_STORE_CTX *cert_store_ctx;
-     STACK_OF(SSL_CIPHER) *cipher_list_old = NULL, *cipher_list = NULL;
-     const SSL_CIPHER *cipher = NULL;
+-    X509 *peercert;
+-    X509_STORE *cert_store = NULL;
+-    X509_STORE_CTX *cert_store_ctx;
+-    STACK_OF(SSL_CIPHER) *cipher_list_old = NULL, *cipher_list = NULL;
+-    const SSL_CIPHER *cipher = NULL;
 -    int depth, verify_old, verify, n, is_slave = 0;
-+    int depth, verify_old, verify, n;
-     const char *ncipher_suite;
- 
+-    const char *ncipher_suite;
+-
 -    /* On a slave connection, we do not expect to have an SSLConnRec, but
 -     * our master connection might have one. */
 -    if (!(sslconn && ssl) && r->connection->master) {
@@ -349,7 +321,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 -        hssc            = handshakeserver? mySrvConfig(handshakeserver) : NULL;
 -        is_slave        = 1;
 -    }
--    
+     
 -    if (ssl) {
 -        /*
 -         * We should have handshaken here (on handshakeserver),
@@ -360,13 +332,23 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 -         */
 -        if (!SSL_is_init_finished(ssl)) {
 -            return HTTP_FORBIDDEN;
--        }
++    /*
++     * Remember the peer certificate's DN
++     */
++    if ((cert = SSL_get_peer_certificate(ssl))) {
++        if (sslconn->client_cert) {
++            X509_free(sslconn->client_cert);
+         }
 -        ctx = SSL_get_SSL_CTX(ssl);
--    }
++        sslconn->client_cert = cert;
++        sslconn->client_dn = NULL;
+     }
 -
--    /*
++    
+     /*
 -     * Support for SSLRequireSSL directive
--     */
++     * Finally check for acceptable renegotiation results
+      */
 -    if (dc->bSSLRequired && !ssl) {
 -        if ((sc->enabled == SSL_ENABLED_OPTIONAL) && !is_slave) {
 -            /* This vhost was configured for optional SSL, just tell the
@@ -374,20 +356,40 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 -             */
 -            apr_table_setn(r->err_headers_out, "Upgrade", "TLS/1.0, HTTP/1.1");
 -            apr_table_setn(r->err_headers_out, "Connection", "Upgrade");
--
++    if ((dc->nVerifyClient != SSL_CVERIFY_NONE) ||
++        (sc->server->auth.verify_mode != SSL_CVERIFY_NONE)) {
++        BOOL do_verify = ((dc->nVerifyClient == SSL_CVERIFY_REQUIRE) ||
++                          (sc->server->auth.verify_mode == SSL_CVERIFY_REQUIRE));
++
++        if (do_verify && (SSL_get_verify_result(ssl) != X509_V_OK)) {
++            ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(02262)
++                          "Re-negotiation handshake failed: "
++                          "Client verification failed");
+ 
 -            return HTTP_UPGRADE_REQUIRED;
--        }
--
++            return HTTP_FORBIDDEN;
+         }
+ 
 -        ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(02219)
 -                      "access to %s failed, reason: %s",
 -                      r->filename, "SSL connection required");
 -
 -        /* remember forbidden access for strict require option */
 -        apr_table_setn(r->notes, "ssl-access-forbidden", "1");
--
++        if (do_verify) {
++            if (cert == NULL) {
++                ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(02263)
++                              "Re-negotiation handshake failed: "
++                              "Client certificate missing");
+ 
 -        return HTTP_FORBIDDEN;
--    }
--
++                return HTTP_FORBIDDEN;
++            }
++        }
+     }
++    return OK;
++}
+ 
 -    /*
 -     * Check to see whether SSL is in use; if it's not, then no
 -     * further access control checks are relevant.  (the test for
@@ -396,11 +398,28 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 -    if (sc->enabled == SSL_ENABLED_FALSE || !ssl) {
 -        return DECLINED;
 -    }
--
++/*
++ *  Access Handler, classic flavour, for SSL/TLS up to v1.2 
++ *  where everything can be renegotiated and no one is happy.
++ */
++static int ssl_hook_Access_classic(request_rec *r, SSLSrvConfigRec *sc, SSLDirConfigRec *dc,
++                                   SSLConnRec *sslconn, SSL *ssl)
++{
++    server_rec *handshakeserver = sslconn ? sslconn->server : NULL;
++    SSLSrvConfigRec *hssc       = handshakeserver? mySrvConfig(handshakeserver) : NULL;
++    SSL_CTX *ctx = NULL;
++    BOOL renegotiate = FALSE, renegotiate_quick = FALSE;
++    X509 *peercert;
++    X509_STORE *cert_store = NULL;
++    X509_STORE_CTX *cert_store_ctx;
++    STACK_OF(SSL_CIPHER) *cipher_list_old = NULL, *cipher_list = NULL;
++    const SSL_CIPHER *cipher = NULL;
++    int depth, verify_old, verify, n, rc;
++    const char *ncipher_suite;
+ 
  #ifdef HAVE_SRP
      /*
-      * Support for per-directory reconfigured SSL connection parameters
-@@ -581,7 +564,7 @@
+@@ -581,7 +570,7 @@
          }
  
          /* configure new state */
@@ -409,7 +428,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
              /* TODO: this categorically fails changed cipher suite settings
               * on slave connections. We could do better by
               * - create a new SSL* from our SSL_CTX and set cipher suite there,
-@@ -659,7 +642,7 @@
+@@ -659,7 +648,7 @@
          }
  
          if (renegotiate) {
@@ -418,7 +437,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
                  /* The request causes renegotiation on a slave connection.
                   * This is not allowed since we might have concurrent requests
                   * on this connection.
-@@ -732,7 +715,7 @@
+@@ -732,7 +721,7 @@
                    (verify     & SSL_VERIFY_FAIL_IF_NO_PEER_CERT)))
              {
                  renegotiate = TRUE;
@@ -427,8 +446,29 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
                      /* The request causes renegotiation on a slave connection.
                       * This is not allowed since we might have concurrent requests
                       * on this connection.
-@@ -1050,30 +1033,8 @@
+@@ -885,6 +874,7 @@
+ 
+         if (renegotiate_quick) {
+             STACK_OF(X509) *cert_stack;
++            X509 *cert;
+ 
+             /* perform just a manual re-verification of the peer */
+             ap_log_rerror(APLOG_MARK, APLOG_DEBUG, 0, r, APLOGNO(02258)
+@@ -1037,43 +1027,10 @@
+         }
+ 
          /*
+-         * Remember the peer certificate's DN
+-         */
+-        if ((cert = SSL_get_peer_certificate(ssl))) {
+-            if (sslconn->client_cert) {
+-                X509_free(sslconn->client_cert);
+-            }
+-            sslconn->client_cert = cert;
+-            sslconn->client_dn = NULL;
+-        }
+-
+-        /*
           * Finally check for acceptable renegotiation results
           */
 -        if ((dc->nVerifyClient != SSL_CVERIFY_NONE) ||
@@ -455,16 +495,19 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 -
 -                X509_free(peercert);
 -            }
-+        if (OK != (rc = ssl_check_post_client_verify(r, sc, dc, ssl))) {
++        if (OK != (rc = ssl_check_post_client_verify(r, sc, dc, sslconn, ssl))) {
 +            return rc;
          }
  
          /*
-@@ -1167,6 +1128,195 @@
-     return DECLINED;
- }
+@@ -1096,6 +1053,215 @@
+         }
+     }
  
-+#ifdef SSL_OP_NO_TLSv1_3
++    return DECLINED;
++}
++
++#if SSL_HAVE_PROTOCOL_TLSV1_3
 +/*
 + *  Access Handler, modern flavour, for SSL/TLS v1.3 and onward. 
 + *  Only client certificates can be requested, everything else stays.
@@ -557,8 +600,16 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 +            ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO() "verify client post handshake");
 +
 +            SSL_set_verify(ssl, vmode_needed, ssl_callback_SSLVerify);
-+            SSL_verify_client_post_handshake(ssl);
 +
++            if (SSL_verify_client_post_handshake(ssl) != 1) {
++                ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(10158)
++                              "cannot perform post-handshake authentication");
++                ssl_log_ssl_error(SSLLOG_MARK, APLOG_ERR, r->server);
++                apr_table_setn(r->notes, "error-notes",
++                               "Reason: Cannot perform Post-Handshake Authentication.<br />");
++                return HTTP_FORBIDDEN;
++            }
++            
 +            old_state = sslconn->reneg_state;
 +            sslconn->reneg_state = RENEG_ALLOW;
 +            modssl_set_app_data2(ssl, r);
@@ -576,7 +627,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 +            /*
 +             * Finally check for acceptable renegotiation results
 +             */
-+            if (OK != (rc = ssl_check_post_client_verify(r, sc, dc, ssl))) {
++            if (OK != (rc = ssl_check_post_client_verify(r, sc, dc, sslconn, ssl))) {
 +                return rc;
 +            }
 +        }
@@ -592,6 +643,9 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 +    SSLSrvConfigRec *sc         = mySrvConfig(r->server);
 +    SSLConnRec *sslconn         = myConnConfig(r->connection);
 +    SSL *ssl                    = sslconn ? sslconn->ssl : NULL;
++    apr_array_header_t *requires;
++    ssl_require_t *ssl_requires;
++    int ok, i, ret;
 +
 +    /* On a slave connection, we do not expect to have an SSLConnRec, but
 +     * our master connection might have one. */
@@ -643,20 +697,26 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 +        return DECLINED;
 +    }
 +
-+#ifdef SSL_OP_NO_TLSv1_3
++#if SSL_HAVE_PROTOCOL_TLSV1_3
 +    /* TLSv1.3+ is less complicated here. Branch off into a new codeline
 +     * and avoid messing with the past. */
 +    if (SSL_version(ssl) >= TLS1_3_VERSION) {
-+        return ssl_hook_Access_modern(r, sc, dc, sslconn, ssl);
-+    } 
++        ret = ssl_hook_Access_modern(r, sc, dc, sslconn, ssl);
++    }
++    else
 +#endif
-+    return ssl_hook_Access_classic(r, sc, dc, sslconn, ssl);
-+}
++    {
++        ret = ssl_hook_Access_classic(r, sc, dc, sslconn, ssl);
++    }
 +
- /*
-  *  Authentication Handler:
-  *  Fake a Basic authentication from the X509 client certificate.
-@@ -2080,31 +2230,43 @@
++    if (ret != DECLINED) {
++        return ret;
++    }
++
+     /* If we're trying to have the user name set from a client
+      * certificate then we need to set it here. This should be safe as
+      * the user name probably isn't important from an auth checking point
+@@ -2080,31 +2246,43 @@
  {
      conn_rec *c;
      server_rec *s;
@@ -680,6 +740,10 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 +#endif
 +    {
 +        SSLConnRec *sslconn;
++
++        if ((sslconn = myConnConfig(c)) == NULL) {
++            return;
++        }
  
 -    /* If the reneg state is to reject renegotiations, check the SSL
 -     * state machine and move to ABORT if a Client Hello is being
@@ -688,10 +752,6 @@ http://svn.apache.org/viewvc?view=revision&revision=1833588
 -        (where & SSL_CB_HANDSHAKE_START) &&
 -        scr->reneg_state == RENEG_REJECT) {
 -            scr->reneg_state = RENEG_ABORT;
-+        if ((sslconn = myConnConfig(c)) == NULL) {
-+            return;
-+        }
-+
 +        /* If the reneg state is to reject renegotiations, check the SSL
 +         * state machine and move to ABORT if a Client Hello is being
 +         * read. */
