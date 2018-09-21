@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -733,6 +733,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Sep 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-8
+- comment-out SSLProtocol, SSLProxyProtocol from ssl.conf in
+  default configuration; now follow OpenSSL system default (#1468322)
+
 * Fri Sep 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-7
 - mod_ssl: follow OpenSSL protocol defaults if SSLProtocol
   is not configured (Rob Crittenden, #1618371)
