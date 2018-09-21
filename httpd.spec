@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -73,9 +73,10 @@ Patch29: httpd-2.4.33-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
-Patch35: httpd-2.4.33-sslciphdefault.patch
 Patch36: httpd-2.4.33-r1830819+.patch
 Patch37: httpd-2.4.34-r1827912+.patch
+Patch38: httpd-2.4.34-sslciphdefault.patch
+Patch39: httpd-2.4.34-sslprotdefault.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -236,9 +237,10 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 #patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
-%patch35 -p1 -b .sslciphdefault
 %patch36 -p1 -b .r1830819+
 %patch37 -p1 -b .r1827912+
+%patch38 -p1 -b .sslciphdefault
+%patch39 -p1 -b .sslprotdefault
 
 %patch58 -p1 -b .r1738878
 %patch59 -p1 -b .r1555631
@@ -731,6 +733,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Sep 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-7
+- mod_ssl: follow OpenSSL protocol defaults if SSLProtocol
+  is not configured (Rob Crittenden, #1618371)
+
 * Tue Aug 28 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.34-6
 - mod_ssl: enable SSLv3 and change behavior of "SSLProtocol All"
   configuration (#1624777)
