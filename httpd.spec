@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -244,7 +244,7 @@ interface for storing and accessing per-user session data.
 
 %patch58 -p1 -b .r1738878
 %patch59 -p1 -b .r1555631
-%patch60 -p1 -b .enablesslv3
+%patch60 -p1 -b .enable-sslv3
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -733,6 +733,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Sep 25 2018 Joe Orton <jorton@redhat.com> - 2.4.34-9
+- fix build if OpenSSL built w/o SSLv3 support
+
 * Fri Sep 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-8
 - comment-out SSLProtocol, SSLProxyProtocol from ssl.conf in
   default configuration; now follow OpenSSL system default (#1468322)
