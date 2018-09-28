@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -59,7 +59,7 @@ Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch4: httpd-2.4.34-layfix.patch
-Patch6: httpd-2.4.3-apctl-systemd.patch
+Patch6: httpd-2.4.34-apctlsystemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
@@ -733,6 +733,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Sep 28 2018 Joe Orton <jorton@redhat.com> - 2.4.34-10
+- apachectl: don't read /etc/sysconfig/httpd
+
 * Tue Sep 25 2018 Joe Orton <jorton@redhat.com> - 2.4.34-9
 - fix build if OpenSSL built w/o SSLv3 support
 
