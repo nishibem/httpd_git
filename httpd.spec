@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.37
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -63,7 +63,7 @@ Patch6: httpd-2.4.34-apctlsystemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
-Patch21: httpd-2.4.33-mddefault.patch
+Patch21: httpd-2.4.37-r1842929+.patch
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
@@ -224,7 +224,7 @@ interface for storing and accessing per-user session data.
 
 %patch19 -p1 -b .detectsystemd
 
-%patch21 -p1 -b .mddefault
+%patch21 -p1 -b .r1842929+
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
@@ -729,6 +729,11 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Oct 31 2018 Joe Orton <jorton@redhat.com> - 2.4.37-2
+- add DefaultStateDir/ap_state_dir_relative()
+- mod_dav_fs: use state dir for default DAVLockDB
+- mod_md: use state dir for default MDStoreDir
+
 * Wed Oct 31 2018 Joe Orton <jorton@redhat.com> - 2.4.37-1
 - update to 2.4.37
 
