@@ -31,3 +31,4 @@ x86_64
 /httpd-*.tar.bz2
 /httpd*.8
 /results_httpd
+/htcacheclean.service.8

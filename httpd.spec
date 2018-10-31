@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -49,6 +49,7 @@ Source29: 01-md.conf
 Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
+Source33: htcacheclean.service.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 Source42: httpd-init.service
@@ -275,6 +276,7 @@ sed 's/@MPM@/%{mpm}/' < $RPM_SOURCE_DIR/httpd.service.xml \
     > httpd.service.xml
 
 xmlto man ./httpd.service.xml
+xmlto man $RPM_SOURCE_DIR/htcacheclean.service.xml
 
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa}
 : Default MPM is %{mpm}, vendor string is '%{vstring}'
@@ -497,7 +499,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 
 # Install systemd service man pages
 install -m 644 -p httpd.service.8 httpd-init.service.8 httpd.socket.8 \
-        httpd@.service.8 \
+        httpd@.service.8 htcacheclean.service.8 \
         $RPM_BUILD_ROOT%{_mandir}/man8
 
 # fix man page paths
@@ -733,6 +735,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Oct 31 2018 Joe Orton <jorton@redhat.com> - 2.4.34-11
+- add htcacheclean.service(8) man page
+
 * Fri Sep 28 2018 Joe Orton <jorton@redhat.com> - 2.4.34-10
 - apachectl: don't read /etc/sysconfig/httpd
 
