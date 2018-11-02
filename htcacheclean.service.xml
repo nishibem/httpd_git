@@ -50,7 +50,7 @@
     <para>This manual page describes the <command>systemd</command>
     unit file for the <command>htcacheclean</command> daemon.  This
     unit file provides a service which runs
-    <command>htcacheclean</command> is run in daemon mode,
+    <command>htcacheclean</command> in daemon mode,
     periodically cleaning the disk cache root to ensure disk space
     usage is within configured limits.</para>
 
