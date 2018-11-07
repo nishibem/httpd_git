@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.37
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -729,6 +729,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Nov 07 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.37-3
+- Resolves: #1647241 - fix apachectl script
+
 * Wed Oct 31 2018 Joe Orton <jorton@redhat.com> - 2.4.37-2
 - add DefaultStateDir/ap_state_dir_relative()
 - mod_dav_fs: use state dir for default DAVLockDB
