@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.37
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -50,6 +50,7 @@ Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
 Source33: htcacheclean.service.xml
+Source34: httpd.conf.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 Source42: httpd-init.service
@@ -266,11 +267,16 @@ if test "x${vmmn}" != "x%{mmn}"; then
    exit 1
 fi
 
-sed 's/@MPM@/%{mpm}/' < $RPM_SOURCE_DIR/httpd.service.xml \
-    > httpd.service.xml
+sed '
+s,@MPM@,%{mpm},g
+s,@DOCROOT@,%{docroot},g
+s,@LOGDIR@,%{_localstatedir}/log/httpd,g
+' < $RPM_SOURCE_DIR/httpd.conf.xml \
+    > httpd.conf.xml
 
-xmlto man ./httpd.service.xml
+xmlto man ./httpd.conf.xml
 xmlto man $RPM_SOURCE_DIR/htcacheclean.service.xml
+xmlto man $RPM_SOURCE_DIR/httpd.service.xml
 
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa}
 : Default MPM is %{mpm}, vendor string is '%{vstring}'
@@ -491,10 +497,13 @@ mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
-# Install systemd service man pages
+# Install man pages
+install -d $RPM_BUILD_ROOT%{_mandir}/man8 $RPM_BUILD_ROOT%{_mandir}/man5
 install -m 644 -p httpd.service.8 httpd-init.service.8 httpd.socket.8 \
         httpd@.service.8 htcacheclean.service.8 \
         $RPM_BUILD_ROOT%{_mandir}/man8
+install -m 644 -p httpd.conf.5 \
+        $RPM_BUILD_ROOT%{_mandir}/man5
 
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
@@ -660,6 +669,7 @@ exit $rv
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
 
 %{_mandir}/man8/*
+%{_mandir}/man5/*
 %exclude %{_mandir}/man8/httpd-init.*
 
 %{_unitdir}/httpd.service
@@ -729,6 +739,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Nov  8 2018 Joe Orton <jorton@redhat.com> - 2.4.37-4
+- add httpd.conf(5) (#1611361)
+
 * Wed Nov 07 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.37-3
 - Resolves: #1647241 - fix apachectl script
 

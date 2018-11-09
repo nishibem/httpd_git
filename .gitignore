@@ -32,3 +32,4 @@ x86_64
 /httpd*.8
 /results_httpd
 /htcacheclean.service.8
+/httpd.conf.5

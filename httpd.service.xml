@@ -188,17 +188,10 @@ Wants=network-online.target</programlisting>
 
       <para>httpd offers a choice of multi-processing modules (MPMs),
       which can be configured in
-      <filename>/etc/httpd/conf.modules.d/00-mpm.conf</filename>.  The
-      default is to use the <emphasis>@MPM@</emphasis> MPM.</para>
-
-      <para>If using the <emphasis>prefork</emphasis> MPM, the
-      "httpd_graceful_shutdown" SELinux boolean should also be
-      enabled, since with this MPM, httpd needs to establish TCP
-      connections to local ports to successfully complete a graceful
-      restart or shutdown. This boolean can be enabled by running the
-      command: <command>semanage boolean -m --on
-      httpd_graceful_shutdown</command></para>
-
+      <filename>/etc/httpd/conf.modules.d/00-mpm.conf</filename>.
+      See
+      <citerefentry><refentrytitle>httpd.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+      for more information on changing the MPM.</para>
     </refsect2>
 
     <refsect2>
@@ -322,6 +315,7 @@ ReloadPropagatedFrom=httpd.service</programlisting>
 
     <para>
     <citerefentry><refentrytitle>httpd</refentrytitle><manvolnum>8</manvolnum></citerefentry>, 
+    <citerefentry><refentrytitle>httpd.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry>, 
     <citerefentry><refentrytitle>systemctl</refentrytitle><manvolnum>1</manvolnum></citerefentry>, 
     <citerefentry><refentrytitle>systemd.service</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
