@@ -223,7 +223,7 @@
       <title>Instantiated services</title>
 
       <para>As an alternative to (or in addition to) the
-      <command>httpd.service</command> unit, the instatiated template
+      <command>httpd.service</command> unit, the instantiated template
       service <command>httpd@.service</command> unit file can be used,
       which starts <command>httpd</command> using a different
       configuration file to the default. For example,
