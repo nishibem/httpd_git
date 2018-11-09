@@ -50,6 +50,7 @@ Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
 Source33: htcacheclean.service.xml
+Source34: httpd.conf.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 Source42: httpd-init.service
