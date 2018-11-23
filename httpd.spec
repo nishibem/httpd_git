@@ -76,7 +76,7 @@ Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch36: httpd-2.4.33-r1830819+.patch
 Patch38: httpd-2.4.34-sslciphdefault.patch
-Patch39: httpd-2.4.34-sslprotdefault.patch
+Patch39: httpd-2.4.37-sslprotdefault.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
