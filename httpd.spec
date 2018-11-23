@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.37
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -76,7 +76,7 @@ Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch36: httpd-2.4.33-r1830819+.patch
 Patch38: httpd-2.4.34-sslciphdefault.patch
-Patch39: httpd-2.4.34-sslprotdefault.patch
+Patch39: httpd-2.4.37-sslprotdefault.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -739,6 +739,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Nov 22 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.37-5
+- Resolves: #1652678 - TLS connection allowed while all protocols are forbidden
+
 * Thu Nov  8 2018 Joe Orton <jorton@redhat.com> - 2.4.37-4
 - add httpd.conf(5) (#1611361)
 
