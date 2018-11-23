@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.37
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -739,6 +739,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Nov 23 2018 Lubos Uhliarik <luhliari@redhat.com> - 2.4.37-5
+- Resolves: #1652678 - TLS connection allowed while all protocols are forbidden 
+
 * Thu Nov  8 2018 Joe Orton <jorton@redhat.com> - 2.4.37-4
 - add httpd.conf(5) (#1611361)
 
