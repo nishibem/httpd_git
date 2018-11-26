@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.34
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -74,6 +74,7 @@ Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch35: httpd-2.4.33-sslciphdefault.patch
 Patch36: httpd-2.4.33-r1830819+.patch
+Patch37: httpd-2.4.37-sslprotdefault.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -234,6 +235,7 @@ interface for storing and accessing per-user session data.
 %patch34 -p1 -b .socketactivation
 %patch35 -p1 -b .sslciphdefault
 %patch36 -p1 -b .r1830819+
+%patch37 -p1 -b .sslprotdefault
 
 %patch58 -p1 -b .r1738878
 %patch59 -p1 -b .r1555631
@@ -725,6 +727,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Nov 26 2018 Lubos Uhliarik <luhliari@redhat.com> - 2.4.34-4
+- Resolves: #1652678 - TLS connection allowed while all protocols are forbidden
+
 * Fri Jul 20 2018 Joe Orton <jorton@redhat.com> - 2.4.34-3
 - mod_ssl: fix OCSP regression (upstream r1555631)
 
