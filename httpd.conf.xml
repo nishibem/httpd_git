@@ -50,12 +50,11 @@
   <refsect1>
     <title>Description</title>
 
-    <para>The <command>httpd</command> daemon uses a main
-    configuration file at
+    <para>The main configuration file for the <command>httpd</command> daemon is
     <filename>/etc/httpd/conf/httpd.conf</filename>.  The syntax of
     this file is described at <ulink
     url="https://httpd.apache.org/docs/2.4/configuring.html"/>, and
-    the full set of available directives at <ulink
+    the full set of available directives is listed at <ulink
     url="https://httpd.apache.org/docs/2.4/mod/directives.html"/>.
     </para>
 
@@ -130,8 +129,8 @@
       <title>Module configuration files</title>
       
       <para>Module configuration files are provided in the
-      <filename>/etc/httpd/conf.modules.d/</filename> directory, with
-      names which are by convention prefixed with two digit numeric
+      <filename>/etc/httpd/conf.modules.d/</filename> directory.  Filenames
+      in this directory are by convention prefixed with two digit numeric
       prefix to ensure they are processed in the desired order.  Core
       modules provide with the <command>httpd</command> package are
       loaded by files with a <option>0x-</option> prefix to ensure
