@@ -71,7 +71,7 @@
       appropriate <option>LoadModule</option> directive so that module
       is loaded by default.</para>
 
-      <para>Some notable configured defaults are:.</para>
+      <para>Some notable configured defaults are:</para>
 
       <variablelist>
         <varlistentry>
@@ -81,7 +81,7 @@
         </varlistentry>
         <varlistentry>
           <term><option>Listen 80</option></term>
-          <listitem><para>The daemon lists on TCP port 80.</para></listitem>
+          <listitem><para>The daemon listens on TCP port 80.</para></listitem>
         </varlistentry>
         <varlistentry>
           <term><option>ErrorLog "logs/error_log"</option></term>
