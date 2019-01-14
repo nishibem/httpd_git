@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.37
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -739,6 +739,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jan 14 2019 Björn Esser <besser82@fedoraproject.org> - 2.4.37-6
+- Rebuilt for libcrypt.so.2 (#1666033)
+
 * Thu Nov 22 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.37-5
 - Resolves: #1652678 - TLS connection allowed while all protocols are forbidden
 
