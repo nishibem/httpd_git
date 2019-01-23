@@ -9,9 +9,11 @@ http://svn.apache.org/viewvc?view=revision&revision=1831173
 http://svn.apache.org/viewvc?view=revision&revision=1835240
 http://svn.apache.org/viewvc?view=revision&revision=1835242
 
---- httpd-2.4.33/modules/ssl/ssl_engine_config.c.r1830819+
-+++ httpd-2.4.33/modules/ssl/ssl_engine_config.c
-@@ -891,7 +891,9 @@
+diff --git a/modules/ssl/ssl_engine_config.c b/modules/ssl/ssl_engine_config.c
+index d276fea..5467d23 100644
+--- httpd-2.4.38/modules/ssl/ssl_engine_config.c.r1830819+
++++ httpd-2.4.38/modules/ssl/ssl_engine_config.c
+@@ -916,7 +916,9 @@
      SSLSrvConfigRec *sc = mySrvConfig(cmd->server);
      const char *err;
  
@@ -22,7 +24,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
          return err;
      }
  
-@@ -907,7 +909,9 @@
+@@ -932,7 +934,9 @@
      SSLSrvConfigRec *sc = mySrvConfig(cmd->server);
      const char *err;
  
@@ -33,9 +35,9 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
          return err;
      }
  
---- httpd-2.4.33/modules/ssl/ssl_engine_init.c.r1830819+
-+++ httpd-2.4.33/modules/ssl/ssl_engine_init.c
-@@ -1181,12 +1182,18 @@
+--- httpd-2.4.38/modules/ssl/ssl_engine_init.c.r1830819+
++++ httpd-2.4.38/modules/ssl/ssl_engine_init.c
+@@ -1228,12 +1228,18 @@
                  (certfile = APR_ARRAY_IDX(mctx->pks->cert_files, i,
                                            const char *));
           i++) {
@@ -55,7 +57,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
              if ((SSL_CTX_use_certificate_file(mctx->ssl_ctx, certfile,
                                                SSL_FILETYPE_PEM) < 1)) {
                  ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO(02561)
-@@ -1215,12 +1222,46 @@
+@@ -1262,12 +1268,46 @@
  
          ERR_clear_error();
  
@@ -107,7 +109,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
              const unsigned char *ptr;
  
              ERR_clear_error();
-@@ -1307,8 +1348,9 @@
+@@ -1354,8 +1394,9 @@
      /*
       * Try to read DH parameters from the (first) SSLCertificateFile
       */
@@ -119,7 +121,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
          SSL_CTX_set_tmp_dh(mctx->ssl_ctx, dhparams);
          ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, APLOGNO(02540)
                       "Custom DH parameters (%d bits) for %s loaded from %s",
-@@ -1320,10 +1362,10 @@
+@@ -1367,10 +1408,10 @@
      /*
       * Similarly, try to read the ECDH curve name from SSLCertificateFile...
       */
@@ -134,42 +136,27 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
          SSL_CTX_set_tmp_ecdh(mctx->ssl_ctx, eckey);
          ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, APLOGNO(02541)
                       "ECDH curve %s for %s specified in %s",
---- httpd-2.4.33/modules/ssl/ssl_engine_pphrase.c.r1830819+
-+++ httpd-2.4.33/modules/ssl/ssl_engine_pphrase.c
-@@ -143,9 +143,6 @@
+--- httpd-2.4.38/modules/ssl/ssl_engine_pphrase.c.r1830819+
++++ httpd-2.4.38/modules/ssl/ssl_engine_pphrase.c
+@@ -143,8 +143,6 @@
      const char *key_id = asn1_table_vhost_key(mc, p, sc->vhost_id, idx);
      EVP_PKEY *pPrivateKey = NULL;
      ssl_asn1_t *asn1;
 -    unsigned char *ucp;
 -    long int length;
--    BOOL bReadable;
      int nPassPhrase = (*pphrases)->nelts;
      int nPassPhraseRetry = 0;
      apr_time_t pkey_mtime = 0;
-@@ -222,16 +219,12 @@
+@@ -221,7 +219,7 @@
           * is not empty. */
          ERR_clear_error();
  
--        bReadable = ((pPrivateKey = modssl_read_privatekey(ppcb_arg.pkey_file,
--                     NULL, ssl_pphrase_Handle_CB, &ppcb_arg)) != NULL ?
--                     TRUE : FALSE);
--
--        /*
--         * when the private key file now was readable,
--         * it's fine and we go out of the loop
--         */
--        if (bReadable)
--           break;
+-        pPrivateKey = modssl_read_privatekey(ppcb_arg.pkey_file, NULL,
 +        pPrivateKey = modssl_read_privatekey(ppcb_arg.pkey_file,
-+                                             ssl_pphrase_Handle_CB, &ppcb_arg);
-+        /* If the private key was successfully read, nothing more to
-+           do here. */
-+        if (pPrivateKey != NULL)
-+            break;
- 
-         /*
-          * when we have more remembered pass phrases
-@@ -356,19 +349,12 @@
+                                              ssl_pphrase_Handle_CB, &ppcb_arg);
+         /* If the private key was successfully read, nothing more to
+            do here. */
+@@ -351,19 +349,12 @@
          nPassPhrase++;
      }
  
@@ -192,7 +179,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
          asn1->source_mtime = pkey_mtime;
      }
  
-@@ -619,3 +605,288 @@
+@@ -614,3 +605,288 @@
       */
      return (len);
  }
@@ -481,9 +468,9 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
 +    return APR_SUCCESS;
 +}
 +#endif
---- httpd-2.4.33/modules/ssl/ssl_private.h.r1830819+
-+++ httpd-2.4.33/modules/ssl/ssl_private.h
-@@ -976,21 +976,28 @@
+--- httpd-2.4.38/modules/ssl/ssl_private.h.r1830819+
++++ httpd-2.4.38/modules/ssl/ssl_private.h
+@@ -1002,21 +1002,28 @@
  apr_status_t ssl_load_encrypted_pkey(server_rec *, apr_pool_t *, int,
                                       const char *, apr_array_header_t **);
  
@@ -521,7 +508,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
  
  /**  Mutex Support  */
  int          ssl_mutex_init(server_rec *, apr_pool_t *);
-@@ -1078,6 +1085,10 @@
+@@ -1109,6 +1116,10 @@
  int ssl_is_challenge(conn_rec *c, const char *servername, 
                       X509 **pcert, EVP_PKEY **pkey);
  
@@ -532,9 +519,9 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
  #endif /* SSL_PRIVATE_H */
  /** @} */
  
---- httpd-2.4.33/modules/ssl/ssl_util.c.r1830819+
-+++ httpd-2.4.33/modules/ssl/ssl_util.c
-@@ -181,45 +181,37 @@
+--- httpd-2.4.38/modules/ssl/ssl_util.c.r1830819+
++++ httpd-2.4.38/modules/ssl/ssl_util.c
+@@ -192,45 +192,37 @@
      return TRUE;
  }
  
@@ -596,7 +583,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
  }
  
  ssl_asn1_t *ssl_asn1_table_get(apr_hash_t *table,
-@@ -469,3 +461,13 @@
+@@ -480,3 +472,13 @@
  }
  
  #endif /* #if APR_HAS_THREADS && MODSSL_USE_OPENSSL_PRE_1_1_API */
@@ -610,8 +597,8 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
 +    return 0;
 +#endif
 +}
---- httpd-2.4.33/modules/ssl/ssl_util_ssl.c.r1830819+
-+++ httpd-2.4.33/modules/ssl/ssl_util_ssl.c
+--- httpd-2.4.38/modules/ssl/ssl_util_ssl.c.r1830819+
++++ httpd-2.4.38/modules/ssl/ssl_util_ssl.c
 @@ -74,7 +74,7 @@
  **  _________________________________________________________________
  */
@@ -672,8 +659,8 @@ http://svn.apache.org/viewvc?view=revision&revision=1835242
  /*  _________________________________________________________________
  **
  **  Smart shutdown
---- httpd-2.4.33/modules/ssl/ssl_util_ssl.h.r1830819+
-+++ httpd-2.4.33/modules/ssl/ssl_util_ssl.h
+--- httpd-2.4.38/modules/ssl/ssl_util_ssl.h.r1830819+
++++ httpd-2.4.38/modules/ssl/ssl_util_ssl.h
 @@ -64,8 +64,11 @@
  void        modssl_init_app_data2_idx(void);
  void       *modssl_get_app_data2(SSL *);

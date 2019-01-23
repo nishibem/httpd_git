@@ -12,8 +12,9 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.37
-Release: 5%{?dist}
+Version: 2.4.38
+Release: 1%{?dist}
+
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -74,7 +75,7 @@ Patch29: httpd-2.4.33-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
-Patch36: httpd-2.4.33-r1830819+.patch
+Patch36: httpd-2.4.38-r1830819+.patch
 Patch38: httpd-2.4.34-sslciphdefault.patch
 Patch39: httpd-2.4.37-sslprotdefault.patch
 
@@ -739,8 +740,14 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Fri Nov 23 2018 Lubos Uhliarik <luhliari@redhat.com> - 2.4.37-5
-- Resolves: #1652678 - TLS connection allowed while all protocols are forbidden 
+* Wed Jan 23 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.38-1
+- new version 2.4.38 (#1668125)
+
+* Mon Jan 14 2019 Björn Esser <besser82@fedoraproject.org> - 2.4.37-6
+- Rebuilt for libcrypt.so.2 (#1666033)
+
+* Thu Nov 22 2018 Lubos Uhliarik <luhliari@redhat.com> - 2.4.37-5
+- Resolves: #1652678 - TLS connection allowed while all protocols are forbidden
 
 * Thu Nov  8 2018 Joe Orton <jorton@redhat.com> - 2.4.37-4
 - add httpd.conf(5) (#1611361)
