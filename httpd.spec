@@ -13,8 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.38
-Release: 1%{?dist}
-
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -740,7 +739,7 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Wed Jan 23 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.38-1
+* Wed Jan 23 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.38-2
 - new version 2.4.38 (#1668125)
 
 * Mon Jan 14 2019 Björn Esser <besser82@fedoraproject.org> - 2.4.37-6
