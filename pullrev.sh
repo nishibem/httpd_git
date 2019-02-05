@@ -7,7 +7,7 @@ fi
 
 repo="https://svn.apache.org/repos/asf/httpd/httpd/trunk"
 #repo="https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x"
-ver=2.4.34
+ver=2.4.37
 prefix="httpd-${ver}"
 suffix="r$1${2:++}"
 fn="${prefix}-${suffix}.patch"

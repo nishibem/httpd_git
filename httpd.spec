@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.38
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -56,6 +56,7 @@ Source41: htcacheclean.sysconf
 Source42: httpd-init.service
 Source43: httpd-ssl-gencerts
 Source44: httpd@.service
+Source45: config.layout
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
@@ -257,6 +258,9 @@ if test "x${vmmn}" != "x%{mmn}"; then
    exit 1
 fi
 
+# Provide default layout
+cp $RPM_SOURCE_DIR/config.layout .
+
 sed '
 s,@MPM@,%{mpm},g
 s,@DOCROOT@,%{docroot},g
@@ -399,7 +403,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd \
+         $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd/state \
          $RPM_BUILD_ROOT/run/httpd/htcacheclean
 
 # Substitute in defaults which are usually done (badly) by "make install"
@@ -461,8 +465,9 @@ ln -s ../../pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
 # symlinks for /etc/httpd
+rmdir $RPM_BUILD_ROOT/etc/httpd/{state,run}
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s ../..%{_localstatedir}/lib/httpd $RPM_BUILD_ROOT/etc/httpd/state
+ln -s ../..%{_localstatedir}/lib/httpd/state $RPM_BUILD_ROOT/etc/httpd/state
 ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
@@ -729,6 +734,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Feb  5 2019 Joe Orton <jorton@redhat.com> - 2.4.38-4
+- use serverroot-relative statedir, rundir by default
+
 * Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.38-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
