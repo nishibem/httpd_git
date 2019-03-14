@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.38
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -45,7 +45,6 @@ Source26: 10-listen443.conf
 Source27: httpd.socket
 Source28: 00-optional.conf
 Source29: 01-md.conf
-# Documentation
 Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
@@ -57,11 +56,10 @@ Source42: httpd-init.service
 Source43: httpd-ssl-gencerts
 Source44: httpd@.service
 Source45: config.layout
+Source46: apachectl.sh
 # build/scripts patches
-Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
-Patch6: httpd-2.4.34-apctlsystemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
@@ -210,10 +208,8 @@ interface for storing and accessing per-user session data.
 
 %prep
 %setup -q
-%patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
-%patch6 -p1 -b .apctlsystemd
 
 %patch19 -p1 -b .detectsystemd
 
@@ -482,7 +478,8 @@ install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-gencerts \
 	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-gencerts
 
-# Install action scripts
+# Install scripts
+install -p -m 755 $RPM_SOURCE_DIR/apachectl.sh $RPM_BUILD_ROOT%{_sbindir}/apachectl
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
 for f in graceful configtest; do
     install -p -m 755 $RPM_SOURCE_DIR/action-${f}.sh \
@@ -736,6 +733,13 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Feb 28 2019 Joe Orton <jorton@redhat.com> - 2.4.38-6
+- apachectl: cleanup and replace script wholesale (#1641237)
+ * drop "apachectl fullstatus" support
+ * run systemctl with --no-pager option
+ * implement graceful&graceful-stop by signal directly
+- run "httpd -t" from legacy action script
+
 * Tue Feb 05 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.38-5
 - segmentation fault fix (FIPS)
 
