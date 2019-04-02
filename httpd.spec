@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.38
-Release: 6%{?dist}
+Version: 2.4.39
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -76,7 +76,6 @@ Patch34: httpd-2.4.17-socket-activation.patch
 Patch36: httpd-2.4.38-r1830819+.patch
 Patch38: httpd-2.4.34-sslciphdefault.patch
 Patch39: httpd-2.4.37-sslprotdefault.patch
-Patch40: httpd-2.4.37-fips-segfault.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -226,7 +225,6 @@ interface for storing and accessing per-user session data.
 %patch36 -p1 -b .r1830819+
 %patch38 -p1 -b .sslciphdefault
 %patch39 -p1 -b .sslprotdefault
-%patch40 -p1 -b .fipsseg
 
 %patch58 -p1 -b .r1738878
 %patch60 -p1 -b .enable-sslv3
@@ -733,6 +731,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Apr 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-1
+- update to 2.4.39
+
 * Thu Feb 28 2019 Joe Orton <jorton@redhat.com> - 2.4.38-6
 - apachectl: cleanup and replace script wholesale (#1641237)
  * drop "apachectl fullstatus" support
