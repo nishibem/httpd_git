@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.34
-Release: 4%{?dist}
+Version: 2.4.39
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -72,8 +72,8 @@ Patch29: httpd-2.4.33-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
-Patch35: httpd-2.4.33-sslciphdefault.patch
-Patch36: httpd-2.4.33-r1830819+.patch
+Patch35: httpd-2.4.34-sslciphdefault.patch
+Patch36: httpd-2.4.38-r1830819+.patch
 Patch37: httpd-2.4.37-sslprotdefault.patch
 
 # Bug fixes
@@ -238,7 +238,7 @@ interface for storing and accessing per-user session data.
 %patch37 -p1 -b .sslprotdefault
 
 %patch58 -p1 -b .r1738878
-%patch59 -p1 -b .r1555631
+#%patch59 -p1 -b .r1555631
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -727,6 +727,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Apr 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-1
+- new version 2.4.39
+
 * Mon Nov 26 2018 Lubos Uhliarik <luhliari@redhat.com> - 2.4.34-4
 - Resolves: #1652678 - TLS connection allowed while all protocols are forbidden
 
