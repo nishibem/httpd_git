@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -731,7 +731,7 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Tue Apr 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-1
+* Tue Apr 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-2
 - update to 2.4.39
 
 * Thu Feb 28 2019 Joe Orton <jorton@redhat.com> - 2.4.38-6
