@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.38
-Release: 2%{?dist}
+Version: 2.4.39
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -45,7 +45,6 @@ Source26: 10-listen443.conf
 Source27: httpd.socket
 Source28: 00-optional.conf
 Source29: 01-md.conf
-# Documentation
 Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
@@ -56,11 +55,11 @@ Source41: htcacheclean.sysconf
 Source42: httpd-init.service
 Source43: httpd-ssl-gencerts
 Source44: httpd@.service
+Source45: config.layout
+Source46: apachectl.sh
 # build/scripts patches
-Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
-Patch6: httpd-2.4.34-apctlsystemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
@@ -86,7 +85,6 @@ Patch60: httpd-2.4.34-enable-sslv3.patch
 # Security fixes
 
 License: ASL 2.0
-Group: System Environment/Daemons
 BuildRequires: gcc, autoconf, pkgconfig, findutils, xmlto
 BuildRequires: perl-interpreter, perl-generators, systemd-devel
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
@@ -112,7 +110,6 @@ The Apache HTTP Server is a powerful, efficient, and extensible
 web server.
 
 %package devel
-Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP Server
 Requires: apr-devel, apr-util-devel, pkgconfig
 Requires: httpd = %{version}-%{release}
@@ -127,7 +124,6 @@ able to compile or develop additional modules for Apache, you need
 to install this package.
 
 %package manual
-Group: Documentation
 Summary: Documentation for the Apache HTTP Server
 Requires: httpd = %{version}-%{release}
 BuildArch: noarch
@@ -138,7 +134,6 @@ reference guide for the Apache HTTP Server. The information can
 also be found at https://httpd.apache.org/docs/2.4/.
 
 %package filesystem
-Group: System Environment/Daemons
 Summary: The basic directory layout for the Apache HTTP Server
 BuildArch: noarch
 Requires(pre): /usr/sbin/useradd
@@ -149,7 +144,6 @@ for the Apache HTTP Server including the correct permissions
 for the directories.
 
 %package tools
-Group: System Environment/Daemons
 Summary: Tools for use with the Apache HTTP Server
 
 %description tools
@@ -157,7 +151,6 @@ The httpd-tools package contains tools which can be used with
 the Apache HTTP Server.
 
 %package -n mod_ssl
-Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
@@ -173,7 +166,6 @@ server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
 %package -n mod_md
-Group: System Environment/Daemons
 Summary: Certificate provisioning using ACME for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: jansson-devel, libcurl-devel
@@ -186,7 +178,6 @@ managed domains and their virtual hosts automatically. This includes
 renewal of certificates before they expire.
 
 %package -n mod_proxy_html
-Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: libxml2-devel
@@ -198,7 +189,6 @@ The mod_proxy_html and mod_xml2enc modules provide filters which can
 transform and modify HTML and XML content.
 
 %package -n mod_ldap
-Group: System Environment/Daemons
 Summary: LDAP authentication modules for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: apr-util-ldap
@@ -208,7 +198,6 @@ The mod_ldap and mod_authnz_ldap modules add support for LDAP
 authentication to the Apache HTTP Server.
 
 %package -n mod_session
-Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 
@@ -218,10 +207,8 @@ interface for storing and accessing per-user session data.
 
 %prep
 %setup -q
-%patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
-%patch6 -p1 -b .apctlsystemd
 
 %patch19 -p1 -b .detectsystemd
 
@@ -266,6 +253,9 @@ if test "x${vmmn}" != "x%{mmn}"; then
    : Update the mmn macro and rebuild.
    exit 1
 fi
+
+# Provide default layout
+cp $RPM_SOURCE_DIR/config.layout .
 
 sed '
 s,@MPM@,%{mpm},g
@@ -409,7 +399,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd \
+         $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd/state \
          $RPM_BUILD_ROOT/run/httpd/htcacheclean
 
 # Substitute in defaults which are usually done (badly) by "make install"
@@ -471,8 +461,9 @@ ln -s ../../pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
 # symlinks for /etc/httpd
+rmdir $RPM_BUILD_ROOT/etc/httpd/{state,run}
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s ../..%{_localstatedir}/lib/httpd $RPM_BUILD_ROOT/etc/httpd/state
+ln -s ../..%{_localstatedir}/lib/httpd/state $RPM_BUILD_ROOT/etc/httpd/state
 ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
@@ -485,7 +476,8 @@ install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-gencerts \
 	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-gencerts
 
-# Install action scripts
+# Install scripts
+install -p -m 755 $RPM_SOURCE_DIR/apachectl.sh $RPM_BUILD_ROOT%{_sbindir}/apachectl
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
 for f in graceful configtest; do
     install -p -m 755 $RPM_SOURCE_DIR/action-${f}.sh \
@@ -739,6 +731,25 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Apr 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-1
+- update to 2.4.39
+
+* Thu Feb 28 2019 Joe Orton <jorton@redhat.com> - 2.4.38-6
+- apachectl: cleanup and replace script wholesale (#1641237)
+ * drop "apachectl fullstatus" support
+ * run systemctl with --no-pager option
+ * implement graceful&graceful-stop by signal directly
+- run "httpd -t" from legacy action script
+
+* Tue Feb 05 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.38-5
+- segmentation fault fix (FIPS)
+
+* Tue Feb  5 2019 Joe Orton <jorton@redhat.com> - 2.4.38-4
+- use serverroot-relative statedir, rundir by default
+
+* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.38-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
 * Wed Jan 23 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.38-2
 - new version 2.4.38 (#1668125)
 
