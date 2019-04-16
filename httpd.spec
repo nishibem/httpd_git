@@ -81,6 +81,8 @@ Patch39: httpd-2.4.37-sslprotdefault.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.34-r1738878.patch
 Patch60: httpd-2.4.34-enable-sslv3.patch
+# https://bz.apache.org/bugzilla/show_bug.cgi?id=63325
+Patch61: httpd-2.4.37-r1857129.patch
 
 # Security fixes
 
@@ -228,6 +230,7 @@ interface for storing and accessing per-user session data.
 
 %patch58 -p1 -b .r1738878
 %patch60 -p1 -b .enable-sslv3
+%patch61 -p1 -b .r1857129
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -731,6 +734,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Apr  9 2019 Joe Orton <jorton@redhat.com> - 2.4.39-3
+- fix statedir symlink to point to /var/lib/httpd (#1697662)
+- mod_reqtimeout: fix default values regression (PR 63325)
+
 * Tue Apr 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-2
 - update to 2.4.39
 
