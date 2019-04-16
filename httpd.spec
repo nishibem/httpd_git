@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -80,6 +80,7 @@ Patch37: httpd-2.4.37-sslprotdefault.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.34-r1738878.patch
 Patch59: httpd-2.4.34-r1555631.patch
+Patch61: httpd-2.4.37-r1857129.patch
 
 # Security fixes
 
@@ -239,6 +240,7 @@ interface for storing and accessing per-user session data.
 
 %patch58 -p1 -b .r1738878
 #%patch59 -p1 -b .r1555631
+%patch61 -p1 -b .r1857129
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -727,6 +729,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri May  3 2019 Joe Orton <jorton@redhat.com> - 2.4.39-1.1
+- mod_reqtimeout: fix default values regression (PR 63325)
+
 * Tue Apr 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-1
 - new version 2.4.39
 
