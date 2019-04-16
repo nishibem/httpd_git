@@ -546,7 +546,7 @@ exit 0
 %systemd_preun httpd.service htcacheclean.service httpd.socket
 
 %postun
-%systemd_postun
+%systemd_postun httpd.service htcacheclean.service httpd.socket
 
 # Trigger for conversion from SysV, per guidelines at:
 # https://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Systemd
