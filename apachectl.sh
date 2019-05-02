@@ -22,6 +22,7 @@ fi
 ACMD="$1"
 ARGV="$@"
 SVC='httpd.service'
+HTTPD='@HTTPDBIN@'
 
 if [ "x$2" != "x" ] ; then
     echo Passing arguments to httpd using apachectl is no longer supported.
@@ -49,7 +50,7 @@ graceful-stop)
     ERROR=$?
     ;;
 configtest)
-    /usr/sbin/service ${SVC/.service//} $ACMD
+    $HTTPD -t
     ERROR=$?
     ;;
 *)

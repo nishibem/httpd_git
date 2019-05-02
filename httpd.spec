@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -414,6 +414,9 @@ sed -i \
     s,@@Port@@,80,;" \
     docs/conf/extra/*.conf
 
+# Set correct path for httpd binary in apachectl script
+sed -i 's,@HTTPDBIN@,%{_sbindir}/httpd,g' $RPM_SOURCE_DIR/apachectl.sh
+
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
          $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd/proxy \
@@ -734,6 +737,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu May 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-4
+- httpd dependency on initscripts is unspecified (#1705188)
+
 * Tue Apr  9 2019 Joe Orton <jorton@redhat.com> - 2.4.39-3
 - fix statedir symlink to point to /var/lib/httpd (#1697662)
 - mod_reqtimeout: fix default values regression (PR 63325)
