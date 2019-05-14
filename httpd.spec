@@ -13,10 +13,9 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-Source1: index.html
 Source2: httpd.logrotate
 Source3: instance.conf
 Source4: httpd-ssl-pass-dialog
@@ -428,8 +427,8 @@ EOF
 # Handle contentdir
 mkdir $RPM_BUILD_ROOT%{contentdir}/noindex \
       $RPM_BUILD_ROOT%{contentdir}/server-status
-install -m 644 -p $RPM_SOURCE_DIR/index.html \
-        $RPM_BUILD_ROOT%{contentdir}/noindex/index.html
+ln -s ../../fedora-testpage/index.html \
+      $RPM_BUILD_ROOT%{contentdir}/noindex/index.html
 install -m 644 -p docs/server-status/* \
         $RPM_BUILD_ROOT%{contentdir}/server-status
 rm -rf %{contentdir}/htdocs
@@ -741,6 +740,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Sep 19 2019 Stephen Gallagher <sgallagh@redhat.com> - 2.4.41-2
+- Use testpage from system-logos-httpd for proper branding
+
 * Thu Aug 15 2019 Joe Orton <jorton@redhat.com> - 2.4.41-1
 - update to 2.4.41
 
