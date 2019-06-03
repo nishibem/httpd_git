@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.34
-Release: 3%{?dist}
+Version: 2.4.39
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -45,24 +45,25 @@ Source26: 10-listen443.conf
 Source27: httpd.socket
 Source28: 00-optional.conf
 Source29: 01-md.conf
-# Documentation
 Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
+Source33: htcacheclean.service.xml
+Source34: httpd.conf.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 Source42: httpd-init.service
 Source43: httpd-ssl-gencerts
 Source44: httpd@.service
+Source45: config.layout
+Source46: apachectl.sh
 # build/scripts patches
-Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
-Patch6: httpd-2.4.3-apctl-systemd.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
-Patch21: httpd-2.4.33-mddefault.patch
+Patch21: httpd-2.4.37-r1842929+.patch
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
@@ -72,18 +73,20 @@ Patch29: httpd-2.4.33-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
-Patch35: httpd-2.4.33-sslciphdefault.patch
-Patch36: httpd-2.4.33-r1830819+.patch
+Patch36: httpd-2.4.38-r1830819+.patch
+Patch38: httpd-2.4.34-sslciphdefault.patch
+Patch39: httpd-2.4.37-sslprotdefault.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.34-r1738878.patch
-Patch59: httpd-2.4.34-r1555631.patch
+Patch60: httpd-2.4.34-enable-sslv3.patch
+# https://bz.apache.org/bugzilla/show_bug.cgi?id=63325
+Patch61: httpd-2.4.37-r1857129.patch
 
 # Security fixes
 
 License: ASL 2.0
-Group: System Environment/Daemons
 BuildRequires: gcc, autoconf, pkgconfig, findutils, xmlto
 BuildRequires: perl-interpreter, perl-generators, systemd-devel
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
@@ -109,7 +112,6 @@ The Apache HTTP Server is a powerful, efficient, and extensible
 web server.
 
 %package devel
-Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP Server
 Requires: apr-devel, apr-util-devel, pkgconfig
 Requires: httpd = %{version}-%{release}
@@ -124,7 +126,6 @@ able to compile or develop additional modules for Apache, you need
 to install this package.
 
 %package manual
-Group: Documentation
 Summary: Documentation for the Apache HTTP Server
 Requires: httpd = %{version}-%{release}
 BuildArch: noarch
@@ -135,7 +136,6 @@ reference guide for the Apache HTTP Server. The information can
 also be found at https://httpd.apache.org/docs/2.4/.
 
 %package filesystem
-Group: System Environment/Daemons
 Summary: The basic directory layout for the Apache HTTP Server
 BuildArch: noarch
 Requires(pre): /usr/sbin/useradd
@@ -146,7 +146,6 @@ for the Apache HTTP Server including the correct permissions
 for the directories.
 
 %package tools
-Group: System Environment/Daemons
 Summary: Tools for use with the Apache HTTP Server
 
 %description tools
@@ -154,7 +153,6 @@ The httpd-tools package contains tools which can be used with
 the Apache HTTP Server.
 
 %package -n mod_ssl
-Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
@@ -170,7 +168,6 @@ server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
 %package -n mod_md
-Group: System Environment/Daemons
 Summary: Certificate provisioning using ACME for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: jansson-devel, libcurl-devel
@@ -183,7 +180,6 @@ managed domains and their virtual hosts automatically. This includes
 renewal of certificates before they expire.
 
 %package -n mod_proxy_html
-Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: libxml2-devel
@@ -195,7 +191,6 @@ The mod_proxy_html and mod_xml2enc modules provide filters which can
 transform and modify HTML and XML content.
 
 %package -n mod_ldap
-Group: System Environment/Daemons
 Summary: LDAP authentication modules for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: apr-util-ldap
@@ -205,7 +200,6 @@ The mod_ldap and mod_authnz_ldap modules add support for LDAP
 authentication to the Apache HTTP Server.
 
 %package -n mod_session
-Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 
@@ -215,14 +209,12 @@ interface for storing and accessing per-user session data.
 
 %prep
 %setup -q
-%patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
-%patch6 -p1 -b .apctlsystemd
 
 %patch19 -p1 -b .detectsystemd
 
-%patch21 -p1 -b .mddefault
+%patch21 -p1 -b .r1842929+
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
@@ -232,11 +224,13 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 #patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
-%patch35 -p1 -b .sslciphdefault
 %patch36 -p1 -b .r1830819+
+%patch38 -p1 -b .sslciphdefault
+%patch39 -p1 -b .sslprotdefault
 
 %patch58 -p1 -b .r1738878
-%patch59 -p1 -b .r1555631
+%patch60 -p1 -b .enable-sslv3
+%patch61 -p1 -b .r1857129
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -263,10 +257,19 @@ if test "x${vmmn}" != "x%{mmn}"; then
    exit 1
 fi
 
-sed 's/@MPM@/%{mpm}/' < $RPM_SOURCE_DIR/httpd.service.xml \
-    > httpd.service.xml
+# Provide default layout
+cp $RPM_SOURCE_DIR/config.layout .
 
-xmlto man ./httpd.service.xml
+sed '
+s,@MPM@,%{mpm},g
+s,@DOCROOT@,%{docroot},g
+s,@LOGDIR@,%{_localstatedir}/log/httpd,g
+' < $RPM_SOURCE_DIR/httpd.conf.xml \
+    > httpd.conf.xml
+
+xmlto man ./httpd.conf.xml
+xmlto man $RPM_SOURCE_DIR/htcacheclean.service.xml
+xmlto man $RPM_SOURCE_DIR/httpd.service.xml
 
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa}
 : Default MPM is %{mpm}, vendor string is '%{vstring}'
@@ -399,7 +402,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd \
+         $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd/state \
          $RPM_BUILD_ROOT/run/httpd/htcacheclean
 
 # Substitute in defaults which are usually done (badly) by "make install"
@@ -410,6 +413,9 @@ sed -i \
     s,@@ServerRoot@@,%{docroot},;
     s,@@Port@@,80,;" \
     docs/conf/extra/*.conf
+
+# Set correct path for httpd binary in apachectl script
+sed -i 's,@HTTPDBIN@,%{_sbindir}/httpd,g' $RPM_SOURCE_DIR/apachectl.sh
 
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
@@ -461,6 +467,7 @@ ln -s ../../pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
 # symlinks for /etc/httpd
+rmdir $RPM_BUILD_ROOT/etc/httpd/{state,run}
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
 ln -s ../..%{_localstatedir}/lib/httpd $RPM_BUILD_ROOT/etc/httpd/state
 ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
@@ -475,7 +482,8 @@ install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-gencerts \
 	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-gencerts
 
-# Install action scripts
+# Install scripts
+install -p -m 755 $RPM_SOURCE_DIR/apachectl.sh $RPM_BUILD_ROOT%{_sbindir}/apachectl
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
 for f in graceful configtest; do
     install -p -m 755 $RPM_SOURCE_DIR/action-${f}.sh \
@@ -487,10 +495,13 @@ mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
-# Install systemd service man pages
+# Install man pages
+install -d $RPM_BUILD_ROOT%{_mandir}/man8 $RPM_BUILD_ROOT%{_mandir}/man5
 install -m 644 -p httpd.service.8 httpd-init.service.8 httpd.socket.8 \
-        httpd@.service.8 \
+        httpd@.service.8 htcacheclean.service.8 \
         $RPM_BUILD_ROOT%{_mandir}/man8
+install -m 644 -p httpd.conf.5 \
+        $RPM_BUILD_ROOT%{_mandir}/man5
 
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
@@ -538,7 +549,7 @@ exit 0
 %systemd_preun httpd.service htcacheclean.service httpd.socket
 
 %postun
-%systemd_postun
+%systemd_postun httpd.service htcacheclean.service httpd.socket
 
 # Trigger for conversion from SysV, per guidelines at:
 # https://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Systemd
@@ -656,6 +667,7 @@ exit $rv
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
 
 %{_mandir}/man8/*
+%{_mandir}/man5/*
 %exclude %{_mandir}/man8/httpd-init.*
 
 %{_unitdir}/httpd.service
@@ -725,6 +737,82 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu May 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-4
+- httpd dependency on initscripts is unspecified (#1705188)
+
+* Tue Apr  9 2019 Joe Orton <jorton@redhat.com> - 2.4.39-3
+- fix statedir symlink to point to /var/lib/httpd (#1697662)
+- mod_reqtimeout: fix default values regression (PR 63325)
+
+* Tue Apr 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-2
+- update to 2.4.39
+
+* Thu Feb 28 2019 Joe Orton <jorton@redhat.com> - 2.4.38-6
+- apachectl: cleanup and replace script wholesale (#1641237)
+ * drop "apachectl fullstatus" support
+ * run systemctl with --no-pager option
+ * implement graceful&graceful-stop by signal directly
+- run "httpd -t" from legacy action script
+
+* Tue Feb 05 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.38-5
+- segmentation fault fix (FIPS)
+
+* Tue Feb  5 2019 Joe Orton <jorton@redhat.com> - 2.4.38-4
+- use serverroot-relative statedir, rundir by default
+
+* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.38-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Wed Jan 23 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.38-2
+- new version 2.4.38 (#1668125)
+
+* Mon Jan 14 2019 Björn Esser <besser82@fedoraproject.org> - 2.4.37-6
+- Rebuilt for libcrypt.so.2 (#1666033)
+
+* Thu Nov 22 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.37-5
+- Resolves: #1652678 - TLS connection allowed while all protocols are forbidden
+
+* Thu Nov  8 2018 Joe Orton <jorton@redhat.com> - 2.4.37-4
+- add httpd.conf(5) (#1611361)
+
+* Wed Nov 07 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.37-3
+- Resolves: #1647241 - fix apachectl script
+
+* Wed Oct 31 2018 Joe Orton <jorton@redhat.com> - 2.4.37-2
+- add DefaultStateDir/ap_state_dir_relative()
+- mod_dav_fs: use state dir for default DAVLockDB
+- mod_md: use state dir for default MDStoreDir
+
+* Wed Oct 31 2018 Joe Orton <jorton@redhat.com> - 2.4.37-1
+- update to 2.4.37
+
+* Wed Oct 31 2018 Joe Orton <jorton@redhat.com> - 2.4.34-11
+- add htcacheclean.service(8) man page
+
+* Fri Sep 28 2018 Joe Orton <jorton@redhat.com> - 2.4.34-10
+- apachectl: don't read /etc/sysconfig/httpd
+
+* Tue Sep 25 2018 Joe Orton <jorton@redhat.com> - 2.4.34-9
+- fix build if OpenSSL built w/o SSLv3 support
+
+* Fri Sep 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-8
+- comment-out SSLProtocol, SSLProxyProtocol from ssl.conf in
+  default configuration; now follow OpenSSL system default (#1468322)
+
+* Fri Sep 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-7
+- mod_ssl: follow OpenSSL protocol defaults if SSLProtocol
+  is not configured (Rob Crittenden, #1618371)
+
+* Tue Aug 28 2018 Luboš Uhliarik <luhliari@redhat.com> - 2.4.34-6
+- mod_ssl: enable SSLv3 and change behavior of "SSLProtocol All"
+  configuration (#1624777)
+
+* Tue Aug 21 2018 Joe Orton <jorton@redhat.com> - 2.4.34-5
+- mod_ssl: further TLSv1.3 fix (#1619389)
+
+* Mon Aug 13 2018 Joe Orton <jorton@redhat.com> - 2.4.34-4
+- mod_ssl: backport TLSv1.3 support changes from upstream (#1615059)
+
 * Fri Jul 20 2018 Joe Orton <jorton@redhat.com> - 2.4.34-3
 - mod_ssl: fix OCSP regression (upstream r1555631)
 

@@ -56,8 +56,8 @@
 
     <para>This manual page describes the <command>systemd</command>
     unit files used to integrate the <command>httpd</command> daemon
-    with <command>systemd</command>. Two unit files are available:
-    <command>httpd.service</command> allows the
+    with <command>systemd</command>. Two main unit files are
+    available: <command>httpd.service</command> allows the
     <command>httpd</command> daemon to be run as a system service, and
     <command>httpd.socket</command> allows httpd to be started via
     socket-based activation. Most systems will use
@@ -188,17 +188,10 @@ Wants=network-online.target</programlisting>
 
       <para>httpd offers a choice of multi-processing modules (MPMs),
       which can be configured in
-      <filename>/etc/httpd/conf.modules.d/00-mpm.conf</filename>.  The
-      default is to use the <emphasis>@MPM@</emphasis> MPM.</para>
-
-      <para>If using the <emphasis>prefork</emphasis> MPM, the
-      "httpd_graceful_shutdown" SELinux boolean should also be
-      enabled, since with this MPM, httpd needs to establish TCP
-      connections to local ports to successfully complete a graceful
-      restart or shutdown. This boolean can be enabled by running the
-      command: <command>semanage boolean -m --on
-      httpd_graceful_shutdown</command></para>
-
+      <filename>/etc/httpd/conf.modules.d/00-mpm.conf</filename>.
+      See
+      <citerefentry><refentrytitle>httpd.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+      for more information on changing the MPM.</para>
     </refsect2>
 
     <refsect2>
@@ -223,8 +216,9 @@ Wants=network-online.target</programlisting>
       to which httpd can bind (using the <literal>Listen</literal>
       directive), which parts of the filesystem can be accessed, and
       whether outgoing TCP connections are possible. Many of these
-      restrictions can be adjusted using <command>semanage</command>
-      to change booleans or other types. See
+      restrictions can be relaxed or adjusted by using
+      <command>semanage</command> to change booleans or other
+      types. See
       <citerefentry><refentrytitle>httpd_selinux</refentrytitle><manvolnum>8</manvolnum></citerefentry>
       for more information.</para>
 
@@ -321,6 +315,7 @@ ReloadPropagatedFrom=httpd.service</programlisting>
 
     <para>
     <citerefentry><refentrytitle>httpd</refentrytitle><manvolnum>8</manvolnum></citerefentry>, 
+    <citerefentry><refentrytitle>httpd.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry>, 
     <citerefentry><refentrytitle>systemctl</refentrytitle><manvolnum>1</manvolnum></citerefentry>, 
     <citerefentry><refentrytitle>systemd.service</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
