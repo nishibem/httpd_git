@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -63,7 +63,7 @@ Patch3: httpd-2.4.1-deplibs.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
-Patch21: httpd-2.4.37-r1842929+.patch
+Patch21: httpd-2.4.39-r1842929+.patch
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
@@ -737,6 +737,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Jun 12 2019 Joe Orton <jorton@redhat.com> - 2.4.39-5
+- fixes for StateDir directive (upstream r1857731, r1857731)
+
 * Thu May 02 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-4
 - httpd dependency on initscripts is unspecified (#1705188)
 
