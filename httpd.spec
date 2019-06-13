@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -75,6 +75,7 @@ Patch34: httpd-2.4.17-socket-activation.patch
 Patch36: httpd-2.4.38-r1830819+.patch
 Patch38: httpd-2.4.34-sslciphdefault.patch
 Patch39: httpd-2.4.37-sslprotdefault.patch
+Patch40: httpd-2.4.39-r1861269.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -214,6 +215,7 @@ interface for storing and accessing per-user session data.
 %patch36 -p1 -b .r1830819+
 %patch38 -p1 -b .sslciphdefault
 %patch39 -p1 -b .sslprotdefault
+%patch40 -p1 -b .r1861269
 
 %patch58 -p1 -b .r1738878
 %patch60 -p1 -b .enable-sslv3
@@ -718,8 +720,11 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Thu Jun 13 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-6
+* Thu Jun 13 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-7
 - remove bundled mod_md module
+
+* Thu Jun 13 2019 Joe Orton <jorton@redhat.com> - 2.4.39-6
+- mod_ssl: fix "httpd -L" (etc) before httpd-init.service runs
 
 * Wed Jun 12 2019 Joe Orton <jorton@redhat.com> - 2.4.39-5
 - fixes for StateDir directive (upstream r1857731, r1857731)
