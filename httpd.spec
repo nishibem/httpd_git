@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -44,7 +44,6 @@ Source25: 01-session.conf
 Source26: 10-listen443.conf
 Source27: httpd.socket
 Source28: 00-optional.conf
-Source29: 01-md.conf
 Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
@@ -166,18 +165,6 @@ Conflicts: openssl-libs < 1:1.0.1h-4
 The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
-
-%package -n mod_md
-Summary: Certificate provisioning using ACME for the Apache HTTP Server
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-BuildRequires: jansson-devel, libcurl-devel
-
-%description -n mod_md
-This module manages common properties of domains for one or more
-virtual hosts. Specifically it can use the ACME protocol (RFC Draft)
-to automate certificate provisioning. These will be configured for
-managed domains and their virtual hosts automatically. This includes
-renewal of certificates before they expire.
 
 %package -n mod_proxy_html
 Summary: HTML and XML content filters for the Apache HTTP Server
@@ -328,6 +315,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-authn-anon --enable-authn-alias \
         --disable-imagemap --disable-file-cache \
         --disable-http2 \
+        --disable-md \
 	$*
 make %{?_smp_mflags}
 
@@ -353,8 +341,7 @@ install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf \
-         01-md.conf; do
+         01-ldap.conf 00-systemd.conf 01-session.conf 00-optional.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -621,7 +608,6 @@ exit $rv
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
-%exclude %{_sysconfdir}/httpd/conf.modules.d/01-md.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/htcacheclean
 %ghost %{_sysconfdir}/sysconfig/httpd
@@ -641,7 +627,6 @@ exit $rv
 %{_libdir}/httpd/modules/mod*.so
 %exclude %{_libdir}/httpd/modules/mod_auth_form.so
 %exclude %{_libdir}/httpd/modules/mod_ssl.so
-%exclude %{_libdir}/httpd/modules/mod_md.so
 %exclude %{_libdir}/httpd/modules/mod_*ldap.so
 %exclude %{_libdir}/httpd/modules/mod_proxy_html.so
 %exclude %{_libdir}/httpd/modules/mod_xml2enc.so
@@ -723,10 +708,6 @@ exit $rv
 %{_libdir}/httpd/modules/mod_auth_form.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
-%files -n mod_md
-%{_libdir}/httpd/modules/mod_md.so
-%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-md.conf
-
 %files devel
 %{_includedir}/httpd
 %{_bindir}/apxs
@@ -737,6 +718,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jun 13 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-6
+- remove bundled mod_md module
+
 * Wed Jun 12 2019 Joe Orton <jorton@redhat.com> - 2.4.39-5
 - fixes for StateDir directive (upstream r1857731, r1857731)
 
