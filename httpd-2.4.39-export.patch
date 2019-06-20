@@ -3,8 +3,7 @@ Reduce size of httpd binary by telling linker to export all symbols
 from libmain.a, rather than bloating the symbol table with ap_hack_*
 to do so indirectly.
 
-Upstream-HEAD: needed
-Upstream-2.0: omit
+Upstream: https://svn.apache.org/r1861685 (as new default-off configure option)
 
 --- httpd-2.4.39/Makefile.in.export
 +++ httpd-2.4.39/Makefile.in
