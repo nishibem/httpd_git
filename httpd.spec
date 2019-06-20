@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -63,7 +63,7 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
 Patch21: httpd-2.4.39-r1842929+.patch
-Patch23: httpd-2.4.33-export.patch
+Patch23: httpd-2.4.39-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
@@ -556,19 +556,36 @@ test -f /etc/sysconfig/httpd-disable-posttrans || \
   /bin/systemctl try-restart --no-block httpd.service htcacheclean.service >/dev/null 2>&1 || :
 
 %check
-# Check the built modules are all PIC
-if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
-   : modules contain non-relocatable code
-   exit 1
-fi
+make -C server exports.o
+nm --defined httpd > exports-actual.list
 set +x
 rv=0
+nm --defined-only server/exports.o | \
+  sed -n '/ap_hack_/{s/.* ap_hack_//;/^ap[ru]/d;p;}' | \
+  while read sym; do
+    if ! grep -q " "$sym\$ exports-actual.list; then
+     echo ERROR: Symbol $sym missing in httpd exports
+     rv=1
+    fi
+  done
+if [ $rv -eq 0 ]; then
+  echo PASS: Symbol export list verified.
+fi
+# Check the built modules are all PIC
+if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
+   echo FAIL: Modules contain non-relocatable code
+   rv=1
+else
+   echo PASS: No non-relocatable code in module builds
+fi
 # Ensure every mod_* that's built is loaded.
 for f in $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so; do
   m=${f##*/}
   if ! grep -q $m $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf; then
-    echo ERROR: Module $m not configured.  Disable it, or load it.
+    echo FAIL: Module $m not configured.  Disable it, or load it.
     rv=1
+   else
+    echo PASS: Module $m is configured and loaded.
   fi
 done
 # Ensure every loaded mod_* is actually built
@@ -576,8 +593,10 @@ mods=`grep -h ^LoadModule $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.c
 for m in $mods; do
   f=$RPM_BUILD_ROOT%{_libdir}/httpd/modules/${m}
   if ! test -x $f; then
-    echo ERROR: Module $m is configured but not built.
+    echo FAIL: Module $m is configured but not built.
     rv=1
+  else
+    echo PASS: Loaded module $m is installed.
   fi
 done
 set -x
@@ -720,6 +739,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jun 20 2019 Joe Orton <jorton@redhat.com> - 2.4.39-8
+- remove superfluous ap_hack_ symbols from httpd binary
+- more verbose %%check section
+
 * Thu Jun 13 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.39-7
 - remove bundled mod_md module
 
