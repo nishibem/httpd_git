@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -739,6 +739,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jun 21 2019 Joe Orton <jorton@redhat.com> - 2.4.39-9
+- create instance-specific StateDir in httpd@.service, instance.conf
+
 * Thu Jun 20 2019 Joe Orton <jorton@redhat.com> - 2.4.39-8
 - remove superfluous ap_hack_ symbols from httpd binary
 - more verbose %%check section
