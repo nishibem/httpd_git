@@ -49,8 +49,12 @@ graceful-stop)
     /usr/bin/systemctl kill --signal=SIGWINCH $SVC
     ERROR=$?
     ;;
-configtest)
+configtest|-t)
     $HTTPD -t
+    ERROR=$?
+    ;;
+-v|-V)
+    $HTTPD $ACMD
     ERROR=$?
     ;;
 *)

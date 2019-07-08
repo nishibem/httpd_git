@@ -406,7 +406,8 @@ sed -i \
     docs/conf/extra/*.conf
 
 # Set correct path for httpd binary in apachectl script
-sed -i 's,@HTTPDBIN@,%{_sbindir}/httpd,g' $RPM_SOURCE_DIR/apachectl.sh
+sed 's,@HTTPDBIN@,%{_sbindir}/httpd,g' $RPM_SOURCE_DIR/apachectl.sh \
+    > apachectl.sh
 
 # Create cache directory
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
@@ -474,7 +475,8 @@ install -m755 $RPM_SOURCE_DIR/httpd-ssl-gencerts \
 	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-gencerts
 
 # Install scripts
-install -p -m 755 $RPM_SOURCE_DIR/apachectl.sh $RPM_BUILD_ROOT%{_sbindir}/apachectl
+install -m 755 apachectl.sh $RPM_BUILD_ROOT%{_sbindir}/apachectl
+touch -r $RPM_SOURCE_DIR/apachectl.sh $RPM_BUILD_ROOT%{_sbindir}/apachectl
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
 for f in graceful configtest; do
     install -p -m 755 $RPM_SOURCE_DIR/action-${f}.sh \
@@ -743,6 +745,7 @@ exit $rv
 %changelog
 * Mon Jul  8 2019 Joe Orton <jorton@redhat.com> - 2.4.39-10
 - htpasswd: add SHA-256/512 support
+- apachectl: restore -V/-v/-t support (#1727434)
 
 * Fri Jun 21 2019 Joe Orton <jorton@redhat.com> - 2.4.39-9
 - create instance-specific StateDir in httpd@.service, instance.conf
