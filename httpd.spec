@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -76,6 +76,7 @@ Patch36: httpd-2.4.38-r1830819+.patch
 Patch38: httpd-2.4.34-sslciphdefault.patch
 Patch39: httpd-2.4.37-sslprotdefault.patch
 Patch40: httpd-2.4.39-r1861269.patch
+Patch41: httpd-2.4.37-r1861793+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -216,6 +217,7 @@ interface for storing and accessing per-user session data.
 %patch38 -p1 -b .sslciphdefault
 %patch39 -p1 -b .sslprotdefault
 %patch40 -p1 -b .r1861269
+%patch41 -p1 -b .r1861793+
 
 %patch58 -p1 -b .r1738878
 %patch60 -p1 -b .enable-sslv3
@@ -739,6 +741,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jul  8 2019 Joe Orton <jorton@redhat.com> - 2.4.39-10
+- htpasswd: add SHA-256/512 support
+
 * Fri Jun 21 2019 Joe Orton <jorton@redhat.com> - 2.4.39-9
 - create instance-specific StateDir in httpd@.service, instance.conf
 
