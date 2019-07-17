@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -77,6 +77,7 @@ Patch38: httpd-2.4.34-sslciphdefault.patch
 Patch39: httpd-2.4.37-sslprotdefault.patch
 Patch40: httpd-2.4.39-r1861269.patch
 Patch41: httpd-2.4.37-r1861793+.patch
+Patch42: httpd-2.4.37-r1828172+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -218,6 +219,7 @@ interface for storing and accessing per-user session data.
 %patch39 -p1 -b .sslprotdefault
 %patch40 -p1 -b .r1861269
 %patch41 -p1 -b .r1861793+
+%patch42 -p1 -b .r1828172+
 
 %patch58 -p1 -b .r1738878
 %patch60 -p1 -b .enable-sslv3
@@ -316,6 +318,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
+        --enable-cgid-fdpassing \
         --enable-authn-anon --enable-authn-alias \
         --disable-imagemap --disable-file-cache \
         --disable-http2 \
@@ -743,6 +746,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Jul 17 2019 Joe Orton <jorton@redhat.com> - 2.4.39-11
+- mod_cgid: use fd passing to fix script stderr handling (#1591157)
+
 * Mon Jul  8 2019 Joe Orton <jorton@redhat.com> - 2.4.39-10
 - htpasswd: add SHA-256/512 support
 - apachectl: restore -V/-v/-t support (#1727434)
