@@ -276,7 +276,7 @@ autoheader && autoconf || exit 1
 
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
-	support/apxs.in
+        support/apxs.in
 
 export CFLAGS=$RPM_OPT_FLAGS
 export LDFLAGS="-Wl,-z,relro,-z,now"
@@ -286,34 +286,34 @@ export LYNX_PATH=/usr/bin/links
 
 # Build the daemon
 ./configure \
- 	--prefix=%{_sysconfdir}/httpd \
- 	--exec-prefix=%{_prefix} \
- 	--bindir=%{_bindir} \
- 	--sbindir=%{_sbindir} \
- 	--mandir=%{_mandir} \
-	--libdir=%{_libdir} \
-	--sysconfdir=%{_sysconfdir}/httpd/conf \
-	--includedir=%{_includedir}/httpd \
-	--libexecdir=%{_libdir}/httpd/modules \
-	--datadir=%{contentdir} \
+        --prefix=%{_sysconfdir}/httpd \
+        --exec-prefix=%{_prefix} \
+        --bindir=%{_bindir} \
+        --sbindir=%{_sbindir} \
+        --mandir=%{_mandir} \
+        --libdir=%{_libdir} \
+        --sysconfdir=%{_sysconfdir}/httpd/conf \
+        --includedir=%{_includedir}/httpd \
+        --libexecdir=%{_libdir}/httpd/modules \
+        --datadir=%{contentdir} \
         --enable-layout=Fedora \
         --with-installbuilddir=%{_libdir}/httpd/build \
         --enable-mpms-shared=all \
         --with-apr=%{_prefix} --with-apr-util=%{_prefix} \
-	--enable-suexec --with-suexec \
+        --enable-suexec --with-suexec \
         --enable-suexec-capabilities \
-	--with-suexec-caller=%{suexec_caller} \
-	--with-suexec-docroot=%{docroot} \
-	--without-suexec-logfile \
+        --with-suexec-caller=%{suexec_caller} \
+        --with-suexec-docroot=%{docroot} \
+        --without-suexec-logfile \
         --with-suexec-syslog \
-	--with-suexec-bin=%{_sbindir}/suexec \
-	--with-suexec-uidmin=1000 --with-suexec-gidmin=1000 \
+        --with-suexec-bin=%{_sbindir}/suexec \
+        --with-suexec-uidmin=1000 --with-suexec-gidmin=1000 \
         --with-brotli \
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
-	--enable-ssl --with-ssl --disable-distcache \
-	--enable-proxy --enable-proxy-fdpass \
+        --enable-ssl --with-ssl --disable-distcache \
+        --enable-proxy --enable-proxy-fdpass \
         --enable-cache \
         --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
@@ -323,7 +323,7 @@ export LYNX_PATH=/usr/bin/links
         --disable-imagemap --disable-file-cache \
         --disable-http2 \
         --disable-md \
-	$*
+        $*
 make %{?_smp_mflags}
 
 %install
@@ -396,7 +396,6 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd/state \
          $RPM_BUILD_ROOT/run/httpd/htcacheclean
 
 # Substitute in defaults which are usually done (badly) by "make install"
@@ -471,11 +470,11 @@ ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 # install http-ssl-pass-dialog
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
-	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
+        $RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
 
 # install http-ssl-gencerts
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-gencerts \
-	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-gencerts
+        $RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-gencerts
 
 # Install scripts
 install -m 755 apachectl.sh $RPM_BUILD_ROOT%{_sbindir}/apachectl
@@ -489,7 +488,7 @@ done
 # Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
-	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
+        $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
 # Install man pages
 install -d $RPM_BUILD_ROOT%{_mandir}/man8 $RPM_BUILD_ROOT%{_mandir}/man5
