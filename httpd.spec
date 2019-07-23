@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.39
-Release: 11%{?dist}
+Release: 12%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -395,12 +395,12 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
    $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/httpd.conf
 
 # Other directories
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/httpd \
          $RPM_BUILD_ROOT/run/httpd/htcacheclean
 
 # Substitute in defaults which are usually done (badly) by "make install"
 sed -i \
-   "s,@@ServerRoot@@/var,%{_localstatedir}/lib/dav,;
+   "/^DavLockDB/d;
     s,@@ServerRoot@@/user.passwd,/etc/httpd/conf/user.passwd,;
     s,@@ServerRoot@@/docs,%{docroot},;
     s,@@ServerRoot@@,%{docroot},;
@@ -673,7 +673,6 @@ exit $rv
 %attr(0710,root,apache) %dir /run/httpd
 %attr(0700,apache,apache) %dir /run/httpd/htcacheclean
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
-%attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd/proxy
@@ -745,6 +744,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Jul 23 2019 Joe Orton <jorton@redhat.com> - 2.4.39-12
+- drop /var/lib/dav directory, since mod_dav_fs uses statedir
+
 * Wed Jul 17 2019 Joe Orton <jorton@redhat.com> - 2.4.39-11
 - mod_cgid: use fd passing to fix script stderr handling (#1591157)
 
