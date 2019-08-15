@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.39
-Release: 13%{?dist}
+Version: 2.4.41
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -83,8 +83,6 @@ Patch42: httpd-2.4.37-r1828172+.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch58: httpd-2.4.34-r1738878.patch
 Patch60: httpd-2.4.34-enable-sslv3.patch
-# https://bz.apache.org/bugzilla/show_bug.cgi?id=63325
-Patch61: httpd-2.4.37-r1857129.patch
 
 # Security fixes
 
@@ -223,7 +221,6 @@ interface for storing and accessing per-user session data.
 
 %patch58 -p1 -b .r1738878
 %patch60 -p1 -b .enable-sslv3
-%patch61 -p1 -b .r1857129
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -744,6 +741,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Aug 15 2019 Joe Orton <jorton@redhat.com> - 2.4.41-1
+- update to 2.4.41
+
 * Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.39-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 

@@ -118,41 +118,6 @@ http://svn.apache.org/viewvc?view=revision&revision=1853631
      dav_hook_gather_propsets(dav_fs_gather_propsets, NULL, NULL,
                               APR_HOOK_MIDDLE);
      dav_hook_find_liveprop(dav_fs_find_liveprop, NULL, NULL, APR_HOOK_MIDDLE);
---- httpd-2.4.39/modules/md/mod_md_config.c.r1842929+
-+++ httpd-2.4.39/modules/md/mod_md_config.c
-@@ -54,10 +54,18 @@
- 
- #define DEF_VAL     (-1)
- 
-+#ifndef MD_DEFAULT_BASE_DIR
-+#define MD_DEFAULT_BASE_DIR "md"
-+#endif
-+
- /* Default settings for the global conf */
- static md_mod_conf_t defmc = {
-     NULL,
--    "md",
-+#if 1
-+    NULL, /* apply default state-dir-relative */
-+#else
-+    MD_DEFAULT_BASE_DIR,
-+#endif
-     NULL,
-     NULL,
-     80,
-@@ -864,6 +872,12 @@
-     if (mc->hsts_max_age > 0) {
-         mc->hsts_header = apr_psprintf(p, "max-age=%d", mc->hsts_max_age);
-     }
-+
-+#if 1
-+    if (mc->base_dir == NULL) {
-+        mc->base_dir = ap_state_dir_relative(p, MD_DEFAULT_BASE_DIR);
-+    }
-+#endif
-     
-     return APR_SUCCESS;
- }
 --- httpd-2.4.39/server/core.c.r1842929+
 +++ httpd-2.4.39/server/core.c
 @@ -129,6 +129,8 @@

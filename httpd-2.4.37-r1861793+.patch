@@ -46,7 +46,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1862612
 +        " -5  Force SHA-512 crypt() hash of the password (very secure)." NL
 +        " -B  Force bcrypt aencryption of the password (very secure)." NL
          " -C  Set the computing time used for the bcrypt algorithm" NL
-         "     (higher is more secure but slower, default: %d, valid: 4 to 31)." NL
+         "     (higher is more secure but slower, default: %d, valid: 4 to 17)." NL
 +        " -r  Set the number of rounds used for the SHA-256, SHA-512 algorithms" NL
 +        "     (higher is more secure but slower, default: 5000)." NL
          " -d  Force CRYPT encryption of the password (8 chars max, insecure)." NL
@@ -237,7 +237,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1862612
  .TP
 @@ -79,11 +85,14 @@
  \fB-C\fR
- This flag is only allowed in combination with \fB-B\fR (bcrypt encryption)\&. It sets the computing time used for the bcrypt algorithm (higher is more secure but slower, default: 5, valid: 4 to 31)\&.  
+ This flag is only allowed in combination with \fB-B\fR (bcrypt encryption)\&. It sets the computing time used for the bcrypt algorithm (higher is more secure but slower, default: 5, valid: 4 to 17)\&.  
  .TP
 +\fB-r\fR
 +This flag is only allowed in combination with \fB-2\fR or \fB-5\fR\&. It sets the number of hash rounds used for the SHA-2 algorithms (higher is more secure but slower; the default is 5,000)\&.  
