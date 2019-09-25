@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -157,7 +157,7 @@ Epoch: 1
 BuildRequires: openssl-devel
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-Requires: sscg >= 2.2.0
+Requires: sscg >= 2.2.0, /usr/bin/hostname
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
 
@@ -740,6 +740,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Sep 25 2019 Joe Orton <jorton@redhat.com> - 2.4.41-3
+- mod_ssl: restore dependency on /usr/bin/hostname (#1135118)
+
 * Thu Sep 19 2019 Stephen Gallagher <sgallagh@redhat.com> - 2.4.41-2
 - Use testpage from system-logos-httpd for proper branding
 
