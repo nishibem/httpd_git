@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -76,7 +76,7 @@ Patch38: httpd-2.4.34-sslciphdefault.patch
 Patch39: httpd-2.4.37-sslprotdefault.patch
 Patch40: httpd-2.4.39-r1861269.patch
 Patch41: httpd-2.4.37-r1861793+.patch
-Patch42: httpd-2.4.37-r1828172+.patch
+Patch42: httpd-2.4.41-r1828172+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -740,6 +740,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Oct  2 2019 Joe Orton <jorton@redhat.com> - 2.4.41-4
+- mod_cgid: possible stdout timeout handling fix (#1757683)
+
 * Wed Sep 25 2019 Joe Orton <jorton@redhat.com> - 2.4.41-3
 - mod_ssl: restore dependency on /usr/bin/hostname (#1135118)
 
