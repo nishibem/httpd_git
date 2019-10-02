@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 1%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -77,7 +77,7 @@ Patch38: httpd-2.4.34-sslciphdefault.patch
 Patch39: httpd-2.4.37-sslprotdefault.patch
 Patch40: httpd-2.4.39-r1861269.patch
 Patch41: httpd-2.4.37-r1861793+.patch
-Patch42: httpd-2.4.37-r1828172+.patch
+Patch42: httpd-2.4.41-r1828172+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -158,7 +158,7 @@ Epoch: 1
 BuildRequires: openssl-devel
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-Requires: sscg >= 2.2.0
+Requires: sscg >= 2.2.0, /usr/bin/hostname
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
 
@@ -741,6 +741,12 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Oct  2 2019 Joe Orton <jorton@redhat.com> - 2.4.41-4
+- mod_cgid: possible stdout timeout handling fix (#1757683)
+
+* Wed Sep 25 2019 Joe Orton <jorton@redhat.com> - 2.4.41-3
+- mod_ssl: restore dependency on /usr/bin/hostname (#1135118)
+
 * Thu Aug 15 2019 Joe Orton <jorton@redhat.com> - 2.4.41-1
 - update to 2.4.41
 
