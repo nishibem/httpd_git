@@ -7,7 +7,7 @@ fi
 
 repo="https://svn.apache.org/repos/asf/httpd/httpd/trunk"
 #repo="https://svn.apache.org/repos/asf/httpd/httpd/branches/2.4.x"
-ver=2.4.37
+ver=2.4.41
 prefix="httpd-${ver}"
 suffix="r$1${2:++}"
 fn="${prefix}-${suffix}.patch"
@@ -36,7 +36,7 @@ for r in $*; do
     echo "+ fetching ${r}"
     this=`mktemp /tmp/pullrevXXXXXX`
     svn diff -c ${r} ${repo} | filterdiff --remove-timestamps --clean -x 'CHANGES' -x '*/next-number' -x 'STATUS' \
-        --addprefix="${prefix}/" > ${this}
+        -x '*.xml' --addprefix="${prefix}/" > ${this}
     next=`mktemp /tmp/pullrevXXXXXX`
     combinediff --quiet ${prev} ${this} > ${next}
     rm -f "${this}"
