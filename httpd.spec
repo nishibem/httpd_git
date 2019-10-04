@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -740,6 +740,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Oct  4 2019 Joe Orton <jorton@redhat.com> - 2.4.41-6
+- mod_cgid/mod_cgi: further upstream consolidation patches
+
 * Thu Oct  3 2019 Joe Orton <jorton@redhat.com> - 2.4.41-5
 - mod_proxy_balancer: fix balancer-manager XSRF check (PR 63688)
 
