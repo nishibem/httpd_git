@@ -1,9 +1,12 @@
-# ./pullrev.sh 1828172 1862968 1863191 1867878 1867882
+# ./pullrev.sh 1828172 1862968 1863191 1867878 1867882 1867968 1867970 1867971
 http://svn.apache.org/viewvc?view=revision&revision=1828172
 http://svn.apache.org/viewvc?view=revision&revision=1862968
 http://svn.apache.org/viewvc?view=revision&revision=1863191
 http://svn.apache.org/viewvc?view=revision&revision=1867878
 http://svn.apache.org/viewvc?view=revision&revision=1867882
+http://svn.apache.org/viewvc?view=revision&revision=1867968
+http://svn.apache.org/viewvc?view=revision&revision=1867970
+http://svn.apache.org/viewvc?view=revision&revision=1867971
 
 --- httpd-2.4.41/modules/generators/mod_cgi.c
 +++ httpd-2.4.41/modules/generators/mod_cgi.c
@@ -89,9 +92,31 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
              }
          }
      }
-@@ -563,189 +590,7 @@
+@@ -541,212 +568,10 @@
+     return APR_SUCCESS;
  }
  
+-static void discard_script_output(apr_bucket_brigade *bb)
+-{
+-    apr_bucket *e;
+-    const char *buf;
+-    apr_size_t len;
+-    apr_status_t rv;
+-
+-    for (e = APR_BRIGADE_FIRST(bb);
+-         e != APR_BRIGADE_SENTINEL(bb);
+-         e = APR_BUCKET_NEXT(e))
+-    {
+-        if (APR_BUCKET_IS_EOS(e)) {
+-            break;
+-        }
+-        rv = apr_bucket_read(e, &buf, &len, APR_BLOCK_READ);
+-        if (rv != APR_SUCCESS) {
+-            break;
+-        }
+-    }
+-}
+-
  #if APR_FILES_AS_SOCKETS
 -
 -/* A CGI bucket type is needed to catch any output to stderr from the
@@ -276,11 +301,13 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
 -    apr_bucket_copy_notimpl
 -};
 -
-+#include "cgi_common.h"
++#define WANT_CGI_BUCKET
  #endif
++#include "cgi_common.h"
  
  static int cgi_handler(request_rec *r)
-@@ -766,6 +611,8 @@
+ {
+@@ -766,6 +591,8 @@
      apr_status_t rv;
      cgi_exec_info_t e_info;
      conn_rec *c;
@@ -289,7 +316,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
  
      if (strcmp(r->handler, CGI_MAGIC_TYPE) && strcmp(r->handler, "cgi-script")) {
          return DECLINED;
-@@ -925,10 +772,7 @@
+@@ -925,10 +752,7 @@
      AP_DEBUG_ASSERT(script_in != NULL);
  
  #if APR_FILES_AS_SOCKETS
@@ -301,25 +328,120 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
      if (b == NULL)
          return HTTP_INTERNAL_SERVER_ERROR;
  #else
-@@ -985,7 +829,7 @@
-              * stderr output, as normal. */
-             discard_script_output(bb);
-             apr_brigade_destroy(bb);
+@@ -938,111 +762,7 @@
+     b = apr_bucket_eos_create(c->bucket_alloc);
+     APR_BRIGADE_INSERT_TAIL(bb, b);
+ 
+-    /* Handle script return... */
+-    if (!nph) {
+-        const char *location;
+-        char sbuf[MAX_STRING_LEN];
+-        int ret;
+-
+-        if ((ret = ap_scan_script_header_err_brigade_ex(r, bb, sbuf,
+-                                                        APLOG_MODULE_INDEX)))
+-        {
+-            ret = log_script(r, conf, ret, dbuf, sbuf, bb, script_err);
+-
+-            /*
+-             * ret could be HTTP_NOT_MODIFIED in the case that the CGI script
+-             * does not set an explicit status and ap_meets_conditions, which
+-             * is called by ap_scan_script_header_err_brigade, detects that
+-             * the conditions of the requests are met and the response is
+-             * not modified.
+-             * In this case set r->status and return OK in order to prevent
+-             * running through the error processing stack as this would
+-             * break with mod_cache, if the conditions had been set by
+-             * mod_cache itself to validate a stale entity.
+-             * BTW: We circumvent the error processing stack anyway if the
+-             * CGI script set an explicit status code (whatever it is) and
+-             * the only possible values for ret here are:
+-             *
+-             * HTTP_NOT_MODIFIED          (set by ap_meets_conditions)
+-             * HTTP_PRECONDITION_FAILED   (set by ap_meets_conditions)
+-             * HTTP_INTERNAL_SERVER_ERROR (if something went wrong during the
+-             * processing of the response of the CGI script, e.g broken headers
+-             * or a crashed CGI process).
+-             */
+-            if (ret == HTTP_NOT_MODIFIED) {
+-                r->status = ret;
+-                return OK;
+-            }
+-
+-            return ret;
+-        }
+-
+-        location = apr_table_get(r->headers_out, "Location");
+-
+-        if (location && r->status == 200) {
+-            /* For a redirect whether internal or not, discard any
+-             * remaining stdout from the script, and log any remaining
+-             * stderr output, as normal. */
+-            discard_script_output(bb);
+-            apr_brigade_destroy(bb);
 -            apr_file_pipe_timeout_set(script_err, r->server->timeout);
-+            apr_file_pipe_timeout_set(script_err, timeout);
-             log_script_err(r, script_err);
-         }
- 
-@@ -1036,7 +880,7 @@
-      * connection drops or we stopped sending output for some other
-      * reason */
-     if (rv == APR_SUCCESS && !r->connection->aborted) {
+-            log_script_err(r, script_err);
+-        }
+-
+-        if (location && location[0] == '/' && r->status == 200) {
+-            /* This redirect needs to be a GET no matter what the original
+-             * method was.
+-             */
+-            r->method = "GET";
+-            r->method_number = M_GET;
+-
+-            /* We already read the message body (if any), so don't allow
+-             * the redirected request to think it has one.  We can ignore
+-             * Transfer-Encoding, since we used REQUEST_CHUNKED_ERROR.
+-             */
+-            apr_table_unset(r->headers_in, "Content-Length");
+-
+-            ap_internal_redirect_handler(location, r);
+-            return OK;
+-        }
+-        else if (location && r->status == 200) {
+-            /* XXX: Note that if a script wants to produce its own Redirect
+-             * body, it now has to explicitly *say* "Status: 302"
+-             */
+-            return HTTP_MOVED_TEMPORARILY;
+-        }
+-
+-        rv = ap_pass_brigade(r->output_filters, bb);
+-    }
+-    else /* nph */ {
+-        struct ap_filter_t *cur;
+-
+-        /* get rid of all filters up through protocol...  since we
+-         * haven't parsed off the headers, there is no way they can
+-         * work
+-         */
+-
+-        cur = r->proto_output_filters;
+-        while (cur && cur->frec->ftype < AP_FTYPE_CONNECTION) {
+-            cur = cur->next;
+-        }
+-        r->output_filters = r->proto_output_filters = cur;
+-
+-        rv = ap_pass_brigade(r->output_filters, bb);
+-    }
+-
+-    /* don't soak up script output if errors occurred writing it
+-     * out...  otherwise, we prolong the life of the script when the
+-     * connection drops or we stopped sending output for some other
+-     * reason */
+-    if (rv == APR_SUCCESS && !r->connection->aborted) {
 -        apr_file_pipe_timeout_set(script_err, r->server->timeout);
-+        apr_file_pipe_timeout_set(script_err, timeout);
-         log_script_err(r, script_err);
-     }
+-        log_script_err(r, script_err);
+-    }
+-
+-    apr_file_close(script_err);
+-
+-    return OK;                      /* NOT r->status, even if it has changed. */
++    return cgi_handle_response(r, nph, bb, timeout, conf, dbuf, script_err);
+ }
  
-@@ -1277,7 +1121,7 @@
+ /*============================================================================
+@@ -1277,7 +997,7 @@
  AP_DECLARE_MODULE(cgi) =
  {
      STANDARD20_MODULE_STUFF,
@@ -328,6 +450,24 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
      NULL,                        /* dir merger --- default is to override */
      create_cgi_config,           /* server config */
      merge_cgi_config,            /* merge server config */
+--- httpd-2.4.41/modules/generators/config5.m4
++++ httpd-2.4.41/modules/generators/config5.m4
+@@ -78,4 +78,15 @@
+ 
+ APR_ADDTO(INCLUDES, [-I\$(top_srcdir)/$modpath_current])
+ 
++AC_ARG_ENABLE(cgid-fdpassing,
++  [APACHE_HELP_STRING(--enable-cgid-fdpassing,Enable experimental mod_cgid support for fd passing)],
++  [if test "$enableval" = "yes"; then
++     AC_CHECK_DECL(CMSG_DATA,
++       [AC_DEFINE([HAVE_CGID_FDPASSING], 1, [Enable FD passing support in mod_cgid])],
++       [AC_MSG_ERROR([cannot support mod_cgid fd-passing on this system])], [
++#include <sys/types.h>
++#include <sys/socket.h>])
++  fi
++])
++
+ APACHE_MODPATH_FINISH
 --- httpd-2.4.41/modules/generators/mod_cgid.c
 +++ httpd-2.4.41/modules/generators/mod_cgid.c
 @@ -342,15 +342,19 @@
@@ -658,19 +798,49 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
  static int log_script(request_rec *r, cgid_server_conf * conf, int ret,
                        char *dbuf, const char *sbuf, apr_bucket_brigade *bb,
                        apr_file_t *script_err)
-@@ -1204,6 +1349,11 @@
+@@ -1204,6 +1349,13 @@
      return ret;
  }
  
-+#ifdef HAVE_CGID_FDPASSING
 +/* Pull in CGI bucket implementation. */
-+#include "cgi_common.h"
++#define cgi_server_conf cgid_server_conf
++#ifdef HAVE_CGID_FDPASSING
++#define WANT_CGI_BUCKET
 +#endif
++#include "cgi_common.h"
 +
  static int connect_to_daemon(int *sdptr, request_rec *r,
                               cgid_server_conf *conf)
  {
-@@ -1395,6 +1545,7 @@
+@@ -1270,27 +1422,6 @@
+     return OK;
+ }
+ 
+-static void discard_script_output(apr_bucket_brigade *bb)
+-{
+-    apr_bucket *e;
+-    const char *buf;
+-    apr_size_t len;
+-    apr_status_t rv;
+-
+-    for (e = APR_BRIGADE_FIRST(bb);
+-         e != APR_BRIGADE_SENTINEL(bb);
+-         e = APR_BUCKET_NEXT(e))
+-    {
+-        if (APR_BUCKET_IS_EOS(e)) {
+-            break;
+-        }
+-        rv = apr_bucket_read(e, &buf, &len, APR_BLOCK_READ);
+-        if (rv != APR_SUCCESS) {
+-            break;
+-        }
+-    }
+-}
+-
+ /****************************************************************
+  *
+  * Actual cgid handling...
+@@ -1395,6 +1526,7 @@
  
  static int cgid_handler(request_rec *r)
  {
@@ -678,7 +848,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
      int retval, nph, dbpos;
      char *argv0, *dbuf;
      apr_bucket_brigade *bb;
-@@ -1404,10 +1555,11 @@
+@@ -1404,10 +1536,11 @@
      int seen_eos, child_stopped_reading;
      int sd;
      char **env;
@@ -691,7 +861,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
  
      if (strcmp(r->handler, CGI_MAGIC_TYPE) && strcmp(r->handler, "cgi-script")) {
          return DECLINED;
-@@ -1416,7 +1568,7 @@
+@@ -1416,7 +1549,7 @@
      conf = ap_get_module_config(r->server->module_config, &cgid_module);
      dc = ap_get_module_config(r->per_dir_config, &cgid_module);
  
@@ -700,7 +870,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
      is_included = !strcmp(r->protocol, "INCLUDED");
  
      if ((argv0 = strrchr(r->filename, '/')) != NULL) {
-@@ -1469,6 +1621,17 @@
+@@ -1469,6 +1602,17 @@
      }
      */
  
@@ -718,7 +888,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
      /*
       * httpd core function used to add common environment variables like
       * DOCUMENT_ROOT. 
-@@ -1481,12 +1644,16 @@
+@@ -1481,12 +1625,16 @@
          return retval;
      }
  
@@ -736,7 +906,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
      info = apr_palloc(r->pool, sizeof(struct cleanup_script_info));
      info->conf = conf;
      info->r = r;
-@@ -1508,12 +1675,7 @@
+@@ -1508,12 +1656,7 @@
       */
  
      apr_os_pipe_put_ex(&tempsock, &sd, 1, r->pool);
@@ -750,10 +920,116 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
      apr_pool_cleanup_kill(r->pool, (void *)((long)sd), close_unix_socket);
  
      /* Transfer any put/post args, CERN style...
-@@ -1605,23 +1767,28 @@
+@@ -1605,114 +1748,19 @@
       */
      shutdown(sd, 1);
  
+-    /* Handle script return... */
+-    if (!nph) {
+-        conn_rec *c = r->connection;
+-        const char *location;
+-        char sbuf[MAX_STRING_LEN];
+-        int ret;
+-
+-        bb = apr_brigade_create(r->pool, c->bucket_alloc);
+-        b = apr_bucket_pipe_create(tempsock, c->bucket_alloc);
+-        APR_BRIGADE_INSERT_TAIL(bb, b);
+-        b = apr_bucket_eos_create(c->bucket_alloc);
+-        APR_BRIGADE_INSERT_TAIL(bb, b);
+-
+-        if ((ret = ap_scan_script_header_err_brigade_ex(r, bb, sbuf,
+-                                                        APLOG_MODULE_INDEX)))
+-        {
+-            ret = log_script(r, conf, ret, dbuf, sbuf, bb, NULL);
+-
+-            /*
+-             * ret could be HTTP_NOT_MODIFIED in the case that the CGI script
+-             * does not set an explicit status and ap_meets_conditions, which
+-             * is called by ap_scan_script_header_err_brigade, detects that
+-             * the conditions of the requests are met and the response is
+-             * not modified.
+-             * In this case set r->status and return OK in order to prevent
+-             * running through the error processing stack as this would
+-             * break with mod_cache, if the conditions had been set by
+-             * mod_cache itself to validate a stale entity.
+-             * BTW: We circumvent the error processing stack anyway if the
+-             * CGI script set an explicit status code (whatever it is) and
+-             * the only possible values for ret here are:
+-             *
+-             * HTTP_NOT_MODIFIED          (set by ap_meets_conditions)
+-             * HTTP_PRECONDITION_FAILED   (set by ap_meets_conditions)
+-             * HTTP_INTERNAL_SERVER_ERROR (if something went wrong during the
+-             * processing of the response of the CGI script, e.g broken headers
+-             * or a crashed CGI process).
+-             */
+-            if (ret == HTTP_NOT_MODIFIED) {
+-                r->status = ret;
+-                return OK;
+-            }
+-
+-            return ret;
+-        }
+-
+-        location = apr_table_get(r->headers_out, "Location");
+-
+-        if (location && location[0] == '/' && r->status == 200) {
+-
+-            /* Soak up all the script output */
+-            discard_script_output(bb);
+-            apr_brigade_destroy(bb);
+-            /* This redirect needs to be a GET no matter what the original
+-             * method was.
+-             */
+-            r->method = "GET";
+-            r->method_number = M_GET;
+-
+-            /* We already read the message body (if any), so don't allow
+-             * the redirected request to think it has one. We can ignore
+-             * Transfer-Encoding, since we used REQUEST_CHUNKED_ERROR.
+-             */
+-            apr_table_unset(r->headers_in, "Content-Length");
+-
+-            ap_internal_redirect_handler(location, r);
+-            return OK;
+-        }
+-        else if (location && r->status == 200) {
+-            /* XXX: Note that if a script wants to produce its own Redirect
+-             * body, it now has to explicitly *say* "Status: 302"
+-             */
+-            discard_script_output(bb);
+-            apr_brigade_destroy(bb);
+-            return HTTP_MOVED_TEMPORARILY;
+-        }
+-
+-        rv = ap_pass_brigade(r->output_filters, bb);
+-        if (rv != APR_SUCCESS) { 
+-            ap_log_rerror(APLOG_MARK, APLOG_TRACE1, rv, r,
+-                          "Failed to flush CGI output to client");
+-        }
+-    }
+-
+-    if (nph) {
+-        conn_rec *c = r->connection;
+-        struct ap_filter_t *cur;
+-
+-        /* get rid of all filters up through protocol...  since we
+-         * haven't parsed off the headers, there is no way they can
+-         * work
+-         */
+-
+-        cur = r->proto_output_filters;
+-        while (cur && cur->frec->ftype < AP_FTYPE_CONNECTION) {
+-            cur = cur->next;
+-        }
+-        r->output_filters = r->proto_output_filters = cur;
+-
+-        bb = apr_brigade_create(r->pool, c->bucket_alloc);
+-        b = apr_bucket_pipe_create(tempsock, c->bucket_alloc);
+-        APR_BRIGADE_INSERT_TAIL(bb, b);
+-        b = apr_bucket_eos_create(c->bucket_alloc);
+-        APR_BRIGADE_INSERT_TAIL(bb, b);
+-        ap_pass_brigade(r->output_filters, bb);
+-    }
 +    bb = apr_brigade_create(r->pool, c->bucket_alloc);
 +#ifdef HAVE_CGID_FDPASSING
 +    b = cgi_bucket_create(r, dc->timeout, tempsock, script_err, c->bucket_alloc);
@@ -765,76 +1041,13 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
 +    APR_BRIGADE_INSERT_TAIL(bb, b);
 +    b = apr_bucket_eos_create(c->bucket_alloc);
 +    APR_BRIGADE_INSERT_TAIL(bb, b);
-+
-     /* Handle script return... */
-     if (!nph) {
--        conn_rec *c = r->connection;
-         const char *location;
-         char sbuf[MAX_STRING_LEN];
-         int ret;
  
--        bb = apr_brigade_create(r->pool, c->bucket_alloc);
--        b = apr_bucket_pipe_create(tempsock, c->bucket_alloc);
--        APR_BRIGADE_INSERT_TAIL(bb, b);
--        b = apr_bucket_eos_create(c->bucket_alloc);
--        APR_BRIGADE_INSERT_TAIL(bb, b);
--
-         if ((ret = ap_scan_script_header_err_brigade_ex(r, bb, sbuf,
-                                                         APLOG_MODULE_INDEX)))
-         {
--            ret = log_script(r, conf, ret, dbuf, sbuf, bb, NULL);
-+            ret = log_script(r, conf, ret, dbuf, sbuf, bb, script_err);
- 
-             /*
-              * ret could be HTTP_NOT_MODIFIED in the case that the CGI script
-@@ -1658,6 +1825,11 @@
-             /* Soak up all the script output */
-             discard_script_output(bb);
-             apr_brigade_destroy(bb);
-+            if (script_err) {
-+                apr_file_pipe_timeout_set(script_err, timeout);
-+                log_script_err(r, script_err);
-+            }
-+            
-             /* This redirect needs to be a GET no matter what the original
-              * method was.
-              */
-@@ -1690,7 +1862,6 @@
-     }
- 
-     if (nph) {
--        conn_rec *c = r->connection;
-         struct ap_filter_t *cur;
- 
-         /* get rid of all filters up through protocol...  since we
-@@ -1704,14 +1875,20 @@
-         }
-         r->output_filters = r->proto_output_filters = cur;
- 
--        bb = apr_brigade_create(r->pool, c->bucket_alloc);
--        b = apr_bucket_pipe_create(tempsock, c->bucket_alloc);
--        APR_BRIGADE_INSERT_TAIL(bb, b);
--        b = apr_bucket_eos_create(c->bucket_alloc);
--        APR_BRIGADE_INSERT_TAIL(bb, b);
--        ap_pass_brigade(r->output_filters, bb);
-+        rv = ap_pass_brigade(r->output_filters, bb);
-     }
- 
-+    /* don't soak up script output if errors occurred writing it
-+     * out...  otherwise, we prolong the life of the script when the
-+     * connection drops or we stopped sending output for some other
-+     * reason */
-+    if (script_err && rv == APR_SUCCESS && !r->connection->aborted) {
-+        apr_file_pipe_timeout_set(script_err, timeout);
-+        log_script_err(r, script_err);
-+    }
-+
-+    if (script_err) apr_file_close(script_err);
-+
-     return OK; /* NOT r->status, even if it has changed. */
+-    return OK; /* NOT r->status, even if it has changed. */
++    return cgi_handle_response(r, nph, bb, timeout, conf, dbuf, script_err);
  }
  
-@@ -1829,7 +2006,7 @@
+ 
+@@ -1829,7 +1877,7 @@
          return retval;
      }
  
@@ -843,27 +1056,9 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
  
      info = apr_palloc(r->pool, sizeof(struct cleanup_script_info));
      info->conf = conf;
---- httpd-2.4.41/modules/generators/config5.m4
-+++ httpd-2.4.41/modules/generators/config5.m4
-@@ -78,4 +78,15 @@
- 
- APR_ADDTO(INCLUDES, [-I\$(top_srcdir)/$modpath_current])
- 
-+AC_ARG_ENABLE(cgid-fdpassing,
-+  [APACHE_HELP_STRING(--enable-cgid-fdpassing,Enable experimental mod_cgid support for fd passing)],
-+  [if test "$enableval" = "yes"; then
-+     AC_CHECK_DECL(CMSG_DATA,
-+       [AC_DEFINE([HAVE_CGID_FDPASSING], 1, [Enable FD passing support in mod_cgid])],
-+       [AC_MSG_ERROR([cannot support mod_cgid fd-passing on this system])], [
-+#include <sys/types.h>
-+#include <sys/socket.h>])
-+  fi
-+])
-+
- APACHE_MODPATH_FINISH
 --- httpd-2.4.41/modules/generators/cgi_common.h
 +++ httpd-2.4.41/modules/generators/cgi_common.h
-@@ -0,0 +1,220 @@
+@@ -0,0 +1,359 @@
 +/* Licensed to the Apache Software Foundation (ASF) under one or more
 + * contributor license agreements.  See the NOTICE file distributed with
 + * this work for additional information regarding copyright ownership.
@@ -893,6 +1088,24 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
 +#include "httpd.h"
 +#include "util_filter.h"
 +
++static void discard_script_output(apr_bucket_brigade *bb)
++{
++    apr_bucket *e;
++    const char *buf;
++    apr_size_t len;
++
++    for (e = APR_BRIGADE_FIRST(bb);
++         e != APR_BRIGADE_SENTINEL(bb) && !APR_BUCKET_IS_EOS(e);
++         e = APR_BRIGADE_FIRST(bb))
++    {
++        if (apr_bucket_read(e, &buf, &len, APR_BLOCK_READ)) {
++            break;
++        }
++        apr_bucket_delete(e);
++    }
++}
++
++#ifdef WANT_CGI_BUCKET
 +/* A CGI bucket type is needed to catch any output to stderr from the
 + * script; see PR 22030. */
 +static const apr_bucket_type_t bucket_type_cgi;
@@ -1084,3 +1297,124 @@ http://svn.apache.org/viewvc?view=revision&revision=1867882
 +    apr_bucket_copy_notimpl
 +};
 +
++#endif /* WANT_CGI_BUCKET */
++
++/* Handle the CGI response output, having set up the brigade with the
++ * CGI or PIPE bucket as appropriate. */
++static int cgi_handle_response(request_rec *r, int nph, apr_bucket_brigade *bb,
++                               apr_interval_time_t timeout, cgi_server_conf *conf,
++                               char *logdata, apr_file_t *script_err)
++{
++    apr_status_t rv;
++    
++    /* Handle script return... */
++    if (!nph) {
++        const char *location;
++        char sbuf[MAX_STRING_LEN];
++        int ret;
++
++        if ((ret = ap_scan_script_header_err_brigade_ex(r, bb, sbuf,
++                                                        APLOG_MODULE_INDEX)))
++        {
++            ret = log_script(r, conf, ret, logdata, sbuf, bb, script_err);
++
++            /*
++             * ret could be HTTP_NOT_MODIFIED in the case that the CGI script
++             * does not set an explicit status and ap_meets_conditions, which
++             * is called by ap_scan_script_header_err_brigade, detects that
++             * the conditions of the requests are met and the response is
++             * not modified.
++             * In this case set r->status and return OK in order to prevent
++             * running through the error processing stack as this would
++             * break with mod_cache, if the conditions had been set by
++             * mod_cache itself to validate a stale entity.
++             * BTW: We circumvent the error processing stack anyway if the
++             * CGI script set an explicit status code (whatever it is) and
++             * the only possible values for ret here are:
++             *
++             * HTTP_NOT_MODIFIED          (set by ap_meets_conditions)
++             * HTTP_PRECONDITION_FAILED   (set by ap_meets_conditions)
++             * HTTP_INTERNAL_SERVER_ERROR (if something went wrong during the
++             * processing of the response of the CGI script, e.g broken headers
++             * or a crashed CGI process).
++             */
++            if (ret == HTTP_NOT_MODIFIED) {
++                r->status = ret;
++                return OK;
++            }
++
++            return ret;
++        }
++
++        location = apr_table_get(r->headers_out, "Location");
++
++        if (location && r->status == 200) {
++            /* For a redirect whether internal or not, discard any
++             * remaining stdout from the script, and log any remaining
++             * stderr output, as normal. */
++            discard_script_output(bb);
++            apr_brigade_destroy(bb);
++
++            if (script_err) {
++                apr_file_pipe_timeout_set(script_err, timeout);
++                log_script_err(r, script_err);
++            }
++        }
++
++        if (location && location[0] == '/' && r->status == 200) {
++            /* This redirect needs to be a GET no matter what the original
++             * method was.
++             */
++            r->method = "GET";
++            r->method_number = M_GET;
++
++            /* We already read the message body (if any), so don't allow
++             * the redirected request to think it has one.  We can ignore
++             * Transfer-Encoding, since we used REQUEST_CHUNKED_ERROR.
++             */
++            apr_table_unset(r->headers_in, "Content-Length");
++
++            ap_internal_redirect_handler(location, r);
++            return OK;
++        }
++        else if (location && r->status == 200) {
++            /* XXX: Note that if a script wants to produce its own Redirect
++             * body, it now has to explicitly *say* "Status: 302"
++             */
++            discard_script_output(bb);
++            apr_brigade_destroy(bb);
++            return HTTP_MOVED_TEMPORARILY;
++        }
++
++        rv = ap_pass_brigade(r->output_filters, bb);
++    }
++    else /* nph */ {
++        struct ap_filter_t *cur;
++
++        /* get rid of all filters up through protocol...  since we
++         * haven't parsed off the headers, there is no way they can
++         * work
++         */
++
++        cur = r->proto_output_filters;
++        while (cur && cur->frec->ftype < AP_FTYPE_CONNECTION) {
++            cur = cur->next;
++        }
++        r->output_filters = r->proto_output_filters = cur;
++
++        rv = ap_pass_brigade(r->output_filters, bb);
++    }
++
++    /* don't soak up script output if errors occurred writing it
++     * out...  otherwise, we prolong the life of the script when the
++     * connection drops or we stopped sending output for some other
++     * reason */
++    if (script_err && rv == APR_SUCCESS && !r->connection->aborted) {
++        apr_file_pipe_timeout_set(script_err, timeout);
++        log_script_err(r, script_err);
++    }
++
++    if (script_err) apr_file_close(script_err);
++
++    return OK;                      /* NOT r->status, even if it has changed. */
++}
