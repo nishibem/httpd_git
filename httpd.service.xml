@@ -233,6 +233,24 @@ Wants=network-online.target</programlisting>
     </refsect2>
 
     <refsect2>
+      <title>Logging and log file rotation</title>
+
+      <para>The <command>httpd</command> daemon is configured to log
+      to the <filename>/var/log/httpd</filename> directory by default,
+      and a drop-in for <command>logrotate</command> is provided at
+      <filename>/etc/logrotate.d/httpd</filename> to enable log file
+      rotation.  The <command>httpd.service</command> systemd unit is
+      reloaded after a <command>logrotate</command> run.</para>
+
+      <para>Log file compression is not enabled by default; since
+      <command>httpd</command> can continue writing to open log files
+      for some time after a reload (graceful restart), if compression
+      is enabled the <literal>delaycompress</literal> option must be
+      present (as in the default) to delay compression of log files to
+      a later rotation run.</para>
+    </refsect2>
+
+    <refsect2>
       <title>Socket activation</title>
 
       <para>Socket activation (see
@@ -322,7 +340,8 @@ ReloadPropagatedFrom=httpd.service</programlisting>
     <citerefentry><refentrytitle>systemd.exec</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>systemd.socket</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
     <citerefentry><refentrytitle>httpd_selinux</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
-    <citerefentry><refentrytitle>semanage</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+    <citerefentry><refentrytitle>semanage</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>logrotate</refentrytitle><manvolnum>8</manvolnum></citerefentry>
     </para>
   </refsect1>
 
