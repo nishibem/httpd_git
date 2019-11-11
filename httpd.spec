@@ -13,36 +13,40 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-Source2: httpd.logrotate
-Source3: instance.conf
-Source4: httpd-ssl-pass-dialog
-Source5: httpd.tmpfiles
-Source6: httpd.service
-Source7: action-graceful.sh
-Source8: action-configtest.sh
-Source9: server-status.conf
-Source10: httpd.conf
-Source11: 00-base.conf
-Source12: 00-mpm.conf
-Source13: 00-lua.conf
-Source14: 01-cgi.conf
-Source15: 00-dav.conf
-Source16: 00-proxy.conf
-Source17: 00-ssl.conf
-Source18: 01-ldap.conf
-Source19: 00-proxyhtml.conf
-Source20: userdir.conf
-Source21: ssl.conf
-Source22: welcome.conf
-Source23: manual.conf
-Source24: 00-systemd.conf
-Source25: 01-session.conf
-Source26: 10-listen443.conf
-Source27: httpd.socket
-Source28: 00-optional.conf
+Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
+# gpg key file downloaded and verified by luhliarik
+# https://httpd.apache.org/dev/verification.html
+Source2: https://dist.apache.org/repos/dist/release/httpd/KEYS
+Source3: httpd.logrotate
+Source4: instance.conf
+Source5: httpd-ssl-pass-dialog
+Source6: httpd.tmpfiles
+Source7: httpd.service
+Source8: action-graceful.sh
+Source9: action-configtest.sh
+Source10: server-status.conf
+Source11: httpd.conf
+Source12: 00-base.conf
+Source13: 00-mpm.conf
+Source14: 00-lua.conf
+Source15: 01-cgi.conf
+Source16: 00-dav.conf
+Source17: 00-proxy.conf
+Source18: 00-ssl.conf
+Source19: 01-ldap.conf
+Source20: 00-proxyhtml.conf
+Source21: userdir.conf
+Source22: ssl.conf
+Source23: welcome.conf
+Source24: manual.conf
+Source25: 00-systemd.conf
+Source26: 01-session.conf
+Source27: 10-listen443.conf
+Source28: httpd.socket
+Source29: 00-optional.conf
 Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
@@ -55,6 +59,7 @@ Source43: httpd-ssl-gencerts
 Source44: httpd@.service
 Source45: config.layout
 Source46: apachectl.sh
+
 # build/scripts patches
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
@@ -195,6 +200,7 @@ The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
 
 %prep
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %setup -q
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
@@ -740,6 +746,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Nov 11 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.41-7
+- add automatic source tarball signature verification in %prep section
+
 * Fri Oct  4 2019 Joe Orton <jorton@redhat.com> - 2.4.41-6
 - mod_cgid/mod_cgi: further upstream consolidation patches
 

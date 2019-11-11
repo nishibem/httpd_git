@@ -33,3 +33,4 @@ x86_64
 /results_httpd
 /htcacheclean.service.8
 /httpd.conf.5
+/httpd-2.4.41.tar.bz2.asc
