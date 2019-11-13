@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -747,6 +747,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Nov 13 2019 Joe Orton <jorton@redhat.com> - 2.4.41-8
+- apachectl: in graceful/graceful-stop, only signal main process (#1758798)
+
 * Mon Nov 11 2019 Lubos Uhliarik <luhliari@redhat.com> - 2.4.41-7
 - add automatic source tarball signature verification in %prep section
 
