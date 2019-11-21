@@ -87,7 +87,7 @@ Patch42: httpd-2.4.41-r1828172+.patch
 Patch58: httpd-2.4.34-r1738878.patch
 Patch60: httpd-2.4.34-enable-sslv3.patch
 Patch61: httpd-2.4.41-r1865749.patch
-Patch62: httpd-2.4.41-r1870095.patch
+Patch62: httpd-2.4.41-r1870095+.patch
 
 # Security fixes
 
