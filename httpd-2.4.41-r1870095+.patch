@@ -1,7 +1,6 @@
-# ./pullrev.sh 1870095
+# ./pullrev.sh 1870095 1870097
 http://svn.apache.org/viewvc?view=revision&revision=1870095
-
-https://bugzilla.redhat.com/show_bug.cgi?id=1775146
+http://svn.apache.org/viewvc?view=revision&revision=1870097
 
 --- httpd-2.4.41/modules/ssl/ssl_engine_kernel.c
 +++ httpd-2.4.41/modules/ssl/ssl_engine_kernel.c
@@ -98,22 +97,21 @@ https://bugzilla.redhat.com/show_bug.cgi?id=1775146
          }
      }
  
-@@ -1132,7 +1144,18 @@
+@@ -1132,6 +1144,17 @@
              }
          }
  
 +        /* Fill reneg buffer if required. */
-         if (change_vmode) {
++        if (change_vmode) {
 +            rc = fill_reneg_buffer(r, dc);
 +            if (rc) {
-+                ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO()
++                ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(10228)
 +                              "could not buffer message body to allow "
 +                              "TLS Post-Handshake Authentication to proceed");
 +                return rc;
 +            }
 +        }
 +
-+        if (change_vmode) {
+         if (change_vmode) {
              char peekbuf[1];
  
-             if (r->connection->master) {
