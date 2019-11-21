@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -87,6 +87,7 @@ Patch42: httpd-2.4.41-r1828172+.patch
 Patch58: httpd-2.4.34-r1738878.patch
 Patch60: httpd-2.4.34-enable-sslv3.patch
 Patch61: httpd-2.4.41-r1865749.patch
+Patch62: httpd-2.4.41-r1870095.patch
 
 # Security fixes
 
@@ -227,6 +228,7 @@ interface for storing and accessing per-user session data.
 %patch58 -p1 -b .r1738878
 %patch60 -p1 -b .enable-sslv3
 %patch61 -p1 -b .r1865749
+%patch62 -p1 -b .r1870095
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -747,6 +749,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Nov 21 2019 Joe Orton <jorton@redhat.com> - 2.4.41-9
+- mod_ssl: fix request body buffering w/TLSv1.3 PHA (#1775146)
+
 * Wed Nov 13 2019 Joe Orton <jorton@redhat.com> - 2.4.41-8
 - apachectl: in graceful/graceful-stop, only signal main process (#1758798)
 
