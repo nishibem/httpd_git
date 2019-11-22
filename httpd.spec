@@ -743,7 +743,7 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Thu Nov 21 2019 Joe Orton <jorton@redhat.com> - 2.4.41-9
+* Thu Nov 21 2019 Joe Orton <jorton@redhat.com> - 2.4.41-6.1
 - mod_ssl: fix request body buffering w/TLSv1.3 PHA (#1775146)
 
 * Fri Oct  4 2019 Joe Orton <jorton@redhat.com> - 2.4.41-6
