@@ -175,12 +175,16 @@ Wants=network-online.target</programlisting>
       <para>System packages (including the httpd package itself) may
       restart the httpd service automatically after packages are
       upgraded, installed, or removed. This is done using the
-      <command>systemctl reload httpd.service</command>, which
-      produces a <emphasis>graceful</emphasis> restart by default as
-      described above.</para>
+      <command>systemctl try-restart httpd.service</command>, which
+      stops then starts the service if it is running.</para>
 
-      <para>To suppress automatic reloads entirely, create the file
-      <filename>/etc/sysconfig/httpd-disable-posttrans</filename>.</para>
+      <para>To disable automatic restarts, create the file
+      <filename>/etc/sysconfig/httpd-disable-posttrans</filename>.
+      When <command>httpd</command> interfaces are added in an update,
+      it may not be safe to <emphasis>reload</emphasis> a running
+      service after upgrading, if updated modules require interfaces
+      only available in the updated httpd.  It is recommended to allow
+      automatic restarts for this reason.</para>
     </refsect2>
 
     <refsect2>
