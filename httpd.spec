@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -59,6 +59,7 @@ Source43: httpd-ssl-gencerts
 Source44: httpd@.service
 Source45: config.layout
 Source46: apachectl.sh
+Source47: apachectl.xml
 
 # build/scripts patches
 Patch2: httpd-2.4.9-apxs.patch
@@ -268,6 +269,9 @@ s,@LOGDIR@,%{_localstatedir}/log/httpd,g
 xmlto man ./httpd.conf.xml
 xmlto man $RPM_SOURCE_DIR/htcacheclean.service.xml
 xmlto man $RPM_SOURCE_DIR/httpd.service.xml
+
+# apachectl.xml => apachectl.8
+xmlto man %{SOURCE47}
 
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa}
 : Default MPM is %{mpm}, vendor string is '%{vstring}'
@@ -498,7 +502,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 # Install man pages
 install -d $RPM_BUILD_ROOT%{_mandir}/man8 $RPM_BUILD_ROOT%{_mandir}/man5
 install -m 644 -p httpd.service.8 httpd-init.service.8 httpd.socket.8 \
-        httpd@.service.8 htcacheclean.service.8 \
+        httpd@.service.8 htcacheclean.service.8 apachectl.8 \
         $RPM_BUILD_ROOT%{_mandir}/man8
 install -m 644 -p httpd.conf.5 \
         $RPM_BUILD_ROOT%{_mandir}/man5
@@ -749,6 +753,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Sat Dec  7 2019 FeRD (Frank Dana) <ferdnyc@gmail.com> - 2.4.41-10
+- apachectl: Add man page for Fedora version
+
 * Thu Nov 21 2019 Joe Orton <jorton@redhat.com> - 2.4.41-9
 - mod_ssl: fix request body buffering w/TLSv1.3 PHA (#1775146)
 
