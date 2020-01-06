@@ -25,8 +25,8 @@
   <refentryinfo>
     <title>apachectl</title>
     <productname>httpd</productname>
-    <corpauthor>Apache Software Foundation and contributors</corpauthor>
-    <editor><contrib>Fedora man page</contrib><surname>Dana</surname><firstname>Frank</firstname><email>ferdnyc@gmail.com</email></editor>
+    <author><contrib>Apache man page</contrib><othername>Apache Software Foundation contributors</othername></author>
+    <author><contrib>Fedora man page</contrib><surname>Dana</surname><firstname>Frank</firstname></author>
   </refentryinfo>
 
   <refmeta>

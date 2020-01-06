@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -753,6 +753,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jan  6 2020 Joe Orton <jorton@redhat.com> - 2.4.41-11
+- apachectl(8): update authors
+
 * Sat Dec  7 2019 FeRD (Frank Dana) <ferdnyc@gmail.com> - 2.4.41-10
 - apachectl: Add man page for Fedora version
 
