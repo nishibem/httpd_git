@@ -4,7 +4,7 @@
 
 ]>
 <!--
- Copyright 2018 Red Hat, Inc.
+ Copyright 2020 Red Hat, Inc.
 
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements. See the NOTICE file distributed with
@@ -25,7 +25,7 @@
   <refentryinfo>
     <title>apachectl</title>
     <productname>httpd</productname>
-    <corpauthor>Apache Software Foundation</corpauthor>
+    <corpauthor>Apache Software Foundation and contributors</corpauthor>
     <editor><contrib>Fedora man page</contrib><surname>Dana</surname><firstname>Frank</firstname><email>ferdnyc@gmail.com</email></editor>
   </refentryinfo>
 
@@ -49,7 +49,7 @@
 
 <!-- body begins here -->
   <refsect1 id='description'>
-    <title>DESCRIPTION</title>
+    <title>Description</title>
 
     <para><command>apachectl</command> is a front end to the Apache HyperText
     Transfer Protocol (HTTP) server. It is designed to help the
@@ -65,10 +65,42 @@
     <para>The <command>apachectl</command> script returns a 0 exit value on
     success, and &gt;0 if an error occurs.</para>
 
+    <refsect2 id="compatibility">
+      <title>Compatibility</title>
+
+      <para>The version of <command>apachectl</command> used on this
+      system is a replacement script intended to be mostly (but not
+      completely) compatible with version provided with
+      <emphasis>Apache httpd</emphasis>.  This
+      <command>apachectl</command> mostly acts as a wrapper around
+      <command>systemctl</command> and manipulates the
+      <command>systemd</command> service for <command>httpd</command>.
+      The interface to the <emphasis>Apache</emphasis> version of
+      <command>apachectl</command> is described at <ulink
+      url="https://httpd.apache.org/docs/2.4/programs/apachectl.html"/>.</para>
+
+      <para>The following differences are present in the version of
+      <command>apachectl</command> present on this system:
+
+      <itemizedlist>
+        <listitem><para>Option arguments passed when starting
+        <command>httpd</command> are not allowed.  These should be
+        configured in the systemd service directly (see <citerefentry><refentrytitle>httpd.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>).</para></listitem>
+
+        <listitem><para>The <command>"fullstatus"</command> option is
+        not available.</para></listitem>
+
+        <listitem><para>The <command>"status"</command> option does
+        not use or rely on the running server's
+        <emphasis>server-status</emphasis> output.</para></listitem>
+      </itemizedlist>
+
+      </para>
+    </refsect2>
   </refsect1>
 
   <refsect1 id='options'>
-    <title>OPTIONS</title>
+    <title>Options</title>
     <variablelist remap='TP'>
       <varlistentry>
         <term><option>start</option></term>
@@ -131,43 +163,29 @@
         <term><option>configtest</option></term>
         <listitem>
           <para>Run a configuration file syntax test. It parses the configuration
-          files and either reports <literal>Syntax Ok</literal>
+          files and either reports <literal>Syntax OK</literal>
           or detailed information about the particular syntax error. This is
           equivalent to <command>httpd -t</command>.</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-
-    <para>The following options were available in earlier versions but have been removed.</para>
-
-    <variablelist remap='TP'>
-      <varlistentry>
-        <term><option>fullstatus</option></term>
-        <listitem>
-          <para>Displays a full status report from <literal>mod_status</literal>.
-          For this to work, you need to have <literal>mod_status</literal> enabled
-          on your server and a text-based browser such as <command>lynx</command>
-          available on your system. The URL used to access the status report
-          can be set by editing the <literal>STATUSURL</literal> variable in the
-          script.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term><option>startssl</option></term>
-        <listitem>
-          <para>To start <command>httpd</command> with SSL support, you should edit
-          your configuration file to include the relevant directives and then
-          use the normal <command>apachectl start</command>.</para>
         </listitem>
       </varlistentry>
     </variablelist>
   </refsect1>
 
   <refsect1 id='bugs'>
-    <title>BUGS</title>
-    <para>Please report bugs by filing an issue against the "httpd" component of the "Fedora"
-    project, in <ulink url='https://bugzilla.redhat.com/'>RedHat Bugzilla</ulink>.</para>
+    <title>Bugs</title>
+    <para>Please report bugs by filing an issue in Bugzilla via <ulink url='https://bugzilla.redhat.com/'/>.</para>
+  </refsect1>
+
+    <refsect1>
+    <title>See also</title>
+
+    <para>
+    <citerefentry><refentrytitle>httpd</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>httpd.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>systemctl</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+    <citerefentry><refentrytitle>httpd.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+    </para>
   </refsect1>
 
 </refentry>

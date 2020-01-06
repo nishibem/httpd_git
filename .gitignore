@@ -34,3 +34,4 @@ x86_64
 /htcacheclean.service.8
 /httpd.conf.5
 /httpd-2.4.41.tar.bz2.asc
+/apachectl.8
