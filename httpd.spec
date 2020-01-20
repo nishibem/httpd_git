@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.41
-Release: 11%{?dist}
+Release: 12%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -72,7 +72,7 @@ Patch23: httpd-2.4.39-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch29: httpd-2.4.33-systemd.patch
+Patch29: httpd-2.4.41-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.33-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
@@ -753,6 +753,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Jan 20 2020 Joe Orton <jorton@redhat.com> - 2.4.41-12
+- mod_systemd: fix timeouts on reload w/ExtendedStatus off (#1590877)
+
 * Mon Jan  6 2020 Joe Orton <jorton@redhat.com> - 2.4.41-11
 - apachectl(8): update authors
 
