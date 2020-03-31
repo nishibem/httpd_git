@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.41
-Release: 13%{?dist}
+Version: 2.4.43
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -62,33 +62,29 @@ Source46: apachectl.sh
 Source47: apachectl.xml
 
 # build/scripts patches
-Patch2: httpd-2.4.9-apxs.patch
-Patch3: httpd-2.4.1-deplibs.patch
+Patch2: httpd-2.4.43-apxs.patch
+Patch3: httpd-2.4.43-deplibs.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.25-detect-systemd.patch
+Patch19: httpd-2.4.43-detect-systemd.patch
 # Features/functional changes
-Patch21: httpd-2.4.39-r1842929+.patch
-Patch23: httpd-2.4.39-export.patch
-Patch24: httpd-2.4.1-corelimit.patch
-Patch25: httpd-2.4.25-selinux.patch
-Patch27: httpd-2.4.2-icons.patch
-Patch29: httpd-2.4.41-systemd.patch
-Patch30: httpd-2.4.4-cachehardmax.patch
-Patch31: httpd-2.4.33-sslmultiproxy.patch
-Patch34: httpd-2.4.17-socket-activation.patch
-Patch36: httpd-2.4.38-r1830819+.patch
-Patch38: httpd-2.4.34-sslciphdefault.patch
-Patch39: httpd-2.4.37-sslprotdefault.patch
-Patch40: httpd-2.4.39-r1861269.patch
-Patch41: httpd-2.4.37-r1861793+.patch
-Patch42: httpd-2.4.41-r1828172+.patch
+Patch21: httpd-2.4.43-r1842929+.patch
+Patch23: httpd-2.4.43-export.patch
+Patch24: httpd-2.4.43-corelimit.patch
+Patch25: httpd-2.4.43-selinux.patch
+Patch27: httpd-2.4.43-icons.patch
+Patch30: httpd-2.4.43-cachehardmax.patch
+Patch31: httpd-2.4.43-sslmultiproxy.patch
+Patch34: httpd-2.4.43-socket-activation.patch
+Patch38: httpd-2.4.43-sslciphdefault.patch
+Patch39: httpd-2.4.43-sslprotdefault.patch
+Patch40: httpd-2.4.43-r1861269.patch
+Patch41: httpd-2.4.43-r1861793+.patch
+Patch42: httpd-2.4.43-r1828172+.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
-Patch58: httpd-2.4.34-r1738878.patch
-Patch60: httpd-2.4.34-enable-sslv3.patch
-Patch61: httpd-2.4.41-r1865749.patch
-Patch62: httpd-2.4.41-r1870095+.patch
+Patch60: httpd-2.4.43-enable-sslv3.patch
+Patch62: httpd-2.4.43-r1870095+.patch
 
 # Security fixes
 
@@ -215,20 +211,16 @@ interface for storing and accessing per-user session data.
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 %patch27 -p1 -b .icons
-%patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 #patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
-%patch36 -p1 -b .r1830819+
 %patch38 -p1 -b .sslciphdefault
 %patch39 -p1 -b .sslprotdefault
 %patch40 -p1 -b .r1861269
 %patch41 -p1 -b .r1861793+
 %patch42 -p1 -b .r1828172+
 
-%patch58 -p1 -b .r1738878
 %patch60 -p1 -b .enable-sslv3
-%patch61 -p1 -b .r1865749
 %patch62 -p1 -b .r1870095
 
 # Patch in the vendor string
@@ -329,6 +321,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-cgid --enable-cgi \
         --enable-cgid-fdpassing \
         --enable-authn-anon --enable-authn-alias \
+        --enable-systemd \
         --disable-imagemap --disable-file-cache \
         --disable-http2 \
         --disable-md \
@@ -753,6 +746,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Mar 31 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.43-1
+- new version 2.4.43 (#1819023)
+
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.41-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 

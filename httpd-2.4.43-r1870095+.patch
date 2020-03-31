@@ -1,10 +1,8 @@
-# ./pullrev.sh 1870095 1870097
-http://svn.apache.org/viewvc?view=revision&revision=1870095
-http://svn.apache.org/viewvc?view=revision&revision=1870097
-
---- httpd-2.4.41/modules/ssl/ssl_engine_kernel.c
-+++ httpd-2.4.41/modules/ssl/ssl_engine_kernel.c
-@@ -114,6 +114,45 @@
+diff --git a/modules/ssl/ssl_engine_kernel.c b/modules/ssl/ssl_engine_kernel.c
+index cbab6a3..765aa4b 100644
+--- a/modules/ssl/ssl_engine_kernel.c
++++ b/modules/ssl/ssl_engine_kernel.c
+@@ -114,6 +114,45 @@ static int has_buffered_data(request_rec *r)
      return result;
  }
  
@@ -50,7 +48,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1870097
  #ifdef HAVE_TLSEXT
  static int ap_array_same_str_set(apr_array_header_t *s1, apr_array_header_t *s2)
  {
-@@ -814,41 +853,14 @@
+@@ -814,41 +853,14 @@ static int ssl_hook_Access_classic(request_rec *r, SSLSrvConfigRec *sc, SSLDirCo
          }
      }
  
@@ -97,7 +95,7 @@ http://svn.apache.org/viewvc?view=revision&revision=1870097
          }
      }
  
-@@ -1132,6 +1144,17 @@
+@@ -1132,6 +1144,17 @@ static int ssl_hook_Access_modern(request_rec *r, SSLSrvConfigRec *sc, SSLDirCon
              }
          }
  
