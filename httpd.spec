@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.43
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -68,6 +68,7 @@ Patch3: httpd-2.4.43-deplibs.patch
 Patch19: httpd-2.4.43-detect-systemd.patch
 # Features/functional changes
 Patch21: httpd-2.4.43-r1842929+.patch
+Patch22: httpd-2.4.43-mod_systemd.patch
 Patch23: httpd-2.4.43-export.patch
 Patch24: httpd-2.4.43-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
@@ -85,6 +86,7 @@ Patch42: httpd-2.4.43-r1828172+.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
 Patch62: httpd-2.4.43-r1870095+.patch
+Patch63: httpd-2.4.43-r1876548.patch
 
 # Security fixes
 
@@ -207,6 +209,7 @@ interface for storing and accessing per-user session data.
 %patch19 -p1 -b .detectsystemd
 
 %patch21 -p1 -b .r1842929+
+%patch22 -p1 -b .mod_systemd
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
@@ -222,6 +225,7 @@ interface for storing and accessing per-user session data.
 
 %patch60 -p1 -b .enable-sslv3
 %patch62 -p1 -b .r1870095
+%patch63 -p1 -b .r1876548
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -746,6 +750,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Apr 17 2020 Joe Orton <jorton@redhat.com> - 2.4.43-2
+- mod_ssl: fix leak in OCSP stapling code (PR 63687, r1876548)
+- mod_systemd: restore descriptive startup logging
+
 * Tue Mar 31 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.43-1
 - new version 2.4.43 (#1819023)
 
