@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.43
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -81,6 +81,7 @@ Patch39: httpd-2.4.43-sslprotdefault.patch
 Patch40: httpd-2.4.43-r1861269.patch
 Patch41: httpd-2.4.43-r1861793+.patch
 Patch42: httpd-2.4.43-r1828172+.patch
+Patch43: httpd-2.4.43-sslcoalesce.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -222,6 +223,7 @@ interface for storing and accessing per-user session data.
 %patch40 -p1 -b .r1861269
 %patch41 -p1 -b .r1861793+
 %patch42 -p1 -b .r1828172+
+%patch43 -p1 -b .sslcoalesce
 
 %patch60 -p1 -b .enable-sslv3
 %patch62 -p1 -b .r1870095
@@ -750,6 +752,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Apr 17 2020 Joe Orton <jorton@redhat.com> - 2.4.43-3
+- mod_ssl: updated coalescing filter to improve TLS efficiency
+
 * Fri Apr 17 2020 Joe Orton <jorton@redhat.com> - 2.4.43-2
 - mod_ssl: fix leak in OCSP stapling code (PR 63687, r1876548)
 - mod_systemd: restore descriptive startup logging
