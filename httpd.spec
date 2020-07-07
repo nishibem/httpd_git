@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.43
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -72,6 +72,7 @@ Patch22: httpd-2.4.43-mod_systemd.patch
 Patch23: httpd-2.4.43-export.patch
 Patch24: httpd-2.4.43-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
+Patch26: httpd-2.4.43-gettid.patch
 Patch27: httpd-2.4.43-icons.patch
 Patch30: httpd-2.4.43-cachehardmax.patch
 Patch31: httpd-2.4.43-sslmultiproxy.patch
@@ -214,6 +215,7 @@ interface for storing and accessing per-user session data.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
+%patch26 -p1 -b .gettid
 %patch27 -p1 -b .icons
 %patch30 -p1 -b .cachehardmax
 #patch31 -p1 -b .sslmultiproxy
@@ -752,6 +754,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Jul  7 2020 Joe Orton <jorton@redhat.com> - 2.4.43-4
+- use gettid() directly and use it for built-in ErrorLogFormat
+
 * Fri Apr 17 2020 Joe Orton <jorton@redhat.com> - 2.4.43-3
 - mod_ssl: updated coalescing filter to improve TLS efficiency
 
