@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.43
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -647,7 +647,6 @@ exit $rv
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/htcacheclean
-%ghost %{_sysconfdir}/sysconfig/httpd
 %{_prefix}/lib/tmpfiles.d/httpd.conf
 
 %dir %{_libexecdir}/initscripts/legacy-actions/httpd
@@ -754,6 +753,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jul 09 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.43-5
+- Remove %ghosted /etc/sysconfig/httpd file (#1850082)
+
 * Tue Jul  7 2020 Joe Orton <jorton@redhat.com> - 2.4.43-4
 - use gettid() directly and use it for built-in ErrorLogFormat
 
