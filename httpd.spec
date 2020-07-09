@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.43
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -83,6 +83,7 @@ Patch40: httpd-2.4.43-r1861269.patch
 Patch41: httpd-2.4.43-r1861793+.patch
 Patch42: httpd-2.4.43-r1828172+.patch
 Patch43: httpd-2.4.43-sslcoalesce.patch
+Patch44: httpd-2.4.43-lua-resume.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -226,6 +227,7 @@ interface for storing and accessing per-user session data.
 %patch41 -p1 -b .r1861793+
 %patch42 -p1 -b .r1828172+
 %patch43 -p1 -b .sslcoalesce
+%patch44 -p1 -b .luaresume
 
 %patch60 -p1 -b .enable-sslv3
 %patch62 -p1 -b .r1870095
@@ -753,6 +755,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Jul 09 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.43-6
+- fix macro in mod_lua for lua 4.5
+
 * Thu Jul 09 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.43-5
 - Remove %ghosted /etc/sysconfig/httpd file (#1850082)
 
