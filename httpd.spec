@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.43
-Release: 5%{?dist}
+Version: 2.4.46
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -83,12 +83,12 @@ Patch40: httpd-2.4.43-r1861269.patch
 Patch41: httpd-2.4.43-r1861793+.patch
 Patch42: httpd-2.4.43-r1828172+.patch
 Patch43: httpd-2.4.43-sslcoalesce.patch
+Patch44: httpd-2.4.46-lua-resume.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
 Patch62: httpd-2.4.43-r1870095+.patch
-Patch63: httpd-2.4.43-r1876548.patch
 
 # Security fixes
 
@@ -99,7 +99,6 @@ BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: gnupg2
 Requires: /etc/mime.types, system-logos-httpd
-Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
@@ -226,10 +225,10 @@ interface for storing and accessing per-user session data.
 %patch41 -p1 -b .r1861793+
 %patch42 -p1 -b .r1828172+
 %patch43 -p1 -b .sslcoalesce
+%patch44 -p1 -b .luaresume
 
 %patch60 -p1 -b .enable-sslv3
 %patch62 -p1 -b .r1870095
-%patch63 -p1 -b .r1876548
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -556,17 +555,6 @@ exit 0
 %postun
 %systemd_postun httpd.service htcacheclean.service httpd.socket
 
-# Trigger for conversion from SysV, per guidelines at:
-# https://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Systemd
-%triggerun -- httpd < 2.2.21-5
-# Save the current service runlevel info
-# User must manually run systemd-sysv-convert --apply httpd
-# to migrate them to systemd targets
-/usr/bin/systemd-sysv-convert --save httpd.service >/dev/null 2>&1 ||:
-
-# Run these because the SysV package being removed won't do them
-/sbin/chkconfig --del httpd >/dev/null 2>&1 || :
-
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
   /bin/systemctl try-restart --no-block httpd.service htcacheclean.service >/dev/null 2>&1 || :
@@ -753,6 +741,17 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Aug 25 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-1
+- new version 2.4.46
+- remove obsolete parts of this spec file
+- fix systemd detection patch
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.43-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jul 09 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.43-6
+- fix macro in mod_lua for lua 4.5
+
 * Thu Jul 09 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.43-5
 - Remove %ghosted /etc/sysconfig/httpd file (#1850082)
 
