@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -532,7 +532,7 @@ cp -p $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk \
       $RPM_BUILD_ROOT%{_libdir}/httpd/build/vendor_config_vars.mk
 
 # Sanitize CFLAGS in standard config_vars.mk
-sed '/^CFLAGS/s,-Wall .*,-Wall,' \
+sed '/^CFLAGS/s,=.*$,= -O2 -g -Wall,' \
     -i $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
 
 sed 's/config_vars.mk/vendor_config_vars.mk/' \
@@ -759,9 +759,12 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Aug 27 2020 Joe Orton <jorton@redhat.com> - 2.4.46-3
+- strip /usr/bin/apxs CFLAGS further
+
 * Thu Aug 27 2020 Joe Orton <jorton@redhat.com> - 2.4.46-2
 - sanitize CFLAGS used by /usr/bin/apxs by default (#1873020)
-- add vendor-apxs script in libdir/httpd/build which exposes full CFLAGS
+- add $libdir/httpd/build/vendor-apxs which exposes full CFLAGS
 - redefine _httpd_apxs RPM macro to use vendor-apxs
 
 * Tue Aug 25 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-1
