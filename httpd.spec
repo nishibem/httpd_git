@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -333,12 +333,12 @@ export LYNX_PATH=/usr/bin/links
         --disable-http2 \
         --disable-md \
         $*
-make %{?_smp_mflags}
+%make_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 
 # Install systemd service files
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
@@ -759,6 +759,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Aug 27 2020 Joe Orton <jorton@redhat.com> - 2.4.46-4
+- use make macros (Tom Stellard)
+
 * Thu Aug 27 2020 Joe Orton <jorton@redhat.com> - 2.4.46-3
 - strip /usr/bin/apxs CFLAGS further
 
