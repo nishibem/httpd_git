@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -430,7 +430,7 @@ echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d
 cat > $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d/macros.httpd <<EOF
 %%_httpd_mmn %{mmnisa}
-%%_httpd_apxs %%{_bindir}/apxs
+%%_httpd_apxs %%{_libdir}/httpd/build/vendor-apxs
 %%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.modules.d
 %%_httpd_confdir %%{_sysconfdir}/httpd/conf.d
 %%_httpd_contentdir %{contentdir}
@@ -524,6 +524,23 @@ sed -i '/.*DEFAULT_..._LIBEXECDIR/d;/DEFAULT_..._INSTALLBUILDDIR/d' \
 # Fix path to instdso in special.mk
 sed -i '/instdso/s,top_srcdir,top_builddir,' \
     $RPM_BUILD_ROOT%{_libdir}/httpd/build/special.mk
+
+# vendor-apxs uses an unsanitized config_vars.mk which may
+# have dependencies on redhat-rpm-config.  apxs uses the
+# config_vars.mk with a sanitized config_vars.mk
+cp -p $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk \
+      $RPM_BUILD_ROOT%{_libdir}/httpd/build/vendor_config_vars.mk
+
+# Sanitize CFLAGS in standard config_vars.mk
+sed '/^CFLAGS/s,-Wall .*,-Wall,' \
+    -i $RPM_BUILD_ROOT%{_libdir}/httpd/build/config_vars.mk
+
+sed 's/config_vars.mk/vendor_config_vars.mk/' \
+    $RPM_BUILD_ROOT%{_bindir}/apxs \
+    > $RPM_BUILD_ROOT%{_libdir}/httpd/build/vendor-apxs
+touch -r $RPM_BUILD_ROOT%{_bindir}/apxs \
+      $RPM_BUILD_ROOT%{_libdir}/httpd/build/vendor-apxs
+chmod 755 $RPM_BUILD_ROOT%{_libdir}/httpd/build/vendor-apxs
 
 # Remove unpackaged files
 rm -vf \
@@ -738,9 +755,15 @@ exit $rv
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
 %{_libdir}/httpd/build/*.sh
+%{_libdir}/httpd/build/vendor-apxs
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Aug 27 2020 Joe Orton <jorton@redhat.com> - 2.4.46-2
+- sanitize CFLAGS used by /usr/bin/apxs by default (#1873020)
+- add vendor-apxs script in libdir/httpd/build which exposes full CFLAGS
+- redefine _httpd_apxs RPM macro to use vendor-apxs
+
 * Tue Aug 25 2020 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-1
 - new version 2.4.46
 - remove obsolete parts of this spec file
