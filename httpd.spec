@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 4%{?dist}
+Release: 5%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -435,6 +435,7 @@ cat > $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d/macros.httpd <<EOF
 %%_httpd_confdir %%{_sysconfdir}/httpd/conf.d
 %%_httpd_contentdir %{contentdir}
 %%_httpd_moddir %%{_libdir}/httpd/modules
+%%_httpd_requires Requires: httpd-mmn = %%{_httpd_mmn}
 EOF
 
 # Handle contentdir
@@ -759,6 +760,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Nov  6 2020 Joe Orton <jorton@redhat.com> - 2.4.46-5
+- add %%_httpd_requires to macros
+
 * Thu Aug 27 2020 Joe Orton <jorton@redhat.com> - 2.4.46-4
 - use make macros (Tom Stellard)
 
