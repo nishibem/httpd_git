@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 5%{?dist}
+Release: 6%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -104,7 +104,7 @@ Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires: httpd-filesystem = %{version}-%{release}
-Requires: mod_http2
+Recommends: mod_http2, mod_lua
 Requires(pre): httpd-filesystem
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -169,7 +169,7 @@ Requires: sscg >= 2.2.0, /usr/bin/hostname
 Conflicts: openssl-libs < 1:1.0.1h-4
 
 %description -n mod_ssl
-The mod_ssl module provides strong cryptography for the Apache Web
+The mod_ssl module provides strong cryptography for the Apache HTTP
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
@@ -200,6 +200,14 @@ Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 %description -n mod_session
 The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
+
+%package -n mod_lua
+Summary: Lua scripting support for the Apache HTTP Server
+Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+
+%description -n mod_lua
+The mod_lua module allows the server to be extended with scripts
+written in the Lua programming language.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
@@ -649,6 +657,7 @@ exit $rv
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/*.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
+%exclude %{_sysconfdir}/httpd/conf.modules.d/00-lua.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
@@ -673,6 +682,7 @@ exit $rv
 %exclude %{_libdir}/httpd/modules/mod_proxy_html.so
 %exclude %{_libdir}/httpd/modules/mod_xml2enc.so
 %exclude %{_libdir}/httpd/modules/mod_session*.so
+%exclude %{_libdir}/httpd/modules/mod_lua.so
 
 %dir %{contentdir}/error
 %dir %{contentdir}/error/include
@@ -749,6 +759,10 @@ exit $rv
 %{_libdir}/httpd/modules/mod_auth_form.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
+%files -n mod_lua
+%{_libdir}/httpd/modules/mod_lua.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-lua.conf
+
 %files devel
 %{_includedir}/httpd
 %{_bindir}/apxs
@@ -760,6 +774,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Dec 17 2020 Joe Orton <jorton@redhat.com> - 2.4.46-6
+- move mod_lua to a subpackage
+- Recommends: both mod_lua and mod_http2
+
 * Fri Nov  6 2020 Joe Orton <jorton@redhat.com> - 2.4.46-5
 - add %%_httpd_requires to macros
 
