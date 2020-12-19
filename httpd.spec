@@ -177,6 +177,7 @@ Security (TLS) protocols.
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: libxml2-devel
+BuildRequires: make
 Epoch: 1
 Obsoletes: mod_proxy_html < 1:2.4.1-2
 
