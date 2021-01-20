@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -89,6 +89,7 @@ Patch44: httpd-2.4.46-lua-resume.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
 Patch62: httpd-2.4.43-r1870095+.patch
+Patch63: httpd-2.4.46-htcacheclean-dont-break.patch
 
 # Security fixes
 
@@ -238,6 +239,7 @@ written in the Lua programming language.
 
 %patch60 -p1 -b .enable-sslv3
 %patch62 -p1 -b .r1870095
+%patch63 -p1 -b .htcacheclean-dont-break
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -775,6 +777,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Jan 20 2021 Artem Egorenkov <aegorenk@redhat.com> - 2.4.46-7
+- prevent htcacheclean from while break when first file processed
+
 * Thu Dec 17 2020 Joe Orton <jorton@redhat.com> - 2.4.46-6
 - move mod_lua to a subpackage
 - Recommends: both mod_lua and mod_http2
