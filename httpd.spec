@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 8%{?dist}
+Release: 9%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -84,6 +84,7 @@ Patch41: httpd-2.4.43-r1861793+.patch
 Patch42: httpd-2.4.43-r1828172+.patch
 Patch43: httpd-2.4.43-sslcoalesce.patch
 Patch44: httpd-2.4.46-lua-resume.patch
+Patch45: httpd-2.4.43-logjournal.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
@@ -236,6 +237,7 @@ written in the Lua programming language.
 %patch42 -p1 -b .r1828172+
 %patch43 -p1 -b .sslcoalesce
 %patch44 -p1 -b .luaresume
+%patch45 -p1 -b .logjournal
 
 %patch60 -p1 -b .enable-sslv3
 %patch62 -p1 -b .r1870095
@@ -777,6 +779,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Feb 01 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-9
+- Resolves: #1914182 - RFE: CustomLog should be able to use journald
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.46-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
