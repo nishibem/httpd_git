@@ -1,12 +1,12 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/httpd/Sanity/httpd-php-mysql-sanity-test
-#   Description: test fetching data from mysqldb/mariadb through php
-#   Author: Karel Srot <ksrot@redhat.com>
+#   Makefile of /CoreOS/httpd/Sanity/smoke
+#   Description: Simple check of httpd test page
+#   Author: Branislav Nater <bnater@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Copyright (c) 2013 Red Hat, Inc. All rights reserved.
+#   Copyright (c) 2021 Red Hat, Inc.
 #
 #   This copyrighted material is made available to anyone wishing
 #   to use, modify, copy, or redistribute it subject to the terms
@@ -24,12 +24,12 @@
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-export TEST=/CoreOS/httpd/Sanity/httpd-php-mysql-sanity-test
+export TEST=/CoreOS/httpd/Sanity/smoke
 export TESTVERSION=1.0
 
 BUILT_FILES=
 
-FILES=$(METADATA) runtest.sh Makefile PURPOSE new_mysql.php old_mysql.php php_mysql_test.sql php_mysql_test.conf
+FILES=$(METADATA) runtest.sh Makefile PURPOSE
 
 .PHONY: all install download clean
 
@@ -43,25 +43,23 @@ clean:
 	rm -f *~ $(BUILT_FILES)
 
 
--include /usr/share/rhts/lib/rhts-make.include
+include /usr/share/rhts/lib/rhts-make.include
 
 $(METADATA): Makefile
-	@echo "Owner:           Karel Srot <ksrot@redhat.com>" > $(METADATA)
+	@echo "Owner:           Branislav Nater <bnater@redhat.com>" > $(METADATA)
 	@echo "Name:            $(TEST)" >> $(METADATA)
 	@echo "TestVersion:     $(TESTVERSION)" >> $(METADATA)
 	@echo "Path:            $(TEST_DIR)" >> $(METADATA)
-	@echo "Description:     test fetching data from mysqldb/mariadb through php" >> $(METADATA)
+	@echo "Description:     Simple check of httpd test page" >> $(METADATA)
 	@echo "Type:            Sanity" >> $(METADATA)
 	@echo "TestTime:        5m" >> $(METADATA)
 	@echo "RunFor:          httpd" >> $(METADATA)
-	@echo "Requires:        httpd php php-zts php-mysqlnd mysql-server mariadb-server" >> $(METADATA)
+	@echo "Requires:        httpd mod_ssl" >> $(METADATA)
 	@echo "RhtsRequires:    library(httpd/http)" >> $(METADATA)
-	@echo "RhtsRequires:    library(mysql/basic)" >> $(METADATA)
-	@echo "RhtsRequires:    library(mariadb55/basic)" >> $(METADATA)
-	@echo "RhtsRequires:    library(php/utils)" >> $(METADATA)
 	@echo "Priority:        Normal" >> $(METADATA)
 	@echo "License:         GPLv2" >> $(METADATA)
 	@echo "Confidential:    no" >> $(METADATA)
 	@echo "Destructive:     no" >> $(METADATA)
+	@echo "Releases:        -RHEL4 -RHELClient5 -RHELServer5" >> $(METADATA)
 
 	rhts-lint $(METADATA)
