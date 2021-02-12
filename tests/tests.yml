@@ -6,7 +6,7 @@
     tags:
     - classic
     tests:
-    - httpd-php-mysql-sanity-test
+    - smoke
     required_packages:
     - findutils         # beakerlib needs find command
     - which             # smoke requires which command
