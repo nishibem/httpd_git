@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 9%{?dist}
+Release: 10%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -75,7 +75,6 @@ Patch25: httpd-2.4.43-selinux.patch
 Patch26: httpd-2.4.43-gettid.patch
 Patch27: httpd-2.4.43-icons.patch
 Patch30: httpd-2.4.43-cachehardmax.patch
-Patch31: httpd-2.4.43-sslmultiproxy.patch
 Patch34: httpd-2.4.43-socket-activation.patch
 Patch38: httpd-2.4.43-sslciphdefault.patch
 Patch39: httpd-2.4.43-sslprotdefault.patch
@@ -169,6 +168,8 @@ Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: sscg >= 2.2.0, /usr/bin/hostname
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
+# mod_ssl/mod_nss cannot both be loaded simultaneously
+Conflicts: mod_nss
 
 %description -n mod_ssl
 The mod_ssl module provides strong cryptography for the Apache HTTP
@@ -228,7 +229,6 @@ written in the Lua programming language.
 %patch26 -p1 -b .gettid
 %patch27 -p1 -b .icons
 %patch30 -p1 -b .cachehardmax
-#patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
 %patch38 -p1 -b .sslciphdefault
 %patch39 -p1 -b .sslprotdefault
@@ -779,6 +779,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Feb 23 2021 Joe Orton <jorton@redhat.com> - 2.4.46-10
+- add Conflicts: with mod_nss
+
 * Mon Feb 01 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-9
 - Resolves: #1914182 - RFE: CustomLog should be able to use journald
 
