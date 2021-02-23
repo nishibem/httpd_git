@@ -88,6 +88,7 @@ Patch45: httpd-2.4.43-logjournal.patch
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
+Patch61: httpd-2.4.46-r1878890.patch
 Patch62: httpd-2.4.43-r1870095+.patch
 Patch63: httpd-2.4.46-htcacheclean-dont-break.patch
 
@@ -240,6 +241,7 @@ written in the Lua programming language.
 %patch45 -p1 -b .logjournal
 
 %patch60 -p1 -b .enable-sslv3
+%patch61 -p1 -b .r1878890
 %patch62 -p1 -b .r1870095
 %patch63 -p1 -b .htcacheclean-dont-break
 
@@ -781,6 +783,7 @@ exit $rv
 %changelog
 * Tue Feb 23 2021 Joe Orton <jorton@redhat.com> - 2.4.46-10
 - add Conflicts: with mod_nss
+- drop use of apr_ldap_rebind (r1878890, #1847585)
 
 * Mon Feb 01 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-9
 - Resolves: #1914182 - RFE: CustomLog should be able to use journald
