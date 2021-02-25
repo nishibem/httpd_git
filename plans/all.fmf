@@ -1,7 +1,6 @@
-summary: CI plan with Tier1 beakerlib tests
+summary: Test plan with all beakerlib tests
 discover:
     how: fmf
     url: https://src.fedoraproject.org/tests/httpd.git
-    filter: 'tier: 1'
 execute:
     how: tmt
