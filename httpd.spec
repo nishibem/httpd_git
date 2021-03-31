@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 10%{?dist}
+Release: 11%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -60,6 +60,7 @@ Source44: httpd@.service
 Source45: config.layout
 Source46: apachectl.sh
 Source47: apachectl.xml
+Source48: apache-poweredby.png
 
 # build/scripts patches
 Patch2: httpd-2.4.43-apxs.patch
@@ -100,7 +101,7 @@ BuildRequires: perl-interpreter, perl-generators, systemd-devel
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: gnupg2
-Requires: /etc/mime.types, system-logos-httpd
+Requires: /etc/mime.types, system-logos-httpd >= 34.0.1
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
@@ -269,6 +270,9 @@ if test "x${vmmn}" != "x%{mmn}"; then
    : Update the mmn macro and rebuild.
    exit 1
 fi
+
+# A new logo which comes together with a new test page
+cp %{SOURCE48} ./docs/icons/apache_pb3.png
 
 # Provide default layout
 cp $RPM_SOURCE_DIR/config.layout .
@@ -484,6 +488,7 @@ rm -v $RPM_BUILD_ROOT%{docroot}/html/*.html \
 # Symlink for the powered-by-$DISTRO image:
 ln -s ../../pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
+
 
 # symlinks for /etc/httpd
 rmdir $RPM_BUILD_ROOT/etc/httpd/{state,run}
@@ -781,6 +786,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Mar 31 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-11
+- Resolves: #1934739 - Apache trademark update - new logo
+
 * Tue Feb 23 2021 Joe Orton <jorton@redhat.com> - 2.4.46-10
 - add Conflicts: with mod_nss
 - drop use of apr_ldap_rebind (r1878890, #1847585)
