@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 11%{?dist}
+Release: 12%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -786,6 +786,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Apr  9 2021 Joe Orton <jorton@redhat.com> - 2.4.46-12
+- use OOMPolicy=continue in httpd.service, httpd@.service (#1947475)
+
 * Wed Mar 31 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-11
 - Resolves: #1934739 - Apache trademark update - new logo
 
