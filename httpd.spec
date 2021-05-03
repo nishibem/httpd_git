@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.46
-Release: 12%{?dist}
+Release: 13%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -101,7 +101,7 @@ BuildRequires: perl-interpreter, perl-generators, systemd-devel
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: gnupg2
-Requires: /etc/mime.types, system-logos-httpd >= 34.0.1
+Requires: /etc/mime.types, system-logos(httpd-logo-ng)
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
@@ -460,7 +460,7 @@ EOF
 # Handle contentdir
 mkdir $RPM_BUILD_ROOT%{contentdir}/noindex \
       $RPM_BUILD_ROOT%{contentdir}/server-status
-ln -s ../../fedora-testpage/index.html \
+ln -s ../../testpage/index.html \
       $RPM_BUILD_ROOT%{contentdir}/noindex/index.html
 install -m 644 -p docs/server-status/* \
         $RPM_BUILD_ROOT%{contentdir}/server-status
@@ -786,6 +786,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon May 03 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-13
+- Related: #1934739 - Apache trademark update - new logo
+
 * Fri Apr  9 2021 Joe Orton <jorton@redhat.com> - 2.4.46-12
 - use OOMPolicy=continue in httpd.service, httpd@.service (#1947475)
 
