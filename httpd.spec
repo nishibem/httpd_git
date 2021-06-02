@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.46
-Release: 13%{?dist}
+Version: 2.4.48
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -68,9 +68,9 @@ Patch3: httpd-2.4.43-deplibs.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.43-detect-systemd.patch
 # Features/functional changes
-Patch21: httpd-2.4.43-r1842929+.patch
+Patch21: httpd-2.4.48-r1842929+.patch
 Patch22: httpd-2.4.43-mod_systemd.patch
-Patch23: httpd-2.4.43-export.patch
+Patch23: httpd-2.4.48-export.patch
 Patch24: httpd-2.4.43-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
 Patch26: httpd-2.4.43-gettid.patch
@@ -82,15 +82,12 @@ Patch39: httpd-2.4.43-sslprotdefault.patch
 Patch40: httpd-2.4.43-r1861269.patch
 Patch41: httpd-2.4.43-r1861793+.patch
 Patch42: httpd-2.4.43-r1828172+.patch
-Patch43: httpd-2.4.43-sslcoalesce.patch
-Patch44: httpd-2.4.46-lua-resume.patch
 Patch45: httpd-2.4.43-logjournal.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
-Patch61: httpd-2.4.46-r1878890.patch
-Patch62: httpd-2.4.43-r1870095+.patch
+Patch61: httpd-2.4.48-r1878890.patch
 Patch63: httpd-2.4.46-htcacheclean-dont-break.patch
 
 # Security fixes
@@ -237,13 +234,10 @@ written in the Lua programming language.
 %patch40 -p1 -b .r1861269
 %patch41 -p1 -b .r1861793+
 %patch42 -p1 -b .r1828172+
-%patch43 -p1 -b .sslcoalesce
-%patch44 -p1 -b .luaresume
 %patch45 -p1 -b .logjournal
 
 %patch60 -p1 -b .enable-sslv3
 %patch61 -p1 -b .r1878890
-%patch62 -p1 -b .r1870095
 %patch63 -p1 -b .htcacheclean-dont-break
 
 # Patch in the vendor string
@@ -786,6 +780,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Wed Jun 02 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.48-1
+- new version 2.4.48
+- Resolves: #1964746 - httpd-2.4.48 is available
+
 * Mon May 03 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-13
 - Related: #1934739 - Apache trademark update - new logo
 
