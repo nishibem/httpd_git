@@ -12,8 +12,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.46
-Release: 10%{?dist}
+Version: 2.4.48
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -68,29 +68,26 @@ Patch3: httpd-2.4.43-deplibs.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.43-detect-systemd.patch
 # Features/functional changes
-Patch21: httpd-2.4.43-r1842929+.patch
+Patch21: httpd-2.4.48-r1842929+.patch
 Patch22: httpd-2.4.43-mod_systemd.patch
-Patch23: httpd-2.4.43-export.patch
+Patch23: httpd-2.4.48-export.patch
 Patch24: httpd-2.4.43-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
 Patch26: httpd-2.4.43-gettid.patch
 Patch27: httpd-2.4.43-icons.patch
 Patch30: httpd-2.4.43-cachehardmax.patch
-Patch31: httpd-2.4.43-sslmultiproxy.patch
 Patch34: httpd-2.4.43-socket-activation.patch
 Patch38: httpd-2.4.43-sslciphdefault.patch
 Patch39: httpd-2.4.43-sslprotdefault.patch
 Patch40: httpd-2.4.43-r1861269.patch
 Patch41: httpd-2.4.43-r1861793+.patch
 Patch42: httpd-2.4.43-r1828172+.patch
-Patch43: httpd-2.4.43-sslcoalesce.patch
-Patch44: httpd-2.4.46-lua-resume.patch
 Patch45: httpd-2.4.43-logjournal.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
-Patch62: httpd-2.4.43-r1870095+.patch
+Patch61: httpd-2.4.48-r1878890.patch
 Patch63: httpd-2.4.46-htcacheclean-dont-break.patch
 
 # Security fixes
@@ -101,7 +98,7 @@ BuildRequires: perl-interpreter, perl-generators, systemd-devel
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: gnupg2
-Requires: /etc/mime.types, system-logos-httpd >= 34.0.1
+Requires: /etc/mime.types, system-logos(httpd-logo-ng)
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
@@ -170,6 +167,8 @@ Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: sscg >= 2.2.0, /usr/bin/hostname
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
+# mod_ssl/mod_nss cannot both be loaded simultaneously
+Conflicts: mod_nss
 
 %description -n mod_ssl
 The mod_ssl module provides strong cryptography for the Apache HTTP
@@ -229,19 +228,16 @@ written in the Lua programming language.
 %patch26 -p1 -b .gettid
 %patch27 -p1 -b .icons
 %patch30 -p1 -b .cachehardmax
-#patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
 %patch38 -p1 -b .sslciphdefault
 %patch39 -p1 -b .sslprotdefault
 %patch40 -p1 -b .r1861269
 %patch41 -p1 -b .r1861793+
 %patch42 -p1 -b .r1828172+
-%patch43 -p1 -b .sslcoalesce
-%patch44 -p1 -b .luaresume
 %patch45 -p1 -b .logjournal
 
 %patch60 -p1 -b .enable-sslv3
-%patch62 -p1 -b .r1870095
+%patch61 -p1 -b .r1878890
 %patch63 -p1 -b .htcacheclean-dont-break
 
 # Patch in the vendor string
@@ -458,7 +454,7 @@ EOF
 # Handle contentdir
 mkdir $RPM_BUILD_ROOT%{contentdir}/noindex \
       $RPM_BUILD_ROOT%{contentdir}/server-status
-ln -s ../../fedora-testpage/index.html \
+ln -s ../../testpage/index.html \
       $RPM_BUILD_ROOT%{contentdir}/noindex/index.html
 install -m 644 -p docs/server-status/* \
         $RPM_BUILD_ROOT%{contentdir}/server-status
@@ -784,8 +780,22 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Wed Mar 31 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-10
+* Wed Jun 02 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.48-1
+- new version 2.4.48
+- Resolves: #1964746 - httpd-2.4.48 is available
+
+* Mon May 03 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-13
+- Related: #1934739 - Apache trademark update - new logo
+
+* Fri Apr  9 2021 Joe Orton <jorton@redhat.com> - 2.4.46-12
+- use OOMPolicy=continue in httpd.service, httpd@.service (#1947475)
+
+* Wed Mar 31 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-11
 - Resolves: #1934739 - Apache trademark update - new logo
+
+* Tue Feb 23 2021 Joe Orton <jorton@redhat.com> - 2.4.46-10
+- add Conflicts: with mod_nss
+- drop use of apr_ldap_rebind (r1878890, #1847585)
 
 * Mon Feb 01 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-9
 - Resolves: #1914182 - RFE: CustomLog should be able to use journald
