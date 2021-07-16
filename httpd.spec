@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.48
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -81,7 +81,7 @@ Patch38: httpd-2.4.43-sslciphdefault.patch
 Patch39: httpd-2.4.43-sslprotdefault.patch
 Patch40: httpd-2.4.43-r1861269.patch
 Patch41: httpd-2.4.43-r1861793+.patch
-Patch42: httpd-2.4.43-r1828172+.patch
+Patch42: httpd-2.4.48-r1828172+.patch
 Patch45: httpd-2.4.43-logjournal.patch
 
 # Bug fixes
@@ -780,6 +780,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Fri Jul 16 2021 Joe Orton <jorton@redhat.com> - 2.4.48-2
+- mod_cgi/mod_cgid: update to unification from trunk
+- httpd.conf: add note on care with Listen and starting at boot
+
 * Wed Jun 02 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.48-1
 - new version 2.4.48
 - Resolves: #1964746 - httpd-2.4.48 is available
