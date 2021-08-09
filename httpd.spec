@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.48
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -486,8 +486,10 @@ ln -s ../../pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
 
 # Symlink for the system logo
+%if 0%{?rhel} >= 9
 ln -s ../../pixmaps/system-noindex-logo.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/system_noindex_logo.png
+%endif
 
 # symlinks for /etc/httpd
 rmdir $RPM_BUILD_ROOT/etc/httpd/{state,run}
@@ -785,7 +787,7 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Fri Aug 06 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.48-6
+* Fri Aug 06 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.48-7
 - add symlink to system logo for noindex test page
 
 * Fri Aug  6 2021 Joe Orton <jorton@redhat.com> - 2.4.48-4
