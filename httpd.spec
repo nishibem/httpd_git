@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.48
-Release: 7%{?dist}
+Release: 8%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -787,6 +787,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2.4.48-8
+- Rebuilt with OpenSSL 3.0.0
+
 * Fri Aug 06 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.48-7
 - add symlink to system logo for noindex test page
 
