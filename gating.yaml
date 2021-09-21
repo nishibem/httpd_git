@@ -4,4 +4,4 @@ product_versions:
 decision_contexts: [bodhi_update_push_testing]
 subject_type: koji_build
 rules:
-  - !PassingTestCaseRule {test_case_name: fedora-ci.koji-build.tier1-public.functional}
+  - !PassingTestCaseRule {test_case_name: fedora-ci.koji-build./plans/tier1-public.functional}
