@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.49
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -787,7 +787,7 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
-* Wed Sep 22 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.49-2
+* Wed Sep 22 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.49-3
 - Rebuilt for CI testing
 
 * Thu Sep 16 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.49-1
