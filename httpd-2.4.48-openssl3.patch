@@ -1,0 +1,505 @@
+
+https://github.com/apache/httpd/pull/258
+
+diff --git a/modules/ssl/ssl_engine_init.c b/modules/ssl/ssl_engine_init.c
+index 4da24eddcc..5d199cddaf 100644
+--- a/modules/ssl/ssl_engine_init.c
++++ b/modules/ssl/ssl_engine_init.c
+@@ -91,7 +91,6 @@ static int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+ 
+     return 1;
+ }
+-#endif
+ 
+ /*
+  * Grab well-defined DH parameters from OpenSSL, see the BN_get_rfc*
+@@ -171,6 +170,7 @@ DH *modssl_get_dh_params(unsigned keylen)
+         
+     return NULL; /* impossible to reach. */
+ }
++#endif
+ 
+ static void ssl_add_version_components(apr_pool_t *ptemp, apr_pool_t *pconf,
+                                        server_rec *s)
+@@ -440,8 +440,9 @@ apr_status_t ssl_init_Module(apr_pool_t *p, apr_pool_t *plog,
+ 
+     modssl_init_app_data2_idx(); /* for modssl_get_app_data2() at request time */
+ 
++#if MODSSL_USE_OPENSSL_PRE_1_1_API
+     init_dh_params();
+-#if !MODSSL_USE_OPENSSL_PRE_1_1_API
++#else
+     init_bio_methods();
+ #endif
+ 
+@@ -834,7 +835,11 @@ static void ssl_init_ctx_callbacks(server_rec *s,
+ {
+     SSL_CTX *ctx = mctx->ssl_ctx;
+ 
++#if MODSSL_USE_OPENSSL_PRE_1_1_API
+     SSL_CTX_set_tmp_dh_callback(ctx,  ssl_callback_TmpDH);
++#else
++    SSL_CTX_set_dh_auto(ctx, 1);
++#endif
+ 
+     SSL_CTX_set_info_callback(ctx, ssl_callback_Info);
+ 
+@@ -843,6 +848,23 @@ static void ssl_init_ctx_callbacks(server_rec *s,
+ #endif
+ }
+ 
++static APR_INLINE
++int modssl_CTX_load_verify_locations(SSL_CTX *ctx,
++                                     const char *file,
++                                     const char *path)
++{
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++    if (!SSL_CTX_load_verify_locations(ctx, file, path))
++        return 0;
++#else
++    if (file && !SSL_CTX_load_verify_file(ctx, file))
++        return 0;
++    if (path && !SSL_CTX_load_verify_dir(ctx, path))
++        return 0;
++#endif
++    return 1;
++}
++
+ static apr_status_t ssl_init_ctx_verify(server_rec *s,
+                                         apr_pool_t *p,
+                                         apr_pool_t *ptemp,
+@@ -883,10 +905,8 @@ static apr_status_t ssl_init_ctx_verify(server_rec *s,
+         ap_log_error(APLOG_MARK, APLOG_TRACE1, 0, s,
+                      "Configuring client authentication");
+ 
+-        if (!SSL_CTX_load_verify_locations(ctx,
+-                                           mctx->auth.ca_cert_file,
+-                                           mctx->auth.ca_cert_path))
+-        {
++        if (!modssl_CTX_load_verify_locations(ctx, mctx->auth.ca_cert_file,
++                                                   mctx->auth.ca_cert_path)) {
+             ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO(01895)
+                     "Unable to configure verify locations "
+                     "for client authentication");
+@@ -971,6 +991,23 @@ static apr_status_t ssl_init_ctx_cipher_suite(server_rec *s,
+     return APR_SUCCESS;
+ }
+ 
++static APR_INLINE
++int modssl_X509_STORE_load_locations(X509_STORE *store,
++                                     const char *file,
++                                     const char *path)
++{
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++    if (!X509_STORE_load_locations(store, file, path))
++        return 0;
++#else
++    if (file && !X509_STORE_load_file(store, file))
++        return 0;
++    if (path && !X509_STORE_load_path(store, path))
++        return 0;
++#endif
++    return 1;
++}
++
+ static apr_status_t ssl_init_ctx_crl(server_rec *s,
+                                      apr_pool_t *p,
+                                      apr_pool_t *ptemp,
+@@ -1009,8 +1046,8 @@ static apr_status_t ssl_init_ctx_crl(server_rec *s,
+     ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, APLOGNO(01900)
+                  "Configuring certificate revocation facility");
+ 
+-    if (!store || !X509_STORE_load_locations(store, mctx->crl_file,
+-                                             mctx->crl_path)) {
++    if (!store || !modssl_X509_STORE_load_locations(store, mctx->crl_file,
++                                                           mctx->crl_path)) {
+         ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO(01901)
+                      "Host %s: unable to configure X.509 CRL storage "
+                      "for certificate revocation", mctx->sc->vhost_id);
+@@ -1239,6 +1276,31 @@ static int ssl_no_passwd_prompt_cb(char *buf, int size, int rwflag,
+    return 0;
+ }
+ 
++static APR_INLINE int modssl_DH_bits(DH *dh)
++{
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++    return DH_bits(dh);
++#else
++    return BN_num_bits(DH_get0_p(dh));
++#endif
++}
++
++/* SSL_CTX_use_PrivateKey_file() can fail either because the private
++ * key was encrypted, or due to a mismatch between an already-loaded
++ * cert and the key - a common misconfiguration - from calling
++ * X509_check_private_key().  This macro is passed the last error code
++ * off the OpenSSL stack and evaluates to true only for the first
++ * case.  With OpenSSL < 3 the second case is identifiable by the
++ * function code, but function codes are not used from 3.0. */
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++#define CHECK_PRIVKEY_ERROR(ec) (ERR_GET_FUNC(ec) != X509_F_X509_CHECK_PRIVATE_KEY)
++#else
++#define CHECK_PRIVKEY_ERROR(ec) (ERR_GET_LIB != ERR_LIB_X509            \
++                                 || (ERR_GET_REASON(ec) != X509_R_KEY_TYPE_MISMATCH \
++                                     && ERR_GET_REASON(ec) != X509_R_KEY_VALUES_MISMATCH \
++                                     && ERR_GET_REASON(ec) != X509_R_UNKNOWN_KEY_TYPE))
++#endif
++
+ static apr_status_t ssl_init_server_certs(server_rec *s,
+                                           apr_pool_t *p,
+                                           apr_pool_t *ptemp,
+@@ -1249,7 +1311,7 @@ static apr_status_t ssl_init_server_certs(server_rec *s,
+     const char *vhost_id = mctx->sc->vhost_id, *key_id, *certfile, *keyfile;
+     int i;
+     X509 *cert;
+-    DH *dhparams;
++    DH *dh;
+ #ifdef HAVE_ECC
+     EC_GROUP *ecparams = NULL;
+     int nid;
+@@ -1344,8 +1406,7 @@ static apr_status_t ssl_init_server_certs(server_rec *s,
+         }
+         else if ((SSL_CTX_use_PrivateKey_file(mctx->ssl_ctx, keyfile,
+                                               SSL_FILETYPE_PEM) < 1)
+-                 && (ERR_GET_FUNC(ERR_peek_last_error())
+-                     != X509_F_X509_CHECK_PRIVATE_KEY)) {
++                 && CHECK_PRIVKEY_ERROR(ERR_peek_last_error())) {
+             ssl_asn1_t *asn1;
+             const unsigned char *ptr;
+ 
+@@ -1434,12 +1495,12 @@ static apr_status_t ssl_init_server_certs(server_rec *s,
+      */
+     certfile = APR_ARRAY_IDX(mctx->pks->cert_files, 0, const char *);
+     if (certfile && !modssl_is_engine_id(certfile)
+-        && (dhparams = ssl_dh_GetParamFromFile(certfile))) {
+-        SSL_CTX_set_tmp_dh(mctx->ssl_ctx, dhparams);
++        && (dh = ssl_dh_GetParamFromFile(certfile))) {
++        SSL_CTX_set_tmp_dh(mctx->ssl_ctx, dh);
+         ap_log_error(APLOG_MARK, APLOG_DEBUG, 0, s, APLOGNO(02540)
+                      "Custom DH parameters (%d bits) for %s loaded from %s",
+-                     DH_bits(dhparams), vhost_id, certfile);
+-        DH_free(dhparams);
++                     modssl_DH_bits(dh), vhost_id, certfile);
++        DH_free(dh);
+     }
+ 
+ #ifdef HAVE_ECC
+@@ -1490,6 +1551,7 @@ static apr_status_t ssl_init_ticket_key(server_rec *s,
+     char buf[TLSEXT_TICKET_KEY_LEN];
+     char *path;
+     modssl_ticket_key_t *ticket_key = mctx->ticket_key;
++    int res;
+ 
+     if (!ticket_key->file_path) {
+         return APR_SUCCESS;
+@@ -1517,11 +1579,22 @@ static apr_status_t ssl_init_ticket_key(server_rec *s,
+     }
+ 
+     memcpy(ticket_key->key_name, buf, 16);
+-    memcpy(ticket_key->hmac_secret, buf + 16, 16);
+     memcpy(ticket_key->aes_key, buf + 32, 16);
+-
+-    if (!SSL_CTX_set_tlsext_ticket_key_cb(mctx->ssl_ctx,
+-                                          ssl_callback_SessionTicket)) {
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++    memcpy(ticket_key->hmac_secret, buf + 16, 16);
++    res = SSL_CTX_set_tlsext_ticket_key_cb(mctx->ssl_ctx,
++                                           ssl_callback_SessionTicket);
++#else
++    ticket_key->mac_params[0] =
++        OSSL_PARAM_construct_octet_string(OSSL_MAC_PARAM_KEY, buf + 16, 16);
++    ticket_key->mac_params[1] =
++        OSSL_PARAM_construct_utf8_string(OSSL_MAC_PARAM_DIGEST, "sha256", 0);
++    ticket_key->mac_params[2] =
++        OSSL_PARAM_construct_end();
++    res = SSL_CTX_set_tlsext_ticket_key_evp_cb(mctx->ssl_ctx,
++                                               ssl_callback_SessionTicket);
++#endif
++    if (!res) {
+         ap_log_error(APLOG_MARK, APLOG_EMERG, 0, s, APLOGNO(01913)
+                      "Unable to initialize TLS session ticket key callback "
+                      "(incompatible OpenSSL version?)");
+@@ -1652,7 +1725,7 @@ static apr_status_t ssl_init_proxy_certs(server_rec *s,
+         return ssl_die(s);
+     }
+ 
+-    X509_STORE_load_locations(store, pkp->ca_cert_file, NULL);
++    modssl_X509_STORE_load_locations(store, pkp->ca_cert_file, NULL);
+ 
+     for (n = 0; n < ncerts; n++) {
+         int i;
+@@ -2249,10 +2322,11 @@ apr_status_t ssl_init_ModuleKill(void *data)
+ 
+     }
+ 
+-#if !MODSSL_USE_OPENSSL_PRE_1_1_API
++#if MODSSL_USE_OPENSSL_PRE_1_1_API
++    free_dh_params();
++#else
+     free_bio_methods();
+ #endif
+-    free_dh_params();
+ 
+     return APR_SUCCESS;
+ }
+diff --git a/modules/ssl/ssl_engine_io.c b/modules/ssl/ssl_engine_io.c
+index cabf753790..3db7077f1e 100644
+--- a/modules/ssl/ssl_engine_io.c
++++ b/modules/ssl/ssl_engine_io.c
+@@ -194,6 +194,10 @@ static int bio_filter_destroy(BIO *bio)
+ static int bio_filter_out_read(BIO *bio, char *out, int outl)
+ {
+     /* this is never called */
++    bio_filter_out_ctx_t *outctx = (bio_filter_out_ctx_t *)BIO_get_data(bio);
++    ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, outctx->c,
++                  "BUG: %s() should not be called", "bio_filter_out_read");
++    AP_DEBUG_ASSERT(0);
+     return -1;
+ }
+ 
+@@ -293,12 +297,20 @@ static long bio_filter_out_ctrl(BIO *bio, int cmd, long num, void *ptr)
+ static int bio_filter_out_gets(BIO *bio, char *buf, int size)
+ {
+     /* this is never called */
++    bio_filter_out_ctx_t *outctx = (bio_filter_out_ctx_t *)BIO_get_data(bio);
++    ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, outctx->c,
++                  "BUG: %s() should not be called", "bio_filter_out_gets");
++    AP_DEBUG_ASSERT(0);
+     return -1;
+ }
+ 
+ static int bio_filter_out_puts(BIO *bio, const char *str)
+ {
+     /* this is never called */
++    bio_filter_out_ctx_t *outctx = (bio_filter_out_ctx_t *)BIO_get_data(bio);
++    ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, outctx->c,
++                  "BUG: %s() should not be called", "bio_filter_out_puts");
++    AP_DEBUG_ASSERT(0);
+     return -1;
+ }
+ 
+@@ -533,22 +545,47 @@ static int bio_filter_in_read(BIO *bio, char *in, int inlen)
+ 
+ static int bio_filter_in_write(BIO *bio, const char *in, int inl)
+ {
++    bio_filter_in_ctx_t *inctx = (bio_filter_in_ctx_t *)BIO_get_data(bio);
++    ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, inctx->f->c,
++                  "BUG: %s() should not be called", "bio_filter_in_write");
++    AP_DEBUG_ASSERT(0);
+     return -1;
+ }
+ 
+ static int bio_filter_in_puts(BIO *bio, const char *str)
+ {
++    bio_filter_in_ctx_t *inctx = (bio_filter_in_ctx_t *)BIO_get_data(bio);
++    ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, inctx->f->c,
++                  "BUG: %s() should not be called", "bio_filter_in_puts");
++    AP_DEBUG_ASSERT(0);
+     return -1;
+ }
+ 
+ static int bio_filter_in_gets(BIO *bio, char *buf, int size)
+ {
++    bio_filter_in_ctx_t *inctx = (bio_filter_in_ctx_t *)BIO_get_data(bio);
++    ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, inctx->f->c,
++                  "BUG: %s() should not be called", "bio_filter_in_gets");
++    AP_DEBUG_ASSERT(0);
+     return -1;
+ }
+ 
+ static long bio_filter_in_ctrl(BIO *bio, int cmd, long num, void *ptr)
+ {
+-    return -1;
++    bio_filter_in_ctx_t *inctx = (bio_filter_in_ctx_t *)BIO_get_data(bio);
++    switch (cmd) {
++#ifdef BIO_CTRL_EOF
++    case BIO_CTRL_EOF:
++        return inctx->rc == APR_EOF;
++#endif
++    default:
++        break;
++    }
++    ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, inctx->f->c,
++                  "BUG: bio_filter_in_ctrl() should not be called with cmd=%i",
++                  cmd);
++    AP_DEBUG_ASSERT(0);
++    return 0;
+ }
+ 
+ #if MODSSL_USE_OPENSSL_PRE_1_1_API
+@@ -573,7 +610,7 @@ static BIO_METHOD bio_filter_in_method = {
+     bio_filter_in_read,
+     bio_filter_in_puts,         /* puts is never called */
+     bio_filter_in_gets,         /* gets is never called */
+-    bio_filter_in_ctrl,         /* ctrl is never called */
++    bio_filter_in_ctrl,         /* ctrl is called for EOF check */
+     bio_filter_create,
+     bio_filter_destroy,
+     NULL
+diff --git a/modules/ssl/ssl_engine_kernel.c b/modules/ssl/ssl_engine_kernel.c
+index b99dcf19d4..aced92d2d0 100644
+--- a/modules/ssl/ssl_engine_kernel.c
++++ b/modules/ssl/ssl_engine_kernel.c
+@@ -1685,6 +1685,7 @@ const authz_provider ssl_authz_provider_verify_client =
+ **  _________________________________________________________________
+ */
+ 
++#if MODSSL_USE_OPENSSL_PRE_1_1_API
+ /*
+  * Hand out standard DH parameters, based on the authentication strength
+  */
+@@ -1730,6 +1731,7 @@ DH *ssl_callback_TmpDH(SSL *ssl, int export, int keylen)
+ 
+     return modssl_get_dh_params(keylen);
+ }
++#endif
+ 
+ /*
+  * This OpenSSL callback function is called when OpenSSL
+@@ -2614,7 +2616,11 @@ int ssl_callback_SessionTicket(SSL *ssl,
+                                unsigned char *keyname,
+                                unsigned char *iv,
+                                EVP_CIPHER_CTX *cipher_ctx,
+-                               HMAC_CTX *hctx,
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++                               HMAC_CTX *hmac_ctx,
++#else
++                               EVP_MAC_CTX *mac_ctx,
++#endif
+                                int mode)
+ {
+     conn_rec *c = (conn_rec *)SSL_get_app_data(ssl);
+@@ -2641,7 +2647,13 @@ int ssl_callback_SessionTicket(SSL *ssl,
+         }
+         EVP_EncryptInit_ex(cipher_ctx, EVP_aes_128_cbc(), NULL,
+                            ticket_key->aes_key, iv);
+-        HMAC_Init_ex(hctx, ticket_key->hmac_secret, 16, tlsext_tick_md(), NULL);
++
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++        HMAC_Init_ex(hmac_ctx, ticket_key->hmac_secret, 16,
++                     tlsext_tick_md(), NULL);
++#else
++        EVP_MAC_CTX_set_params(mac_ctx, ticket_key->mac_params);
++#endif
+ 
+         ap_log_cerror(APLOG_MARK, APLOG_DEBUG, 0, c, APLOGNO(02289)
+                       "TLS session ticket key for %s successfully set, "
+@@ -2662,7 +2674,13 @@ int ssl_callback_SessionTicket(SSL *ssl,
+ 
+         EVP_DecryptInit_ex(cipher_ctx, EVP_aes_128_cbc(), NULL,
+                            ticket_key->aes_key, iv);
+-        HMAC_Init_ex(hctx, ticket_key->hmac_secret, 16, tlsext_tick_md(), NULL);
++
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++        HMAC_Init_ex(hmac_ctx, ticket_key->hmac_secret, 16,
++                     tlsext_tick_md(), NULL);
++#else
++        EVP_MAC_CTX_set_params(mac_ctx, ticket_key->mac_params);
++#endif
+ 
+         ap_log_cerror(APLOG_MARK, APLOG_DEBUG, 0, c, APLOGNO(02290)
+                       "TLS session ticket key for %s successfully set, "
+diff --git a/modules/ssl/ssl_engine_log.c b/modules/ssl/ssl_engine_log.c
+index 7dbbbdb55e..3b3ceacf0a 100644
+--- a/modules/ssl/ssl_engine_log.c
++++ b/modules/ssl/ssl_engine_log.c
+@@ -78,6 +78,16 @@ apr_status_t ssl_die(server_rec *s)
+     return APR_EGENERAL;
+ }
+ 
++static APR_INLINE
++unsigned long modssl_ERR_peek_error_data(const char **data, int *flags)
++{
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++    return ERR_peek_error_line_data(NULL, NULL, data, flags);
++#else
++    return ERR_peek_error_data(data, flags);
++#endif
++}
++
+ /*
+  * Prints the SSL library error information.
+  */
+@@ -87,7 +97,7 @@ void ssl_log_ssl_error(const char *file, int line, int level, server_rec *s)
+     const char *data;
+     int flags;
+ 
+-    while ((e = ERR_peek_error_line_data(NULL, NULL, &data, &flags))) {
++    while ((e = modssl_ERR_peek_error_data(&data, &flags))) {
+         const char *annotation;
+         char err[256];
+ 
+diff --git a/modules/ssl/ssl_private.h b/modules/ssl/ssl_private.h
+index a6fc7513a2..b091c58c94 100644
+--- a/modules/ssl/ssl_private.h
++++ b/modules/ssl/ssl_private.h
+@@ -89,6 +89,9 @@
+ /* must be defined before including ssl.h */
+ #define OPENSSL_NO_SSL_INTERN
+ #endif
++#if OPENSSL_VERSION_NUMBER >= 0x30000000
++#include <openssl/core_names.h>
++#endif
+ #include <openssl/ssl.h>
+ #include <openssl/err.h>
+ #include <openssl/x509.h>
+@@ -134,13 +137,12 @@
+         SSL_CTX_ctrl(ctx, SSL_CTRL_SET_MIN_PROTO_VERSION, version, NULL)
+ #define SSL_CTX_set_max_proto_version(ctx, version) \
+         SSL_CTX_ctrl(ctx, SSL_CTRL_SET_MAX_PROTO_VERSION, version, NULL)
+-#elif LIBRESSL_VERSION_NUMBER < 0x2070000f
++#endif /* LIBRESSL_VERSION_NUMBER < 0x2060000f */
+ /* LibreSSL before 2.7 declares OPENSSL_VERSION_NUMBER == 2.0 but does not
+  * include most changes from OpenSSL >= 1.1 (new functions, macros, 
+  * deprecations, ...), so we have to work around this...
+  */
+-#define MODSSL_USE_OPENSSL_PRE_1_1_API (1)
+-#endif /* LIBRESSL_VERSION_NUMBER < 0x2060000f */
++#define MODSSL_USE_OPENSSL_PRE_1_1_API (LIBRESSL_VERSION_NUMBER < 0x2070000f)
+ #else /* defined(LIBRESSL_VERSION_NUMBER) */
+ #define MODSSL_USE_OPENSSL_PRE_1_1_API (OPENSSL_VERSION_NUMBER < 0x10100000L)
+ #endif
+@@ -674,7 +676,11 @@ typedef struct {
+ typedef struct {
+     const char *file_path;
+     unsigned char key_name[16];
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
+     unsigned char hmac_secret[16];
++#else
++    OSSL_PARAM mac_params[3];
++#endif
+     unsigned char aes_key[16];
+ } modssl_ticket_key_t;
+ #endif
+@@ -938,8 +944,16 @@ int          ssl_callback_ServerNameIndication(SSL *, int *, modssl_ctx_t *);
+ int          ssl_callback_ClientHello(SSL *, int *, void *);
+ #endif
+ #ifdef HAVE_TLS_SESSION_TICKETS
+-int         ssl_callback_SessionTicket(SSL *, unsigned char *, unsigned char *,
+-                                       EVP_CIPHER_CTX *, HMAC_CTX *, int);
++int ssl_callback_SessionTicket(SSL *ssl,
++                               unsigned char *keyname,
++                               unsigned char *iv,
++                               EVP_CIPHER_CTX *cipher_ctx,
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++                               HMAC_CTX *hmac_ctx,
++#else
++                               EVP_MAC_CTX *mac_ctx,
++#endif
++                               int mode);
+ #endif
+ 
+ #ifdef HAVE_TLS_ALPN
+@@ -1112,10 +1126,12 @@ void ssl_init_ocsp_certificates(server_rec *s, modssl_ctx_t *mctx);
+ 
+ #endif
+ 
++#if MODSSL_USE_OPENSSL_PRE_1_1_API
+ /* Retrieve DH parameters for given key length.  Return value should
+  * be treated as unmutable, since it is stored in process-global
+  * memory. */
+ DH *modssl_get_dh_params(unsigned keylen);
++#endif
+ 
+ /* Returns non-zero if the request was made over SSL/TLS.  If sslconn
+  * is non-NULL and the request is using SSL/TLS, sets *sslconn to the

@@ -12,7 +12,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.48
+Version: 2.4.50
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -60,6 +60,7 @@ Source44: httpd@.service
 Source45: config.layout
 Source46: apachectl.sh
 Source47: apachectl.xml
+Source48: apache-poweredby.png
 
 # build/scripts patches
 Patch2: httpd-2.4.43-apxs.patch
@@ -74,19 +75,20 @@ Patch24: httpd-2.4.43-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
 Patch26: httpd-2.4.43-gettid.patch
 Patch27: httpd-2.4.43-icons.patch
+Patch28: httpd-2.4.48-openssl3.patch
 Patch30: httpd-2.4.43-cachehardmax.patch
-Patch31: httpd-2.4.43-sslmultiproxy.patch
 Patch34: httpd-2.4.43-socket-activation.patch
 Patch38: httpd-2.4.43-sslciphdefault.patch
 Patch39: httpd-2.4.43-sslprotdefault.patch
 Patch40: httpd-2.4.43-r1861269.patch
 Patch41: httpd-2.4.43-r1861793+.patch
-Patch42: httpd-2.4.43-r1828172+.patch
+Patch42: httpd-2.4.48-r1828172+.patch
 Patch45: httpd-2.4.43-logjournal.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
 Patch60: httpd-2.4.43-enable-sslv3.patch
+Patch61: httpd-2.4.48-r1878890.patch
 Patch63: httpd-2.4.46-htcacheclean-dont-break.patch
 
 # Security fixes
@@ -97,7 +99,7 @@ BuildRequires: perl-interpreter, perl-generators, systemd-devel
 BuildRequires: zlib-devel, libselinux-devel, lua-devel, brotli-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: gnupg2
-Requires: /etc/mime.types, system-logos-httpd
+Requires: /etc/mime.types, system-logos(httpd-logo-ng)
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
@@ -166,6 +168,8 @@ Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: sscg >= 2.2.0, /usr/bin/hostname
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts: openssl-libs < 1:1.0.1h-4
+# mod_ssl/mod_nss cannot both be loaded simultaneously
+Conflicts: mod_nss
 
 %description -n mod_ssl
 The mod_ssl module provides strong cryptography for the Apache HTTP
@@ -224,8 +228,8 @@ written in the Lua programming language.
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .gettid
 %patch27 -p1 -b .icons
+%patch28 -p1 -b .openssl3
 %patch30 -p1 -b .cachehardmax
-#patch31 -p1 -b .sslmultiproxy
 %patch34 -p1 -b .socketactivation
 %patch38 -p1 -b .sslciphdefault
 %patch39 -p1 -b .sslprotdefault
@@ -235,6 +239,7 @@ written in the Lua programming language.
 %patch45 -p1 -b .logjournal
 
 %patch60 -p1 -b .enable-sslv3
+%patch61 -p1 -b .r1878890
 %patch63 -p1 -b .htcacheclean-dont-break
 
 # Patch in the vendor string
@@ -261,6 +266,9 @@ if test "x${vmmn}" != "x%{mmn}"; then
    : Update the mmn macro and rebuild.
    exit 1
 fi
+
+# A new logo which comes together with a new test page
+cp %{SOURCE48} ./docs/icons/apache_pb3.png
 
 # Provide default layout
 cp $RPM_SOURCE_DIR/config.layout .
@@ -448,7 +456,7 @@ EOF
 # Handle contentdir
 mkdir $RPM_BUILD_ROOT%{contentdir}/noindex \
       $RPM_BUILD_ROOT%{contentdir}/server-status
-ln -s ../../fedora-testpage/index.html \
+ln -s ../../testpage/index.html \
       $RPM_BUILD_ROOT%{contentdir}/noindex/index.html
 install -m 644 -p docs/server-status/* \
         $RPM_BUILD_ROOT%{contentdir}/server-status
@@ -476,6 +484,12 @@ rm -v $RPM_BUILD_ROOT%{docroot}/html/*.html \
 # Symlink for the powered-by-$DISTRO image:
 ln -s ../../pixmaps/poweredby.png \
         $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
+
+# Symlink for the system logo
+%if 0%{?rhel} >= 9
+ln -s ../../pixmaps/system-noindex-logo.png \
+        $RPM_BUILD_ROOT%{contentdir}/icons/system_noindex_logo.png
+%endif
 
 # symlinks for /etc/httpd
 rmdir $RPM_BUILD_ROOT/etc/httpd/{state,run}
@@ -773,9 +787,47 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Oct 05 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.50-1
+- new version 2.4.50
+
+* Wed Sep 22 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.49-3
+- Rebuilt for CI testing
+
+* Thu Sep 16 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.49-1
+- new version 2.4.49 (#2004776)
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2.4.48-8
+- Rebuilt with OpenSSL 3.0.0
+
+* Fri Aug 06 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.48-7
+- add symlink to system logo for noindex test page
+
+* Fri Aug  6 2021 Joe Orton <jorton@redhat.com> - 2.4.48-4
+- add OpenSSL 3.x compatibility patch
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.48-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jul 16 2021 Joe Orton <jorton@redhat.com> - 2.4.48-2
+- mod_cgi/mod_cgid: update to unification from trunk
+- httpd.conf: add note on care with Listen and starting at boot
+
 * Wed Jun 02 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.48-1
 - new version 2.4.48
 - Resolves: #1964746 - httpd-2.4.48 is available
+
+* Mon May 03 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-13
+- Related: #1934739 - Apache trademark update - new logo
+
+* Fri Apr  9 2021 Joe Orton <jorton@redhat.com> - 2.4.46-12
+- use OOMPolicy=continue in httpd.service, httpd@.service (#1947475)
+
+* Wed Mar 31 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-11
+- Resolves: #1934739 - Apache trademark update - new logo
+
+* Tue Feb 23 2021 Joe Orton <jorton@redhat.com> - 2.4.46-10
+- add Conflicts: with mod_nss
+- drop use of apr_ldap_rebind (r1878890, #1847585)
 
 * Mon Feb 01 2021 Lubos Uhliarik <luhliari@redhat.com> - 2.4.46-9
 - Resolves: #1914182 - RFE: CustomLog should be able to use journald
