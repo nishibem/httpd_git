@@ -12,7 +12,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.4.50
+Version: 2.4.51
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -787,6 +787,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Thu Oct 07 2021 Patrick Uiterwijk <patrick@puiterwijk.org> - 2.4.51-1
+- new version 2.4.51
+
 * Tue Oct 05 2021 Luboš Uhliarik <luhliari@redhat.com> - 2.4.50-1
 - new version 2.4.50
 
