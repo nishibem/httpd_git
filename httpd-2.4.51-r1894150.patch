@@ -1,0 +1,17 @@
+# ./pullrev.sh 1894150
+http://svn.apache.org/viewvc?view=revision&revision=1894150
+
+--- httpd-2.4.51/server/util_filter.c
++++ httpd-2.4.51/server/util_filter.c
+@@ -565,8 +565,9 @@
+                                          apr_bucket_brigade *bb)
+ {
+     if (next) {
+-        apr_bucket *e;
+-        if ((e = APR_BRIGADE_LAST(bb)) && APR_BUCKET_IS_EOS(e) && next->r) {
++        apr_bucket *e = APR_BRIGADE_LAST(bb);
++
++        if (e != APR_BRIGADE_SENTINEL(bb) && APR_BUCKET_IS_EOS(e) && next->r) {
+             /* This is only safe because HTTP_HEADER filter is always in
+              * the filter stack.   This ensures that there is ALWAYS a
+              * request-based filter that we can attach this to.  If the

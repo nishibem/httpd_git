@@ -90,6 +90,8 @@ Patch45: httpd-2.4.43-logjournal.patch
 Patch60: httpd-2.4.43-enable-sslv3.patch
 Patch61: httpd-2.4.48-r1878890.patch
 Patch63: httpd-2.4.46-htcacheclean-dont-break.patch
+Patch64: httpd-2.4.51-r1894150.patch
+Patch65: httpd-2.4.51-r1894152.patch
 
 # Security fixes
 
@@ -241,6 +243,8 @@ written in the Lua programming language.
 %patch60 -p1 -b .enable-sslv3
 %patch61 -p1 -b .r1878890
 %patch63 -p1 -b .htcacheclean-dont-break
+%patch64 -p1 -b .r1894150
+%patch65 -p1 -b .r1894152
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -789,6 +793,7 @@ exit $rv
 %changelog
 * Tue Oct 12 2021 Joe Orton <jorton@redhat.com> - 2.4.51-2
 - mod_ssl: updated patch for OpenSSL 3.0 compatibility (#2007178)
+- mod_deflate/core: add two brigade handling correctness fixes
 
 * Thu Oct 07 2021 Patrick Uiterwijk <patrick@puiterwijk.org> - 2.4.51-1
 - new version 2.4.51
