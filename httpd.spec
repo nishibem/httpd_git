@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.51
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -75,7 +75,7 @@ Patch24: httpd-2.4.43-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
 Patch26: httpd-2.4.43-gettid.patch
 Patch27: httpd-2.4.43-icons.patch
-Patch28: httpd-2.4.48-openssl3.patch
+Patch28: httpd-2.4.51-openssl3.patch
 Patch30: httpd-2.4.43-cachehardmax.patch
 Patch34: httpd-2.4.43-socket-activation.patch
 Patch38: httpd-2.4.43-sslciphdefault.patch
@@ -787,6 +787,9 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Tue Oct 12 2021 Joe Orton <jorton@redhat.com> - 2.4.51-2
+- mod_ssl: updated patch for OpenSSL 3.0 compatibility (#2007178)
+
 * Thu Oct 07 2021 Patrick Uiterwijk <patrick@puiterwijk.org> - 2.4.51-1
 - new version 2.4.51
 
