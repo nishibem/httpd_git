@@ -3,7 +3,7 @@
 %define suexec_caller apache
 %define mmn 20120211
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
-%define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
+%define vstring %(source /etc/os-release; echo ${NAME})
 %if 0%{?fedora} > 26 || 0%{?rhel} > 7
 %global mpm event
 %else
@@ -13,7 +13,7 @@
 Summary: Apache HTTP Server
 Name: httpd
 Version: 2.4.51
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2.asc
@@ -791,6 +791,10 @@ exit $rv
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %changelog
+* Mon Dec 06 2021 Neal Gompa <ngompa@fedoraproject.org> - 2.4.51-3
+- Use NAME from os-release(5) for vendor string
+  Related: #2029071 - httpd on CentOS identifies as RHEL
+
 * Tue Oct 12 2021 Joe Orton <jorton@redhat.com> - 2.4.51-2
 - mod_ssl: updated patch for OpenSSL 3.0 compatibility (#2007178)
 - mod_deflate/core: add two brigade handling correctness fixes
