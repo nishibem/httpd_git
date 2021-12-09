@@ -6,6 +6,8 @@
     sharedscripts
     delaycompress
     postrotate
-        /bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
+    if [ -e /var/run/httpd/httpd.pid ]; then 
+        /bin/systemctl reload httpd.service > /dev/null 2>/dev/null  || true
+    fi
     endscript
 }
